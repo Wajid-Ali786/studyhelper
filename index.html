@@ -29,14 +29,13 @@
 
         /* Custom transition for screens */
         .screen {
-            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+            transition: opacity 0.3s ease-in-out;
         }
 
-        .screen.hidden {
+        .screen-hidden {
             opacity: 0;
-            transform: scale(0.98);
-            pointer-events: none; /* Prevent interaction when hidden */
-            display: none; /* Use display none to remove from layout */
+            pointer-events: none;
+            display: none;
         }
         
         /* Custom styles for answer buttons */
@@ -123,383 +122,459 @@
         input[type=number] {
             -moz-appearance: textfield;
         }
+
+        /* Sidebar styles */
+        #sidebar {
+            transition: transform 0.3s ease-in-out, width 0.3s ease-in-out;
+        }
+
+        #main-content {
+            transition: margin-left 0.3s ease-in-out;
+        }
+
+        /* Sidebar link base styles */
+        .sidebar-link {
+            @apply flex items-center p-3 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700;
+        }
+        /* Sidebar active link styles */
+        .sidebar-link.active {
+            @apply bg-indigo-100 dark:bg-indigo-800 text-indigo-700 dark:text-indigo-300 font-semibold;
+        }
+        
+        /* Toast Notification */
+        #toast-container {
+            @apply fixed bottom-5 right-5 z-50 flex flex-col gap-3;
+        }
+        .toast {
+            @apply p-4 rounded-lg shadow-lg text-white font-semibold flex items-center gap-3 transition-all duration-300;
+            animation: slideIn 0.3s ease-out;
+        }
+        .toast.success { @apply bg-green-600; }
+        .toast.error { @apply bg-red-600; }
+        .toast.warning { @apply bg-yellow-600; }
+        
+        .toast.fade-out {
+            opacity: 0;
+            transform: translateX(100%);
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(100%); }
+            to { opacity: 1; transform: translateX(0); }
+        }
     </style>
 </head>
-<body class="bg-slate-100 dark:bg-slate-900 min-h-screen flex items-center justify-center p-4 transition-colors duration-300">
+<body class="bg-slate-100 dark:bg-slate-900 min-h-screen text-slate-800 dark:text-slate-200">
 
-    <!-- Main Container Card -->
-    <div class="w-full max-w-3xl bg-white dark:bg-slate-800 rounded-xl shadow-xl p-6 sm:p-10 relative">
+    <!-- Toast Notification Container -->
+    <div id="toast-container"></div>
+    
+    <!-- Sidebar Overlay (for mobile) -->
+    <div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-30 md:hidden hidden"></div>
 
-        <!-- Dark Mode Toggle Button -->
-        <button id="theme-toggle-btn" class="absolute top-4 right-4 p-2 rounded-full text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-700 transition-colors">
-            <!-- Sun Icon (visible in light mode) -->
-            <svg id="theme-icon-light" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-            <!-- Moon Icon (visible in dark mode) -->
-            <svg id="theme-icon-dark" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+    <!-- Sidebar -->
+    <nav id="sidebar" class="fixed top-0 left-0 h-full w-64 bg-white dark:bg-slate-800 shadow-xl z-40 transform -translate-x-full md:translate-x-0 flex flex-col">
+        <!-- Logo/Header -->
+        <div class="p-4 flex items-center justify-between border-b dark:border-slate-700">
+            <h1 class="text-2xl font-extrabold text-indigo-600 dark:text-indigo-400">Study Helper</h1>
+            <!-- Close button for mobile -->
+            <button id="sidebar-close-btn" class="md:hidden p-1 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        </div>
+        
+        <!-- Navigation Links -->
+        <div class="flex-grow p-4 space-y-2">
+            <button class="sidebar-link w-full active" data-screen="home-screen">
+                <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                <span>Home</span>
+            </button>
+            <button class="sidebar-link w-full" data-screen="admin-screen">
+                <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                <span>Manage Bank</span>
+            </button>
+            <button class="sidebar-link w-full" data-screen="history-screen">
+                <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                <span>Quiz History</span>
+            </button>
+            <button class="sidebar-link w-full" data-screen="data-screen">
+                <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                <span>Settings & Data</span>
+            </button>
+        </div>
+        
+        <!-- Dark Mode Toggle -->
+        <div class="p-4 border-t dark:border-slate-700">
+            <button id="theme-toggle-btn" class="sidebar-link w-full">
+                <!-- Sun Icon -->
+                <svg id="theme-icon-light" class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                <!-- Moon Icon -->
+                <svg id="theme-icon-dark" class="w-6 h-6 mr-3 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+                <span id="theme-toggle-text">Light Mode</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main id="main-content" class="flex-grow md:ml-64 min-h-screen">
+        <!-- Hamburger button for mobile -->
+        <button id="hamburger-btn" class="md:hidden fixed top-4 left-4 z-20 p-2 bg-white dark:bg-slate-800 rounded-md shadow-md">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
         </button>
 
-        <!-- ===== SCREEN 1: Start Screen ===== -->
-        <div id="start-screen" class="screen text-slate-800 dark:text-slate-200">
-            <h1 class="text-3xl font-extrabold text-center mb-2">Study Helper Quiz</h1>
-            <p class="text-center text-slate-500 dark:text-slate-400 mb-8">Select your topic and start practicing!</p>
+        <!-- Content Area: All screens will be injected here -->
+        <div class="flex items-center justify-center p-4 md:p-8 min-h-full">
 
-            <!-- Subject Cards Container -->
-            <div class="mb-6">
-                <h2 class="text-xl font-semibold mb-4">Your Subjects</h2>
-                <div id="subject-cards-container" class="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-60 overflow-y-auto pr-2">
-                    <!-- Subject cards will be populated by JavaScript -->
-                </div>
-                <p id="no-subjects-msg" class="text-slate-500 dark:text-slate-400 hidden">No subjects found. Go to "Manage Question Bank" to add one!</p>
-            </div>
-            
-            <!-- Quick Actions -->
-            <div class="grid grid-cols-2 gap-4 mb-6">
-                <button id="random-quiz-btn" class="w-full bg-green-600 text-white py-3 px-6 rounded-lg font-semibold shadow-md hover:bg-green-700 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-green-300">
-                    🚀 Random Quiz
-                </button>
-                <button id="manage-bank-btn" class="w-full bg-slate-600 text-white py-3 px-6 rounded-lg font-semibold shadow-md hover:bg-slate-700 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-slate-300">
-                    Manage Bank
-                </button>
-            </div>
-            
-            <!-- Quiz Settings -->
-            <div class="space-y-6 bg-slate-50 dark:bg-slate-700/50 p-4 rounded-lg border dark:border-slate-700">
-                <h2 class="text-xl font-semibold mb-2">Quiz Settings</h2>
-                
-                <div id="quiz-settings-inputs" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <!-- Number of Questions Selection -->
-                    <div>
-                        <label for="question-count-select" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Number of Questions</label>
-                        <select id="question-count-select" class="w-full p-3 border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
-                            <option value="5">5 Questions</option>
-                            <option value="10">10 Questions</option>
-                            <option value="all">All Questions</option>
-                            <option value="custom_count">Custom...</option>
-                        </select>
-                        <input type="number" id="custom-question-count" class="w-full mt-2 hidden" min="1" placeholder="Enter count">
-                    </div>
-                    
-                    <!-- Time per Question Selection -->
-                    <div>
-                        <label for="time-limit-select" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Time per Question</Sabel>
-                        <select id="time-limit-select" class="w-full p-3 border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
-                            <option value="unlimited">Unlimited</option>
-                            <option value="10">10 Seconds</option>
-                            <option value="20" selected>20 Seconds</option>
-                            <option value="30">30 Seconds</option>
-                            <option value="custom_time">Custom...</option>
-                        </select>
-                        <input type="number" id="custom-time-limit" class="w-full mt-2 hidden" min="1" placeholder="Enter seconds">
-                    </div>
-                </div>
-                
-                <div class="flex items-center">
-                    <input id="show-timer-toggle" type="checkbox" class="h-4 w-4 text-indigo-600 border-slate-300 dark:border-slate-600 rounded focus:ring-indigo-500">
-                    <label for="show-timer-toggle" class="ml-2 block text-sm text-slate-700 dark:text-slate-300">Show Timer During Quiz</label>
-                </div>
-            </div>
+            <!-- Main Container Card (was the whole app, now just the content card) -->
+            <div class="w-full max-w-3xl bg-white dark:bg-slate-800 rounded-xl shadow-xl p-6 sm:p-10 relative">
 
-            <!-- Navigation Buttons -->
-            <div class="grid grid-cols-2 gap-4 mt-6">
-                <button id="view-history-btn" class="w-full bg-indigo-600 text-white py-3 px-6 rounded-lg font-semibold shadow-md hover:bg-indigo-700 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-indigo-300">
-                    📊 Quiz History
-                </button>
-                <button id="view-settings-btn" class="w-full bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 py-3 px-6 rounded-lg font-semibold shadow-md hover:bg-slate-300 dark:hover:bg-slate-600 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-slate-300">
-                    ⚙️ Settings & Data
-                </button>
-            </div>
-        </div>
+                <!-- ===== SCREEN 1: Home Screen ===== -->
+                <div id="home-screen" class="screen">
+                    <h1 class="text-3xl font-extrabold text-center mb-2">Study Helper Quiz</h1>
+                    <p class="text-center text-slate-500 dark:text-slate-400 mb-8">Select your topic and start practicing!</p>
 
-        <!-- ===== SCREEN 2: Quiz Screen ===== -->
-        <div id="quiz-screen" class="screen hidden text-slate-800 dark:text-slate-200">
-            <!-- Header: Timer & Score -->
-            <div class="flex justify-between items-center mb-4">
-                <div id="timer" class="text-lg font-bold text-indigo-600 dark:text-indigo-400">Time: 00:00</div>
-                <div id="score" class="text-lg font-bold text-green-600 dark:text-green-400">Score: 0</div>
-            </div>
-
-            <!-- Progress Bar -->
-            <div class="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2.5 mb-6">
-                <div id="progress-bar-inner" class="bg-indigo-600 h-2.5 rounded-full" style="width: 0%"></div>
-            </div>
-
-            <!-- Question Container -->
-            <div id="question-container" class="mb-6">
-                <h2 id="question-text" class="text-2xl font-semibold mb-6 min-h-[70px]">
-                    <!-- Question text goes here -->
-                </h2>
-                <div id="options-container" class="space-y-3">
-                    <!-- Option buttons go here -->
-                </div>
-            </div>
-
-            <!-- Feedback Message -->
-            <p id="feedback-message" class="text-center font-medium min-h-[2em] mb-4"></p>
-
-            <!-- Next Button -->
-            <button id="next-btn" class="w-full bg-slate-700 text-white py-3 px-6 rounded-lg font-semibold text-lg shadow-md hover:bg-slate-800 transition-all duration-300 focus:outline-none focus:ring-slate-300 hidden">
-                Next Question
-            </button>
-            <button id="quit-quiz-btn" class="w-full bg-red-600 text-white py-2 px-4 rounded-lg font-semibold text-sm shadow-md hover:bg-red-700 transition-all duration-300 focus:outline-none focus:ring-red-300 mt-3">
-                Quit Quiz
-            </button>
-        </div>
-
-        <!-- ===== SCREEN 3: Results Screen ===== -->
-        <div id="results-screen" class="screen hidden text-slate-800 dark:text-slate-200">
-            <h1 class="text-3xl font-bold text-center mb-4">Quiz Complete!</h1>
-            
-            <div class="bg-slate-100 dark:bg-slate-700 rounded-lg p-6 text-center mb-6">
-                <p class="text-lg text-slate-600 dark:text-slate-300">Your final score is:</p>
-                <h2 id="final-score" class="text-5xl font-bold text-indigo-600 dark:text-indigo-400 my-2">0 / 0</h2>
-                <p id="percentage" class="text-2xl font-semibold text-green-600 dark:text-green-400">0%</p>
-            </div>
-
-            <!-- Performance Insights -->
-            <div id="performance-insights" class="mb-6">
-                <h3 class="text-xl font-semibold mb-3">Performance Insights</h3>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-center">
-                    <div class="bg-slate-50 dark:bg-slate-700 p-3 rounded-lg">
-                        <p class="text-sm text-slate-500 dark:text-slate-400">Fastest Answer</p>
-                        <p id="fastest-answer" class="text-lg font-semibold">N/A</p>
-                    </div>
-                    <div class="bg-slate-50 dark:bg-slate-700 p-3 rounded-lg">
-                        <p class="text-sm text-slate-500 dark:text-slate-400">Weekly Accuracy</p>
-                        <p id="weekly-accuracy" class="text-lg font-semibold">N/A</p>
-                    </div>
-                    <div class="bg-slate-50 dark:bg-slate-700 p-3 rounded-lg">
-                        <p class="text-sm text-slate-500 dark:text-slate-400">Strongest Subject</p>
-                        <p id="strongest-subject" class="text-lg font-semibold">N/A</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Show Correct Answers Section -->
-            <div id="results-summary-container" class="mb-6">
-                <h3 class="text-xl font-semibold mb-3">Review Your Answers:</h3>
-                <div id="results-summary" class="space-y-4 max-h-60 overflow-y-auto pr-2">
-                    <!-- Results summary goes here -->
-                </div>
-            </div>
-
-            <!-- Restart Button -->
-            <button id="restart-btn" class="w-full bg-indigo-600 text-white py-3 px-6 rounded-lg font-semibold text-lg shadow-md hover:bg-indigo-700 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-indigo-300">
-                Back to Home
-            </button>
-        </div>
-
-        <!-- ===== SCREEN 4: Admin Panel Screen ===== -->
-        <div id="admin-screen" class="screen hidden text-slate-800 dark:text-slate-200">
-            <div class="flex justify-between items-center mb-6">
-                <h1 class="text-3xl font-extrabold">Question Bank</h1>
-                <button id="admin-back-btn" class="bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 py-2 px-4 rounded-lg font-semibold hover:bg-slate-300 dark:hover:bg-slate-600 transition-all">
-                    Back to Home
-                </button>
-            </div>
-
-            <!-- Admin Feedback / Confirmation Area -->
-            <div id="admin-feedback" class="text-center font-medium min-h-[2em] mb-4 p-3 rounded-lg"></div>
-
-            <!-- All sections are now in a single column -->
-            <div class="space-y-8 max-h-[70vh] overflow-y-auto pr-2">
-                
-                <!-- Section 1: Manage Subjects -->
-                <div class="bg-slate-50 dark:bg-slate-700/50 p-5 rounded-lg border dark:border-slate-700">
-                    <h3 class="text-xl font-semibold mb-4 text-slate-700 dark:text-slate-300">Manage Subjects</h3>
-                    
-                    <!-- Add Subject -->
-                    <div class="mb-4">
-                        <label for="new-subject-name" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Add New Subject</label>
-                        <div class="flex gap-2">
-                            <input type="text" id="new-subject-name" placeholder="Enter new subject name" class="w-full p-2 border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500">
-                            <button id="add-subject-btn" class="bg-indigo-600 text-white py-2 px-4 rounded-lg font-semibold hover:bg-indigo-700">Add</button>
-                        </div>
-                    </div>
-
-                    <!-- View/Edit Subjects -->
-                    <div>
-                        <h4 class="text-lg font-semibold mb-2 text-slate-700 dark:text-slate-300">All Subjects</h4>
-                        <p class="text-sm text-slate-500 dark:text-slate-400 mb-3">Click a subject's name to view its questions. Click [Edit] to rename.</p>
-                        <ul id="admin-subject-list" class="space-y-2 max-h-48 overflow-y-auto pr-2">
-                            <!-- Subject list will be populated by JavaScript -->
-                        </ul>
-                    </div>
-                </div>
-
-                <!-- Section 2: Edit Questions Panel (Hidden by default) -->
-                <div id="edit-questions-panel" class="bg-slate-50 dark:bg-slate-700/50 p-5 rounded-lg border dark:border-slate-700 hidden">
-                    <h3 id="edit-questions-title" class="text-xl font-semibold mb-4 text-slate-700 dark:text-slate-300">Edit Questions</h3>
-                    <ul id="question-edit-list" class="space-y-2 max-h-60 overflow-y-auto pr-2">
-                        <!-- Question list will be populated by JavaScript -->
-                    </ul>
-                </div>
-
-                <!-- Section 3: Add / Edit Question Form -->
-                <div class="bg-slate-50 dark:bg-slate-700/50 p-5 rounded-lg border dark:border-slate-700 space-y-4">
-                    <h3 id="question-form-title" class="text-xl font-semibold text-slate-700 dark:text-slate-300">Add New Question</h3>
-                    
-                    <input type="hidden" id="editing-question-index" value="-1">
-
-                    <div>
-                        <label for="admin-subject-select" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Select Subject</label>
-                        <select id="admin-subject-select" class="w-full p-2 border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500">
-                            <!-- Options will be populated by JavaScript -->
-                        </select>
-                    </div>
-
-                    <div>
-                        <label for="admin-question-text" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Question</label>
-                        <textarea id="admin-question-text" rows="2" placeholder="What is...?" class="w-full p-2 border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500"></textarea>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label for="admin-option-1" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Option 1 (Correct Answer)</label>
-                            <input type="text" id="admin-option-1" placeholder="The Correct Answer" class="w-full p-2 border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg focus:ring-2 focus:ring-green-500">
-                        </div>
-                        <div>
-                            <label for="admin-option-2" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Option 2</label>
-                            <input type="text" id="admin-option-2" placeholder="Wrong Answer 1" class="w-full p-2 border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg">
-                        </div>
-                        <div>
-                            <label for="admin-option-3" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Option 3</label>
-                            <input type="text" id="admin-option-3" placeholder="Wrong Answer 2" class="w-full p-2 border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg">
-                        </div>
-                        <div>
-                            <label for="admin-option-4" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Option 4</label>
-                            <input type="text" id="admin-option-4" placeholder="Wrong Answer 3" class="w-full p-2 border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg">
-                        </div>
-                    </div>
-                    <p class="text-xs text-slate-500 dark:text-slate-400 -mt-2">Note: For simplicity, **Option 1** is always the correct answer when adding/editing.</p>
-
-
-                    <div class="flex gap-3">
-                        <button id="save-question-btn" class="w-full bg-green-600 text-white py-3 rounded-lg font-semibold shadow-md hover:bg-green-700">
-                            Save Question
-                        </button>
-                        <button id="cancel-edit-btn" class="w-full bg-slate-200 dark:bg-slate-600 text-slate-800 dark:text-slate-200 py-3 rounded-lg font-semibold hover:bg-slate-300 dark:hover:bg-slate-500 hidden">
-                            Cancel Edit
+                    <!-- Get Started "Empty State" -->
+                    <div id="get-started-container" class="text-center p-6 bg-slate-50 dark:bg-slate-700/50 rounded-lg hidden">
+                        <h2 class="text-2xl font-semibold mb-3">Welcome to Study Helper!</h2>
+                        <p class="text-slate-600 dark:text-slate-300 mb-6">You don't have any subjects yet. Create your first subject and add some questions to get started.</p>
+                        <button id="get-started-btn" class="bg-indigo-600 text-white py-3 px-6 rounded-lg font-semibold shadow-md hover:bg-indigo-700 transition-all">
+                            Add Your First Subject
                         </button>
                     </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- ===== SCREEN 5: History Screen ===== -->
-        <div id="history-screen" class="screen hidden text-slate-800 dark:text-slate-200">
-            <div class="flex justify-between items-center mb-6">
-                <h1 class="text-3xl font-extrabold">Quiz History</h1>
-                <button id="history-back-btn" class="bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 py-2 px-4 rounded-lg font-semibold hover:bg-slate-300 dark:hover:bg-slate-600 transition-all">
-                    Back to Home
-                </button>
-            </div>
 
-            <!-- Overall Stats -->
-            <div id="overall-stats" class="mb-6">
-                <h3 class="text-xl font-semibold mb-3">Overall Statistics</h3>
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
-                    <div class="bg-slate-50 dark:bg-slate-700 p-3 rounded-lg">
-                        <p class="text-sm text-slate-500 dark:text-slate-400">Total Quizzes</p>
-                        <p id="stat-total-quizzes" class="text-lg font-semibold">0</p>
+                    <!-- Subject Cards Container -->
+                    <div id="subject-cards-container" class="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-60 overflow-y-auto pr-2 mb-6">
+                        <!-- Subject cards will be populated by JavaScript -->
                     </div>
-                    <div class="bg-slate-50 dark:bg-slate-700 p-3 rounded-lg">
-                        <p class="text-sm text-slate-500 dark:text-slate-400">Total Questions</p>
-                        <p id="stat-total-questions" class="text-lg font-semibold">0</p>
-                    </div>
-                    <div class="bg-slate-50 dark:bg-slate-700 p-3 rounded-lg">
-                        <p class="text-sm text-slate-500 dark:text-slate-400">Avg. Score</p>
-                        <p id="stat-avg-score" class="text-lg font-semibold">0%</p>
-                    </div>
-                    <div class="bg-slate-50 dark:bg-slate-700 p-3 rounded-lg">
-                        <p class="text-sm text-slate-500 dark:text-slate-400">Best Subject</p>
-                        <p id="stat-best-subject" class="text-lg font-semibold">N/A</p>
-                    </div>
-                </div>
-            </div>
-
-            <div id="history-feedback" class="text-center font-medium min-h-[2em] mb-4 p-3 rounded-lg"></div>
-            
-            <div class="flex justify-between items-center mb-4">
-                <div class="flex gap-2 items-center">
-                    <label for="sort-history-by" class="text-sm font-medium">Sort by:</label>
-                    <select id="sort-history-by" class="text-sm p-1 border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-md">
-                        <option value="date_desc">Date (Newest)</option>
-                        <option value="date_asc">Date (Oldest)</option>
-                        <option value="score_desc">Score (Highest)</option>
-                        <option value="score_asc">Score (Lowest)</option>
-                    </select>
-                </div>
-                <button id="clear-history-btn" class="bg-red-600 text-white py-1 px-3 rounded-lg font-semibold text-sm hover:bg-red-700">
-                    Clear All History
-                </button>
-            </div>
-            
-            <!-- History Table -->
-            <div id="history-table-container" class="w-full max-h-96 overflow-y-auto rounded-lg border dark:border-slate-700">
-                <table id="history-table" class="w-full">
-                    <thead class="sticky top-0">
-                        <tr>
-                            <th class="w-2/5">Subject</th>
-                            <th class="w-1/5">Score</th>
-                            <th class="w-2/5">Date</th>
-                        </tr>
-                    </thead>
-                    <tbody id="history-table-body">
-                        <!-- History rows will be populated by JavaScript -->
-                    </tbody>
-                </table>
-            </div>
-            <p id="no-history-msg" class="text-center text-slate-500 dark:text-slate-400 mt-6 hidden">No quiz history found. Complete a quiz to see your results!</p>
-        </div>
-        
-        <!-- ===== SCREEN 6: Settings & Data Screen ===== -->
-        <div id="data-screen" class="screen hidden text-slate-800 dark:text-slate-200">
-            <div class="flex justify-between items-center mb-6">
-                <h1 class="text-3xl font-extrabold">Settings & Data</h1>
-                <button id="data-back-btn" class="bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 py-2 px-4 rounded-lg font-semibold hover:bg-slate-300 dark:hover:bg-slate-600 transition-all">
-                    Back to Home
-                </button>
-            </div>
-            
-            <div id="data-feedback" class="text-center font-medium min-h-[2em] mb-4 p-3 rounded-lg"></div>
-
-            <div class="space-y-8 max-h-[70vh] overflow-y-auto pr-2">
-                <!-- Section 1: Import/Export Section -->
-                <div class="bg-slate-50 dark:bg-slate-700/50 p-5 rounded-lg border dark:border-slate-700">
-                    <h3 class="text-xl font-semibold text-slate-700 dark:text-slate-300 mb-4">Import / Export Data</h3>
                     
-                    <!-- File Inputs -->
-                    <input type="file" id="import-subject-file" class="hidden-file-input" accept=".json">
-                    <input type="file" id="import-backup-file" class="hidden-file-input" accept=".json">
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <!-- Import -->
-                        <div class="flex flex-col space-y-3">
-                            <label id="import-subject-file-btn" for="import-subject-file" class="w-full text-center bg-orange-500 text-white py-2 px-4 rounded-lg font-semibold hover:bg-orange-600 cursor-pointer">Import Subject (.json)</label>
-                            <label id="import-backup-file-btn" for="import-backup-file" class="w-full text-center bg-orange-700 text-white py-2 px-4 rounded-lg font-semibold hover:bg-orange-800 cursor-pointer">Import Full Backup (.json)</label>
-                        </div>
-                        <!-- Export -->
-                        <div class="flex flex-col space-y-3">
-                            <button id="export-subject-btn" class="w-full bg-indigo-500 text-white py-2 px-4 rounded-lg font-semibold hover:bg-indigo-600">Export Subject...</button>
-                            <button id="export-backup-btn" class="w-full bg-indigo-700 text-white py-2 px-4 rounded-lg font-semibold hover:bg-indigo-800">Export Full Backup</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Section 2: Danger Zone -->
-                <div class="bg-red-50 dark:bg-red-900/20 p-5 rounded-lg border border-red-200 dark:border-red-900/50">
-                    <h3 class="text-xl font-semibold text-red-800 dark:text-red-300 mb-4">Danger Zone</h3>
-                    <p class="text-sm text-red-700 dark:text-red-400 mb-4">These actions cannot be undone. Be careful.</p>
-                    <div class="flex gap-4">
-                        <button id="reset-all-data-btn" class="w-full bg-red-600 text-white py-2 px-4 rounded-lg font-semibold hover:bg-red-700">
-                            Reset All App Data
+                    <!-- Quick Actions -->
+                    <div id="quick-actions-container" class="grid grid-cols-1 gap-4 mb-6">
+                        <button id="random-quiz-btn" class="w-full bg-green-600 text-white py-3 px-6 rounded-lg font-semibold shadow-md hover:bg-green-700 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-green-300">
+                            🚀 Random Quiz
                         </button>
                     </div>
+                    
+                    <!-- Quiz Settings -->
+                    <div id="quiz-settings-container" class="space-y-6 bg-slate-50 dark:bg-slate-700/50 p-4 rounded-lg border dark:border-slate-700">
+                        <h2 class="text-xl font-semibold mb-2">Quiz Settings</h2>
+                        
+                        <div id="quiz-settings-inputs" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <!-- Number of Questions Selection -->
+                            <div>
+                                <label for="question-count-select" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Number of Questions</label>
+                                <select id="question-count-select" class="w-full p-3 border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                                    <option value="5">5 Questions</option>
+                                    <option value="10">10 Questions</option>
+                                    <option value="all">All Questions</option>
+                                    <option value="custom_count">Custom...</option>
+                                </select>
+                                <input type="number" id="custom-question-count" class="w-full mt-2 hidden" min="1" placeholder="Enter count">
+                            </div>
+                            
+                            <!-- Time per Question Selection -->
+                            <div>
+                                <label for="time-limit-select" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Time per Question</Sabel>
+                                <select id="time-limit-select" class="w-full p-3 border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                                    <option value="unlimited">Unlimited</option>
+                                    <option value="10">10 Seconds</option>
+                                    <option value="20" selected>20 Seconds</option>
+                                    <option value="30">30 Seconds</option>
+                                    <option value="custom_time">Custom...</option>
+                                </select>
+                                <input type="number" id="custom-time-limit" class="w-full mt-2 hidden" min="1" placeholder="Enter seconds">
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center">
+                            <input id="show-timer-toggle" type="checkbox" class="h-4 w-4 text-indigo-600 border-slate-300 dark:border-slate-600 rounded focus:ring-indigo-500">
+                            <label for="show-timer-toggle" class="ml-2 block text-sm text-slate-700 dark:text-slate-300">Show Timer During Quiz</label>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
 
-    </div>
+                <!-- ===== SCREEN 2: Quiz Screen ===== -->
+                <div id="quiz-screen" class="screen screen-hidden">
+                    <!-- Header: Timer & Score -->
+                    <div class="flex justify-between items-center mb-4">
+                        <div id="timer" class="text-lg font-bold text-indigo-600 dark:text-indigo-400">Time: 00:00</div>
+                        <div id="score" class="text-lg font-bold text-green-600 dark:text-green-400">Score: 0</div>
+                    </div>
+
+                    <!-- Progress Bar -->
+                    <div class="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2.5 mb-6">
+                        <div id="progress-bar-inner" class="bg-indigo-600 h-2.5 rounded-full" style="width: 0%"></div>
+                    </div>
+
+                    <!-- Question Container -->
+                    <div id="question-container" class="mb-6">
+                        <h2 id="question-text" class="text-2xl font-semibold mb-6 min-h-[70px]">
+                            <!-- Question text goes here -->
+                        </h2>
+                        <div id="options-container" class="space-y-3">
+                            <!-- Option buttons go here -->
+                        </div>
+                    </div>
+
+                    <!-- Feedback Message -->
+                    <p id="feedback-message" class="text-center font-medium min-h-[2em] mb-4"></p>
+
+                    <!-- Next Button -->
+                    <button id="next-btn" class="w-full bg-slate-700 text-white py-3 px-6 rounded-lg font-semibold text-lg shadow-md hover:bg-slate-800 transition-all duration-300 focus:outline-none focus:ring-slate-300 hidden">
+                        Next Question
+                    </button>
+                    <button id="quit-quiz-btn" class="w-full bg-red-600 text-white py-2 px-4 rounded-lg font-semibold text-sm shadow-md hover:bg-red-700 transition-all duration-300 focus:outline-none focus:ring-red-300 mt-3">
+                        Quit Quiz
+                    </button>
+                </div>
+
+                <!-- ===== SCREEN 3: Results Screen ===== -->
+                <div id="results-screen" class="screen screen-hidden">
+                    <h1 class="text-3xl font-bold text-center mb-4">Quiz Complete!</h1>
+                    
+                    <div class="bg-slate-100 dark:bg-slate-700 rounded-lg p-6 text-center mb-6">
+                        <p class="text-lg text-slate-600 dark:text-slate-300">Your final score is:</p>
+                        <h2 id="final-score" class="text-5xl font-bold text-indigo-600 dark:text-indigo-400 my-2">0 / 0</h2>
+                        <p id="percentage" class="text-2xl font-semibold text-green-600 dark:text-green-400">0%</p>
+                    </div>
+
+                    <!-- Performance Insights -->
+                    <div id="performance-insights" class="mb-6">
+                        <h3 class="text-xl font-semibold mb-3">Performance Insights</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-center">
+                            <div class="bg-slate-50 dark:bg-slate-700 p-3 rounded-lg">
+                                <p class="text-sm text-slate-500 dark:text-slate-400">Fastest Answer</p>
+                                <p id="fastest-answer" class="text-lg font-semibold">N/A</p>
+                            </div>
+                            <div class="bg-slate-50 dark:bg-slate-700 p-3 rounded-lg">
+                                <p class="text-sm text-slate-500 dark:text-slate-400">Weekly Accuracy</p>
+                                <p id="weekly-accuracy" class="text-lg font-semibold">N/A</p>
+                            </div>
+                            <div class="bg-slate-50 dark:bg-slate-700 p-3 rounded-lg">
+                                <p class="text-sm text-slate-500 dark:text-slate-400">Strongest Subject</p>
+                                <p id="strongest-subject" class="text-lg font-semibold">N/A</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Show Correct Answers Section -->
+                    <div id="results-summary-container" class="mb-6">
+                        <h3 class="text-xl font-semibold mb-3">Review Your Answers:</h3>
+                        <div id="results-summary" class="space-y-4 max-h-60 overflow-y-auto pr-2">
+                            <!-- Results summary goes here -->
+                        </div>
+                    </div>
+
+                    <!-- Restart Button -->
+                    <button id="restart-btn" class="w-full bg-indigo-600 text-white py-3 px-6 rounded-lg font-semibold text-lg shadow-md hover:bg-indigo-700 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-indigo-300">
+                        Back to Home
+                    </button>
+                </div>
+
+                <!-- ===== SCREEN 4: Admin Panel Screen ===== -->
+                <div id="admin-screen" class="screen screen-hidden">
+                    <div class="flex justify-between items-center mb-6">
+                        <h1 class="text-3xl font-extrabold">Question Bank</h1>
+                    </div>
+
+                    <!-- Admin Feedback / Confirmation Area -->
+                    <div id="admin-feedback" class="text-center font-medium min-h-[2em] mb-4 p-3 rounded-lg"></div>
+
+                    <!-- All sections are now in a single column -->
+                    <div class="space-y-8 max-h-[70vh] overflow-y-auto pr-2">
+                        
+                        <!-- Section 1: Manage Subjects -->
+                        <div class="bg-slate-50 dark:bg-slate-700/50 p-5 rounded-lg border dark:border-slate-700">
+                            <h3 class="text-xl font-semibold mb-4 text-slate-700 dark:text-slate-300">Manage Subjects</h3>
+                            
+                            <!-- Add Subject -->
+                            <div class="mb-4">
+                                <label for="new-subject-name" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Add New Subject</label>
+                                <div class="flex gap-2">
+                                    <input type="text" id="new-subject-name" placeholder="Enter new subject name" class="w-full p-2 border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500">
+                                    <button id="add-subject-btn" class="bg-indigo-600 text-white py-2 px-4 rounded-lg font-semibold hover:bg-indigo-700">Add</button>
+                                </div>
+                            </div>
+
+                            <!-- View/Edit Subjects -->
+                            <div>
+                                <h4 class="text-lg font-semibold mb-2 text-slate-700 dark:text-slate-300">All Subjects</h4>
+                                <p class="text-sm text-slate-500 dark:text-slate-400 mb-3">Click a subject's name to view its questions. Click [Edit] to rename.</p>
+                                <ul id="admin-subject-list" class="space-y-2 max-h-48 overflow-y-auto pr-2">
+                                    <!-- Subject list will be populated by JavaScript -->
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Section 2: Edit Questions Panel (Hidden by default) -->
+                        <div id="edit-questions-panel" class="bg-slate-50 dark:bg-slate-700/50 p-5 rounded-lg border dark:border-slate-700 hidden">
+                            <h3 id="edit-questions-title" class="text-xl font-semibold mb-4 text-slate-700 dark:text-slate-300">Edit Questions</h3>
+                            <ul id="question-edit-list" class="space-y-2 max-h-60 overflow-y-auto pr-2">
+                                <!-- Question list will be populated by JavaScript -->
+                            </ul>
+                        </div>
+
+                        <!-- Section 3: Add / Edit Question Form -->
+                        <div class="bg-slate-50 dark:bg-slate-700/50 p-5 rounded-lg border dark:border-slate-700 space-y-4">
+                            <h3 id="question-form-title" class="text-xl font-semibold text-slate-700 dark:text-slate-300">Add New Question</h3>
+                            
+                            <input type="hidden" id="editing-question-index" value="-1">
+
+                            <div>
+                                <label for="admin-subject-select" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Select Subject</label>
+                                <select id="admin-subject-select" class="w-full p-2 border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500">
+                                    <!-- Options will be populated by JavaScript -->
+                                </select>
+                            </div>
+
+                            <div>
+                                <label for="admin-question-text" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Question</label>
+                                <textarea id="admin-question-text" rows="2" placeholder="What is...?" class="w-full p-2 border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500"></textarea>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label for="admin-option-1" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Option 1 (Correct Answer)</label>
+                                    <input type="text" id="admin-option-1" placeholder="The Correct Answer" class="w-full p-2 border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg focus:ring-2 focus:ring-green-500">
+                                </div>
+                                <div>
+                                    <label for="admin-option-2" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Option 2</label>
+                                    <input type="text" id="admin-option-2" placeholder="Wrong Answer 1" class="w-full p-2 border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg">
+                                </div>
+                                <div>
+                                    <label for="admin-option-3" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Option 3</label>
+                                    <input type="text" id="admin-option-3" placeholder="Wrong Answer 2" class="w-full p-2 border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg">
+                                </div>
+                                <div>
+                                    <label for="admin-option-4" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Option 4</label>
+                                    <input type="text" id="admin-option-4" placeholder="Wrong Answer 3" class="w-full p-2 border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg">
+                                </div>
+                            </div>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 -mt-2">Note: For simplicity, **Option 1** is always the correct answer when adding/editing.</p>
+
+
+                            <div class="flex gap-3">
+                                <button id="save-question-btn" class="w-full bg-green-600 text-white py-3 rounded-lg font-semibold shadow-md hover:bg-green-700">
+                                    Save Question
+                                </button>
+                                <button id="cancel-edit-btn" class="w-full bg-slate-200 dark:bg-slate-600 text-slate-800 dark:text-slate-200 py-3 rounded-lg font-semibold hover:bg-slate-300 dark:hover:bg-slate-500 hidden">
+                                    Cancel Edit
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- ===== SCREEN 5: History Screen ===== -->
+                <div id="history-screen" class="screen screen-hidden">
+                    <div class="flex justify-between items-center mb-6">
+                        <h1 class="text-3xl font-extrabold">Quiz History</h1>
+                    </div>
+
+                    <!-- Overall Stats -->
+                    <div id="overall-stats" class="mb-6">
+                        <h3 class="text-xl font-semibold mb-3">Overall Statistics</h3>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
+                            <div class="bg-slate-50 dark:bg-slate-700 p-3 rounded-lg">
+                                <p class="text-sm text-slate-500 dark:text-slate-400">Total Quizzes</p>
+                                <p id="stat-total-quizzes" class="text-lg font-semibold">0</p>
+                            </div>
+                            <div class="bg-slate-50 dark:bg-slate-700 p-3 rounded-lg">
+                                <p class="text-sm text-slate-500 dark:text-slate-400">Total Questions</p>
+                                <p id="stat-total-questions" class="text-lg font-semibold">0</p>
+                            </div>
+                            <div class="bg-slate-50 dark:bg-slate-700 p-3 rounded-lg">
+                                <p class="text-sm text-slate-500 dark:text-slate-400">Avg. Score</p>
+                                <p id="stat-avg-score" class="text-lg font-semibold">0%</p>
+                            </div>
+                            <div class="bg-slate-50 dark:bg-slate-700 p-3 rounded-lg">
+                                <p class="text-sm text-slate-500 dark:text-slate-400">Best Subject</p>
+                                <p id="stat-best-subject" class="text-lg font-semibold">N/A</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="history-feedback" class="text-center font-medium min-h-[2em] mb-4 p-3 rounded-lg"></div>
+                    
+                    <div class="flex justify-between items-center mb-4">
+                        <div class="flex gap-2 items-center">
+                            <label for="sort-history-by" class="text-sm font-medium">Sort by:</label>
+                            <select id="sort-history-by" class="text-sm p-1 border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-md">
+                                <option value="date_desc">Date (Newest)</option>
+                                <option value="date_asc">Date (Oldest)</option>
+                                <option value="score_desc">Score (Highest)</option>
+                                <option value="score_asc">Score (Lowest)</option>
+                            </select>
+                        </div>
+                        <button id="clear-history-btn" class="bg-red-600 text-white py-1 px-3 rounded-lg font-semibold text-sm hover:bg-red-700">
+                            Clear All History
+                        </button>
+                    </div>
+                    
+                    <!-- History Table -->
+                    <div id="history-table-container" class="w-full max-h-96 overflow-y-auto rounded-lg border dark:border-slate-700">
+                        <table id="history-table" class="w-full">
+                            <thead class="sticky top-0">
+                                <tr>
+                                    <th class="w-2/5">Subject</th>
+                                    <th class="w-1/5">Score</th>
+                                    <th class="w-2/5">Date</th>
+                                </tr>
+                            </thead>
+                            <tbody id="history-table-body">
+                                <!-- History rows will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <p id="no-history-msg" class="text-center text-slate-500 dark:text-slate-400 mt-6 hidden">No quiz history found. Complete a quiz to see your results!</p>
+                </div>
+                
+                <!-- ===== SCREEN 6: Settings & Data Screen ===== -->
+                <div id="data-screen" class="screen screen-hidden">
+                    <div class="flex justify-between items-center mb-6">
+                        <h1 class="text-3xl font-extrabold">Settings & Data</h1>
+                    </div>
+                    
+                    <div id="data-feedback" class="text-center font-medium min-h-[2em] mb-4 p-3 rounded-lg"></div>
+
+                    <div class="space-y-8 max-h-[70vh] overflow-y-auto pr-2">
+                        <!-- Section 1: Import/Export Section -->
+                        <div class="bg-slate-50 dark:bg-slate-700/50 p-5 rounded-lg border dark:border-slate-700">
+                            <h3 class="text-xl font-semibold text-slate-700 dark:text-slate-300 mb-4">Import / Export Data</h3>
+                            
+                            <!-- File Inputs -->
+                            <input type="file" id="import-subject-file" class="hidden-file-input" accept=".json">
+                            <input type="file" id="import-backup-file" class="hidden-file-input" accept=".json">
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <!-- Import -->
+                                <div class="flex flex-col space-y-3">
+                                    <label id="import-subject-file-btn" for="import-subject-file" class="w-full text-center bg-orange-500 text-white py-2 px-4 rounded-lg font-semibold hover:bg-orange-600 cursor-pointer">Import Subject (.json)</label>
+                                    <label id="import-backup-file-btn" for="import-backup-file" class="w-full text-center bg-orange-700 text-white py-2 px-4 rounded-lg font-semibold hover:bg-orange-800 cursor-pointer">Import Full Backup (.json)</label>
+                                </div>
+                                <!-- Export -->
+                                <div class="flex flex-col space-y-3">
+                                    <button id="export-subject-btn" class="w-full bg-indigo-500 text-white py-2 px-4 rounded-lg font-semibold hover:bg-indigo-600">Export Subject...</button>
+                                    <button id="export-backup-btn" class="w-full bg-indigo-700 text-white py-2 px-4 rounded-lg font-semibold hover:bg-indigo-800">Export Full Backup</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Section 2: Danger Zone -->
+                        <div class="bg-red-50 dark:bg-red-900/20 p-5 rounded-lg border border-red-200 dark:border-red-900/50">
+                            <h3 class="text-xl font-semibold text-red-800 dark:text-red-300 mb-4">Danger Zone</h3>
+                            <p class="text-sm text-red-700 dark:text-red-400 mb-4">These actions cannot be undone. Be careful.</p>
+                            <div class="flex gap-4">
+                                <button id="reset-all-data-btn" class="w-full bg-red-600 text-white py-2 px-4 rounded-lg font-semibold hover:bg-red-700">
+                                    Reset All App Data
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div> <!-- End of Main Content Card -->
+        </div> <!-- End of Content Area -->
+    </main> <!-- End of Main Content -->
 
     <!-- ===== JavaScript ===== -->
     <script type="module">
@@ -510,8 +585,17 @@
         const THEME_KEY = 'theme';
 
         // --- 2. DOM Element References ---
+        // Layout
+        const sidebar = document.getElementById('sidebar');
+        const sidebarCloseBtn = document.getElementById('sidebar-close-btn');
+        const sidebarOverlay = document.getElementById('sidebar-overlay');
+        const mainContent = document.getElementById('main-content');
+        const hamburgerBtn = document.getElementById('hamburger-btn');
+        const sidebarLinks = document.querySelectorAll('.sidebar-link');
         const allScreens = document.querySelectorAll('.screen');
-        const startScreen = document.getElementById('start-screen');
+        
+        // Screens
+        const homeScreen = document.getElementById('home-screen');
         const quizScreen = document.getElementById('quiz-screen');
         const resultsScreen = document.getElementById('results-screen');
         const adminScreen = document.getElementById('admin-screen');
@@ -522,16 +606,17 @@
         const themeToggleBtn = document.getElementById('theme-toggle-btn');
         const themeIconLight = document.getElementById('theme-icon-light');
         const themeIconDark = document.getElementById('theme-icon-dark');
+        const themeToggleText = document.getElementById('theme-toggle-text');
 
-        // Start Screen
+        // Home Screen
         const subjectCardsContainer = document.getElementById('subject-cards-container');
-        const noSubjectsMsg = document.getElementById('no-subjects-msg');
+        const getStartedContainer = document.getElementById('get-started-container');
+        const getStartedBtn = document.getElementById('get-started-btn');
+        const quickActionsContainer = document.getElementById('quick-actions-container');
+        const quizSettingsContainer = document.getElementById('quiz-settings-container');
         const randomQuizBtn = document.getElementById('random-quiz-btn');
-        const manageBankBtn = document.getElementById('manage-bank-btn');
-        const viewHistoryBtn = document.getElementById('view-history-btn');
-        const viewSettingsBtn = document.getElementById('view-settings-btn');
         
-        // Start Screen (Settings)
+        // Home Screen (Settings)
         const questionCountSelect = document.getElementById('question-count-select');
         const customQuestionCount = document.getElementById('custom-question-count');
         const timeLimitSelect = document.getElementById('time-limit-select');
@@ -558,7 +643,6 @@
         const strongestSubject = document.getElementById('strongest-subject');
 
         // Admin Screen
-        const adminBackBtn = document.getElementById('admin-back-btn');
         const adminFeedback = document.getElementById('admin-feedback');
         const newSubjectName = document.getElementById('new-subject-name');
         const addSubjectBtn = document.getElementById('add-subject-btn');
@@ -578,12 +662,12 @@
         const editingQuestionIndex = document.getElementById('editing-question-index');
         
         // History Screen
-        const historyBackBtn = document.getElementById('history-back-btn');
         const historyFeedback = document.getElementById('history-feedback');
         const sortHistoryBy = document.getElementById('sort-history-by');
         const clearHistoryBtn = document.getElementById('clear-history-btn');
         const historyTableBody = document.getElementById('history-table-body');
         const noHistoryMsg = document.getElementById('no-history-msg');
+        const historyTableContainer = document.getElementById('history-table-container');
         // History Stats
         const statTotalQuizzes = document.getElementById('stat-total-quizzes');
         const statTotalQuestions = document.getElementById('stat-total-questions');
@@ -591,7 +675,6 @@
         const statBestSubject = document.getElementById('stat-best-subject');
 
         // Data Screen
-        const dataBackBtn = document.getElementById('data-back-btn');
         const dataFeedback = document.getElementById('data-feedback');
         const importSubjectFileInput = document.getElementById('import-subject-file');
         const importBackupFileInput = document.getElementById('import-backup-file');
@@ -629,36 +712,53 @@
             loadData();
             loadHistory();
 
-            populateSubjectCards();
+            checkEmptyState();
             checkRandomQuizButton();
 
             addEventListeners();
+
+            // Show home screen by default
+            showScreen('home-screen');
         }
 
         /**
          * Adds all application event listeners
          */
         function addEventListeners() {
-            // Theme
-            themeToggleBtn.addEventListener('click', toggleTheme);
-
-            // Screen Navigation
-            manageBankBtn.addEventListener('click', () => showScreen(adminScreen));
-            viewHistoryBtn.addEventListener('click', () => showScreen(historyScreen));
-            viewSettingsBtn.addEventListener('click', () => showScreen(dataScreen));
-            adminBackBtn.addEventListener('click', () => showScreen(startScreen));
-            historyBackBtn.addEventListener('click', () => showScreen(startScreen));
-            dataBackBtn.addEventListener('click', () => showScreen(startScreen));
-            restartBtn.addEventListener('click', restartQuiz);
+            // Layout/Navigation
+            hamburgerBtn.addEventListener('click', () => toggleSidebar(true));
+            sidebarCloseBtn.addEventListener('click', () => toggleSidebar(false));
+            sidebarOverlay.addEventListener('click', () => toggleSidebar(false));
+            sidebarLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    // Handle theme toggle separately
+                    if (e.currentTarget.id === 'theme-toggle-btn') {
+                        toggleTheme();
+                        return;
+                    }
+                    
+                    const screenId = e.currentTarget.dataset.screen;
+                    if (screenId) {
+                        showScreen(screenId);
+                        // Close sidebar on mobile after navigation
+                        if (window.innerWidth < 768) {
+                            toggleSidebar(false);
+                        }
+                    }
+                });
+            });
+            getStartedBtn.addEventListener('click', () => showScreen('admin-screen'));
 
             // Quiz Logic
             randomQuizBtn.addEventListener('click', startRandomQuiz);
             nextBtn.addEventListener('click', nextQuestion);
             quitQuizBtn.addEventListener('click', () => {
-                if (confirm("Are you sure you want to quit this quiz?")) {
+                // Use a simple confirm dialog
+                if (window.confirm("Are you sure you want to quit this quiz?")) {
                     endQuiz(true); // true = quit early
                 }
             });
+            restartBtn.addEventListener('click', restartQuiz);
             
             // Settings
             questionCountSelect.addEventListener('change', handleSettingChange);
@@ -701,7 +801,7 @@
                     startQuiz(e.target.dataset.name);
                 }
                 if (e.target.classList.contains('delete-subject-home-btn')) {
-                    requestDeleteSubject(e.target.dataset.name, 'admin'); // 'admin' feedback
+                    requestDeleteSubject(e.target.dataset.name, 'admin'); // Show confirmation on admin screen
                 }
                 
                 // Admin Subject List buttons
@@ -749,46 +849,111 @@
                     resetAllData();
                 }
                 if (e.target.id === 'cancel-action') {
-                    clearAllFeedback();
+                    clearAllConfirmations();
                 }
             });
         }
         
-        // --- Screen Management ---
-        
+        // --- Layout & Screen Management ---
+
+        /**
+         * Toggles the sidebar open or closed
+         */
+        function toggleSidebar(open) {
+            if (open) {
+                sidebar.classList.remove('-translate-x-full');
+                sidebarOverlay.classList.remove('hidden');
+                // On desktop, push content
+                if (window.innerWidth >= 768) {
+                    mainContent.classList.add('md:ml-64');
+                }
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                sidebarOverlay.classList.add('hidden');
+                // On desktop, pull content back
+                if (window.innerWidth >= 768) {
+                    mainContent.classList.remove('md:ml-64');
+                }
+            }
+        }
+
         /**
          * Hides all screens and shows the target screen
          */
-        function showScreen(screenToShow) {
+        function showScreen(screenId) {
+            // Don't hide quiz/results screen if that's what we're showing
+            if (screenId !== 'quiz-screen' && screenId !== 'results-screen') {
+                // Hide sidebar on quiz/results screens, show otherwise
+                sidebar.classList.add('md:translate-x-0');
+                sidebar.classList.remove('md:-translate-x-full');
+                mainContent.classList.add('md:ml-64');
+                hamburgerBtn.classList.remove('hidden');
+            } else {
+                // Quiz or Results screen is active
+                sidebar.classList.remove('md:translate-x-0');
+                sidebar.classList.add('md:-translate-x-full');
+                mainContent.classList.remove('md:ml-64');
+                hamburgerBtn.classList.add('hidden');
+                // Close mobile sidebar if open
+                if (window.innerWidth < 768) {
+                    toggleSidebar(false);
+                }
+            }
+
             allScreens.forEach(screen => {
-                if (!screen.classList.contains('hidden')) {
-                    screen.classList.add('hidden');
+                if (screen.id === screenId) {
+                    screen.classList.remove('screen-hidden');
+                    screen.style.animation = 'fadeIn 0.3s ease-out';
+                    setTimeout(() => screen.style.animation = '', 300);
+                } else {
+                    screen.classList.add('screen-hidden');
+                }
+            });
+            
+            // Update active sidebar link
+            sidebarLinks.forEach(link => {
+                if (link.dataset.screen === screenId) {
+                    link.classList.add('active');
+                } else {
+                    link.classList.remove('active');
                 }
             });
             
             // Refresh dynamic content when showing screen
-            if (screenToShow === startScreen) {
-                populateSubjectCards();
+            if (screenId === 'home-screen') {
+                checkEmptyState();
                 checkRandomQuizButton();
             }
-            if (screenToShow === adminScreen) {
+            if (screenId === 'admin-screen') {
                 populateAdminControls();
                 editQuestionsPanel.classList.add('hidden');
                 clearQuestionForm();
             }
-            if (screenToShow === historyScreen) {
+            if (screenId === 'history-screen') {
                 populateHistoryTable();
                 populateOverallStats();
             }
-            if (screenToShow === dataScreen) {
+            if (screenId === 'data-screen') {
                 populateExportSubjectButton();
             }
-            
-            screenToShow.classList.remove('hidden');
-            // Trigger fade-in animation
-            screenToShow.style.animation = 'fadeIn 0.3s ease-out';
-            // Remove animation after it plays
-            setTimeout(() => screenToShow.style.animation = '', 300);
+        }
+        
+        /**
+         * Checks if this is a new user (no subjects) and shows the "Get Started" message
+         */
+        function checkEmptyState() {
+            if (quizData.subjects.length === 0) {
+                getStartedContainer.classList.remove('hidden');
+                subjectCardsContainer.classList.add('hidden');
+                quickActionsContainer.classList.add('hidden');
+                quizSettingsContainer.classList.add('hidden');
+            } else {
+                getStartedContainer.classList.add('hidden');
+                subjectCardsContainer.classList.remove('hidden');
+                quickActionsContainer.classList.remove('hidden');
+                quizSettingsContainer.classList.remove('hidden');
+                populateSubjectCards();
+            }
         }
         
         // --- Theme Management ---
@@ -807,11 +972,13 @@
                 document.documentElement.classList.add('dark');
                 themeIconLight.classList.add('hidden');
                 themeIconDark.classList.remove('hidden');
+                themeToggleText.textContent = 'Dark Mode';
                 localStorage.setItem(THEME_KEY, 'dark');
             } else {
                 document.documentElement.classList.remove('dark');
                 themeIconLight.classList.remove('hidden');
                 themeIconDark.classList.add('hidden');
+                themeToggleText.textContent = 'Light Mode';
                 localStorage.setItem(THEME_KEY, 'light');
             }
         }
@@ -908,13 +1075,9 @@
         function populateSubjectCards() {
             subjectCardsContainer.innerHTML = '';
             if (quizData.subjects.length === 0) {
-                noSubjectsMsg.classList.remove('hidden');
-                subjectCardsContainer.classList.add('hidden');
+                checkEmptyState(); // This will show the "Get Started" screen
                 return;
             }
-            
-            noSubjectsMsg.classList.add('hidden');
-            subjectCardsContainer.classList.remove('hidden');
             
             quizData.subjects.forEach(subject => {
                 const card = document.createElement('div');
@@ -925,7 +1088,7 @@
                     <div class="flex gap-2">
                         <button class="start-quiz-btn flex-1 bg-indigo-600 text-white py-2 px-3 text-sm rounded-md font-semibold hover:bg-indigo-700" data-name="${subject.name}" ${subject.questions.length === 0 ? 'disabled' : ''} ${subject.questions.length === 0 ? 'opacity-50 cursor-not-allowed' : ''}>Start Quiz</button>
                         <button class="delete-subject-home-btn bg-red-500 text-white p-2 text-sm rounded-md font-semibold hover:bg-red-600" data-name="${subject.name}">
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z" clip-rule="evenodd"></path></svg>
+                            <svg class="w-4 h-4 pointer-events-none" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z" clip-rule="evenodd"></path></svg>
                         </button>
                     </div>
                 `;
@@ -1068,7 +1231,7 @@
         }
 
         function requestClearHistory() {
-            showFeedback(`Are you sure you want to delete <strong>ALL</strong> quiz history? This cannot be undone. <br>
+            showConfirmation(`Are you sure you want to delete <strong>ALL</strong> quiz history? This cannot be undone. <br>
                 <button id="confirm-clear-history" class="bg-red-600 text-white py-1 px-3 rounded-md text-sm mt-2 mr-2">Yes, Delete History</button>
                 <button id="cancel-action" class="bg-slate-200 dark:bg-slate-600 text-slate-800 dark:text-slate-200 py-1 px-3 rounded-md text-sm mt-2">Cancel</button>`, 
             "warning", "history");
@@ -1079,8 +1242,8 @@
             saveHistory();
             populateHistoryTable();
             populateOverallStats();
-            clearFeedback("history");
-            showFeedback("Quiz history cleared.", "success", "history");
+            clearConfirmation("history");
+            showToast("Quiz history cleared.", "success");
         }
 
         // --- Admin Panel: Subject Functions ---
@@ -1088,11 +1251,11 @@
         function addSubject() {
             const name = newSubjectName.value.trim();
             if (!name) {
-                showFeedback("Subject name cannot be empty.", "error", "admin");
+                showToast("Subject name cannot be empty.", "error");
                 return;
             }
             if (quizData.subjects.find(s => s.name.toLowerCase() === name.toLowerCase())) {
-                showFeedback("Subject with this name already exists.", "error", "admin");
+                showToast("Subject with this name already exists.", "error");
                 return;
             }
 
@@ -1100,8 +1263,9 @@
             saveData();
             populateAdminControls();
             checkRandomQuizButton(); // Update random quiz button state
+            checkEmptyState(); // Check if we should hide "get started"
             newSubjectName.value = '';
-            showFeedback(`Subject '${name}' added successfully.`, "success", "admin");
+            showToast(`Subject '${name}' added successfully.`, "success");
         }
 
         function editSubject(oldName, li) {
@@ -1109,7 +1273,7 @@
             document.querySelectorAll('.subject-edit-form').forEach(form => {
                 if (!form.classList.contains('hidden')) {
                     form.classList.add('hidden');
-                    form.previousElementSibling.classList.remove('hidden'); // Show name
+                    form.closest('li').querySelector('.subject-name-display').classList.remove('hidden');
                 }
             });
             // Open this one
@@ -1127,11 +1291,11 @@
         function saveSubjectEdit(oldName, li) {
             const newName = li.querySelector('input').value.trim();
             if (!newName) {
-                showFeedback("Subject name cannot be empty.", "error", "admin");
+                showToast("Subject name cannot be empty.", "error");
                 return;
             }
             if (newName.toLowerCase() !== oldName.toLowerCase() && quizData.subjects.find(s => s.name.toLowerCase() === newName.toLowerCase())) {
-                showFeedback("Another subject with this name already exists.", "error", "admin");
+                showToast("Another subject with this name already exists.", "error");
                 return;
             }
 
@@ -1148,11 +1312,11 @@
             saveHistory();
             saveData();
             populateAdminControls();
-            showFeedback(`Subject renamed to '${newName}'.`, "success", "admin");
+            showToast(`Subject renamed to '${newName}'.`, "success");
         }
 
         function requestDeleteSubject(subjectName, feedbackLocation = 'admin') {
-            showFeedback(`Are you sure you want to delete "<strong>${subjectName}</strong>"? This will delete all its questions. <br>
+            showConfirmation(`Are you sure you want to delete "<strong>${subjectName}</strong>"? This will delete all its questions. <br>
                 <button id="confirm-delete-subject" data-name="${subjectName}" class="bg-red-600 text-white py-1 px-3 rounded-md text-sm mt-2 mr-2">Yes, Delete</button>
                 <button id="cancel-action" class="bg-slate-200 dark:bg-slate-600 text-slate-800 dark:text-slate-200 py-1 px-3 rounded-md text-sm mt-2">Cancel</button>`, 
             "warning", feedbackLocation);
@@ -1164,9 +1328,10 @@
             populateAdminControls();
             populateSubjectCards(); // Refresh home screen
             checkRandomQuizButton(); // Update random quiz button
+            checkEmptyState(); // Check if last subject was deleted
             editQuestionsPanel.classList.add('hidden');
-            clearFeedback("admin");
-            showFeedback(`Subject '${subjectName}' deleted.`, "success", "admin");
+            clearConfirmation("admin");
+            showToast(`Subject '${subjectName}' deleted.`, "success");
         }
 
         // --- Admin Panel: Question Functions ---
@@ -1232,17 +1397,17 @@
             const qIndex = parseInt(editingQuestionIndex.value);
 
             if (!subjectName) {
-                showFeedback("Please select a subject.", "error", "admin");
+                showToast("Please select a subject.", "error");
                 return;
             }
             if (!questionText || options.length < 2) { // Must have at least a question and 2 options
-                showFeedback("Please fill in the question and at least 2 options (including correct answer).", "error", "admin");
+                showToast("Please fill in the question and at least 2 options (including correct answer).", "error");
                 return;
             }
 
             const subject = quizData.subjects.find(s => s.name === subjectName);
             if (!subject) {
-                showFeedback("Selected subject not found.", "error", "admin");
+                showToast("Selected subject not found.", "error");
                 return;
             }
             
@@ -1262,10 +1427,10 @@
 
             if (qIndex > -1) {
                 subject.questions[qIndex] = newQuestion;
-                showFeedback(`Question updated in '${subjectName}'.`, "success", "admin");
+                showToast(`Question updated in '${subjectName}'.`, "success");
             } else {
                 subject.questions.push(newQuestion);
-                showFeedback(`Question added to '${subjectName}'.`, "success", "admin");
+                showToast(`Question added to '${subjectName}'.`, "success");
             }
 
             saveData();
@@ -1293,7 +1458,7 @@
 
         function requestDeleteQuestion(subjectName, qIndex) {
              const question = quizData.subjects.find(s => s.name === subjectName).questions[qIndex];
-            showFeedback(`Are you sure you want to delete this question: "<strong>${question.question.substring(0, 30)}...</strong>"? <br>
+            showConfirmation(`Are you sure you want to delete this question: "<strong>${question.question.substring(0, 30)}...</strong>"? <br>
                 <button id="confirm-delete-question" data-subject="${subjectName}" data-q-index="${qIndex}" class="bg-red-600 text-white py-1 px-3 rounded-md text-sm mt-2 mr-2">Yes, Delete</button>
                 <button id="cancel-action" class="bg-slate-200 dark:bg-slate-600 text-slate-800 dark:text-slate-200 py-1 px-3 rounded-md text-sm mt-2">Cancel</button>`, 
             "warning", "admin");
@@ -1308,8 +1473,8 @@
                 populateSubjectCards(); // Refresh counts on home screen
                 checkRandomQuizButton(); // Update random quiz button
                 showQuestionsForSubject(subjectName);
-                clearFeedback("admin");
-                showFeedback(`Question deleted from '${subjectName}'.`, "success", "admin");
+                clearConfirmation("admin");
+                showToast(`Question deleted from '${subjectName}'.`, "success");
             }
         }
 
@@ -1334,13 +1499,13 @@
             
             const subject = quizData.subjects.find(s => s.name === subjectName);
             if (!subject) {
-                showFeedback("Selected subject not found. Check spelling and case.", "error", "data");
+                showToast("Selected subject not found. Check spelling and case.", "error");
                 return;
             }
             
             const dataStr = JSON.stringify(subject, null, 2);
             downloadJSON(dataStr, `${subject.name.replace(/ /g, '_')}_quiz.json`);
-            showFeedback(`Exported subject '${subject.name}'.`, "success", "data");
+            showToast(`Exported subject '${subject.name}'.`, "success");
         }
         
         let subjectToImport = null;
@@ -1360,7 +1525,7 @@
                     const existing = quizData.subjects.find(s => s.name === subject.name);
                     
                     if (existing) {
-                        showFeedback(`Subject "<strong>${subject.name}</strong>" already exists. Do you want to overwrite it? <br>
+                        showConfirmation(`Subject "<strong>${subject.name}</strong>" already exists. Do you want to overwrite it? <br>
                             <button id="confirm-import-subject" data-subject="${subject.name}" class="bg-orange-600 text-white py-1 px-3 rounded-md text-sm mt-2 mr-2">Yes, Overwrite</button>
                             <button id="cancel-action" class="bg-slate-200 dark:bg-slate-600 text-slate-800 dark:text-slate-200 py-1 px-3 rounded-md text-sm mt-2">Cancel</button>`, 
                         "warning", "data");
@@ -1368,7 +1533,7 @@
                         confirmImportSubject(null, false); // No conflict, add directly
                     }
                 } catch (error) {
-                    showFeedback(`Import failed: ${error.message}`, "error", "data");
+                    showToast(`Import failed: ${error.message}`, "error");
                 }
             };
             reader.readAsText(file);
@@ -1386,7 +1551,7 @@
             }
             
             saveData();
-            showFeedback(`Subject '${subjectToImport.name}' imported successfully.`, "success", "data");
+            showToast(`Subject '${subjectToImport.name}' imported successfully.`, "success");
             subjectToImport = null; // Clear temp
         }
 
@@ -1398,7 +1563,7 @@
             };
             const dataStr = JSON.stringify(backupData, null, 2);
             downloadJSON(dataStr, `study_helper_backup_${new Date().toISOString().split('T')[0]}.json`);
-            showFeedback("Full app backup exported.", "success", "data");
+            showToast("Full app backup exported.", "success");
         }
         
         let backupToImport = null;
@@ -1415,13 +1580,13 @@
                     }
                     backupToImport = data; // Store temp
                     
-                    showFeedback(`Are you sure you want to restore from this backup? <strong>This will overwrite ALL current subjects, history, and settings.</strong> <br>
+                    showConfirmation(`Are you sure you want to restore from this backup? <strong>This will overwrite ALL current subjects, history, and settings.</strong> <br>
                         <button id="confirm-import-backup" class="bg-red-600 text-white py-1 px-3 rounded-md text-sm mt-2 mr-2">Yes, Overwrite Everything</button>
                         <button id="cancel-action" class="bg-slate-200 dark:bg-slate-600 text-slate-800 dark:text-slate-200 py-1 px-3 rounded-md text-sm mt-2">Cancel</button>`, 
                     "warning", "data");
                     
                 } catch (error) {
-                    showFeedback(`Import failed: ${error.message}`, "error", "data");
+                    showToast(`Import failed: ${error.message}`, "error");
                 }
             };
             reader.readAsText(file);
@@ -1431,7 +1596,7 @@
         function confirmImportBackup(confirmed) {
             if (!confirmed || !backupToImport) {
                 backupToImport = null;
-                clearFeedback("data");
+                clearConfirmation("data");
                 return;
             }
             
@@ -1446,7 +1611,7 @@
             localStorage.setItem(SETTINGS_KEY, JSON.stringify(quizSettings));
             
             backupToImport = null;
-            showFeedback("Backup restored successfully! Reloading app...", "success", "data");
+            showToast("Backup restored successfully! Reloading app...", "success");
             
             // Reload the app to apply all new data
             setTimeout(() => {
@@ -1455,7 +1620,7 @@
         }
 
         function requestResetAllData() {
-            showFeedback(`<strong>DANGER:</strong> Are you sure you want to reset all app data? This will delete ALL subjects, questions, history, and settings. <br>
+            showConfirmation(`<strong>DANGER:</strong> Are you sure you want to reset all app data? This will delete ALL subjects, questions, history, and settings. <br>
                 <button id="confirm-reset-all" class="bg-red-600 text-white py-1 px-3 rounded-md text-sm mt-2 mr-2">Yes, Delete Everything</button>
                 <button id="cancel-action" class="bg-slate-200 dark:bg-slate-600 text-slate-800 dark:text-slate-200 py-1 px-3 rounded-md text-sm mt-2">Cancel</button>`, 
             "warning", "data");
@@ -1465,7 +1630,7 @@
             localStorage.removeItem(DB_KEY);
             localStorage.removeItem(HISTORY_KEY);
             localStorage.removeItem(SETTINGS_KEY);
-            showFeedback("All data has been reset. Reloading app...", "success", "data");
+            showToast("All data has been reset. Reloading app...", "success");
             setTimeout(() => {
                 location.reload();
             }, 1500);
@@ -1486,46 +1651,64 @@
             URL.revokeObjectURL(url);
         }
 
-        // --- Feedback Functions ---
+        // --- Feedback Functions (Toast & Confirmation) ---
         
-        function showFeedback(message, type, location = "admin") {
+        /**
+         * Shows a toast notification
+         */
+        function showToast(message, type = 'success') {
+            const toastContainer = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            let icon = '';
+            if (type === 'success') {
+                toast.classList.add('success');
+                icon = '<svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>';
+            } else if (type === 'error') {
+                toast.classList.add('error');
+                icon = '<svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path></svg>';
+            }
+            
+            toast.classList.add('toast');
+            toast.innerHTML = `${icon}<span>${message}</span>`;
+            
+            toastContainer.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.classList.add('fade-out');
+                toast.addEventListener('transitionend', () => {
+                    toast.remove();
+                });
+            }, 3000);
+        }
+
+        /**
+         * Shows a confirmation dialog (replaces old showFeedback)
+         */
+        function showConfirmation(message, type, location = "admin") {
             let feedbackEl;
             switch(location) {
-                case "history":
-                    feedbackEl = historyFeedback;
-                    break;
-                case "data":
-                    feedbackEl = dataFeedback;
-                    break;
+                case "history": feedbackEl = historyFeedback; break;
+                case "data": feedbackEl = dataFeedback; break;
                 case "admin":
-                default:
-                    feedbackEl = adminFeedback;
+                default: feedbackEl = adminFeedback;
             }
             
             feedbackEl.innerHTML = message;
             feedbackEl.classList.remove('text-green-600', 'text-red-600', 'text-yellow-700', 'bg-red-100', 'bg-green-100', 'bg-yellow-100', 'dark:bg-red-900/50', 'dark:bg-green-900/50', 'dark:bg-yellow-900/50');
             
-            if (type === "success") {
-                feedbackEl.classList.add('text-green-600', 'bg-green-100', 'dark:bg-green-900/50');
-            } else if (type === "error") {
-                feedbackEl.classList.add('text-red-600', 'bg-red-100', 'dark:bg-red-900/50');
-            } else if (type === "warning") {
+            if (type === "warning") {
                 feedbackEl.classList.add('text-yellow-700', 'bg-yellow-100', 'dark:bg-yellow-900/50');
             }
         }
         
-        function clearFeedback(location = "admin") {
+        function clearConfirmation(location = "admin") {
             let feedbackEl;
             switch(location) {
-                case "history":
-                    feedbackEl = historyFeedback;
-                    break;
-                case "data":
-                    feedbackEl = dataFeedback;
-                    break;
+                case "history": feedbackEl = historyFeedback; break;
+                case "data": feedbackEl = dataFeedback; break;
                 case "admin":
-                default:
-                    feedbackEl = adminFeedback;
+                default: feedbackEl = adminFeedback;
             }
              if (feedbackEl) {
                  feedbackEl.innerHTML = '';
@@ -1533,10 +1716,10 @@
              }
         }
 
-        function clearAllFeedback() {
-            clearFeedback("admin");
-            clearFeedback("history");
-            clearFeedback("data");
+        function clearAllConfirmations() {
+            clearConfirmation("admin");
+            clearConfirmation("history");
+            clearConfirmation("data");
         }
 
         // --- Quiz Logic ---
@@ -1547,7 +1730,7 @@
         function startQuiz(subjectName) {
             const subject = quizData.subjects.find(s => s.name === subjectName);
             if (!subject || subject.questions.length === 0) {
-                alert("This subject has no questions. Add some in the 'Manage Question Bank' panel.");
+                showToast("This subject has no questions.", "error");
                 return;
             }
 
@@ -1555,7 +1738,7 @@
             const { count, timeLimit, showTimer } = getQuizSettings();
             
             if (count !== 'all' && subject.questions.length < count) {
-                alert(`This subject only has ${subject.questions.length} questions. You can't start a quiz with ${count} questions.`);
+                showToast(`This subject only has ${subject.questions.length} questions.`, "error");
                 return;
             }
 
@@ -1573,7 +1756,7 @@
             }
             
             if (currentQuestions.length === 0) {
-                alert("This subject has no questions yet.");
+                showToast("This subject has no questions yet.", "error");
                 return;
             }
 
@@ -1588,7 +1771,7 @@
             startTimer();
             timerDisplay.classList.toggle('hidden', !isTimerVisible);
 
-            showScreen(quizScreen);
+            showScreen('quiz-screen');
             showQuestion();
             updateProgressBar();
         }
@@ -1611,11 +1794,11 @@
             const allQuestions = quizData.subjects.flatMap(s => s.questions);
 
             if (allQuestions.length === 0) {
-                alert("You don't have any questions in your bank! Add some first.");
+                showToast("You don't have any questions in your bank! Add some first.", "error");
                 return;
             }
             if (count !== 'all' && allQuestions.length < count) {
-                alert(`You only have ${allQuestions.length} questions in total. You can't start a quiz with ${count} questions.`);
+                showToast(`You only have ${allQuestions.length} questions in total.`, "error");
                 return;
             }
             
@@ -1642,7 +1825,7 @@
             startTimer();
             timerDisplay.classList.toggle('hidden', !isTimerVisible);
 
-            showScreen(quizScreen);
+            showScreen('quiz-screen');
             showQuestion();
             updateProgressBar();
         }
@@ -1743,11 +1926,10 @@
             clearInterval(timerInterval);
 
             const total = currentQuestions.length;
-            const percent = total > 0 ? (score / total * 100) : 0;
             
             // Don't save history if user quit with 0 answers
             if (wasQuit && userAnswers.length === 0) {
-                showScreen(startScreen);
+                showScreen('home-screen');
                 return;
             }
 
@@ -1781,7 +1963,7 @@
             // Show results summary
             showResultsSummary();
             
-            showScreen(resultsScreen);
+            showScreen('results-screen');
         }
 
         /**
@@ -1867,11 +2049,11 @@
         }
 
         /**
-         * Resets the quiz to go back to the start screen
+         * Resets the quiz to go back to the home screen
          */
         function restartQuiz() {
             progressBarInner.style.width = '0%';
-            showScreen(startScreen);
+            showScreen('home-screen');
         }
 
         /**
