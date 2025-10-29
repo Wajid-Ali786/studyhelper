@@ -10,7 +10,7 @@
     <!-- 2. Load Inter font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
     <!-- 3. Custom Styles -->
     <style>
@@ -53,23 +53,28 @@
         .fade-in {
             animation: fadeIn 0.5s ease-out forwards;
         }
+
+        /* Custom styles for admin list items */
+        #admin-subject-list li, #question-edit-list li {
+            @apply p-3 bg-white border border-slate-200 rounded-md flex justify-between items-center;
+        }
     </style>
 </head>
 <body class="bg-slate-100 min-h-screen flex items-center justify-center p-4">
 
     <!-- Main Quiz Container Card -->
-    <div class="w-full max-w-2xl bg-white rounded-xl shadow-2xl p-6 sm:p-10">
+    <div class="w-full max-w-2xl bg-white rounded-xl shadow-xl p-6 sm:p-10">
 
         <!-- ===== SCREEN 1: Start Screen ===== -->
         <div id="start-screen" class="screen">
-            <h1 class="text-3xl font-bold text-center text-slate-800 mb-2">Study Helper Quiz</h1>
+            <h1 class="text-3xl font-extrabold text-center text-slate-800 mb-2">Study Helper Quiz</h1>
             <p class="text-center text-slate-500 mb-8">Select your topic and start practicing!</p>
             
             <div class="space-y-6">
                 <!-- Subject Selection -->
                 <div>
                     <label for="subject-select" class="block text-sm font-medium text-slate-700 mb-1">1. Choose a Subject</label>
-                    <select id="subject-select" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    <select id="subject-select" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
                         <!-- Options will be populated by JavaScript -->
                     </select>
                 </div>
@@ -77,7 +82,7 @@
                 <!-- Number of Questions Selection -->
                 <div>
                     <label for="question-count-select" class="block text-sm font-medium text-slate-700 mb-1">2. Select Number of Questions</label>
-                    <select id="question-count-select" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    <select id="question-count-select" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
                         <option value="5">5 Questions</option>
                         <option value="10">10 Questions</option>
                         <option value="all">All Questions</option>
@@ -85,7 +90,7 @@
                 </div>
 
                 <!-- Start Button -->
-                <button id="start-btn" class="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold text-lg shadow-md hover:bg-blue-700 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-blue-300">
+                <button id="start-btn" class="w-full bg-indigo-600 text-white py-3 px-6 rounded-lg font-semibold text-lg shadow-md hover:bg-indigo-700 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-indigo-300">
                     Start Quiz
                 </button>
             </div>
@@ -107,13 +112,13 @@
         <div id="quiz-screen" class="screen hidden">
             <!-- Header: Timer & Score -->
             <div class="flex justify-between items-center mb-4">
-                <div id="timer" class="text-lg font-bold text-blue-600">Time: 00:00</div>
+                <div id="timer" class="text-lg font-bold text-indigo-600">Time: 00:00</div>
                 <div id="score" class="text-lg font-bold text-green-600">Score: 0</div>
             </div>
 
             <!-- Progress Bar -->
             <div class="w-full bg-slate-200 rounded-full h-2.5 mb-6">
-                <div id="progress-bar-inner" class="bg-blue-600 h-2.5 rounded-full" style="width: 0%"></div>
+                <div id="progress-bar-inner" class="bg-indigo-600 h-2.5 rounded-full" style="width: 0%"></div>
             </div>
 
             <!-- Question Container -->
@@ -141,7 +146,7 @@
             
             <div class="bg-slate-100 rounded-lg p-6 text-center mb-6">
                 <p class="text-lg text-slate-600">Your final score is:</p>
-                <h2 id="final-score" class="text-5xl font-bold text-blue-600 my-2">0 / 0</h2>
+                <h2 id="final-score" class="text-5xl font-bold text-indigo-600 my-2">0 / 0</h2>
                 <p id="percentage" class="text-2xl font-semibold text-green-600">0%</p>
             </div>
 
@@ -154,7 +159,7 @@
             </div>
 
             <!-- Restart Button -->
-            <button id="restart-btn" class="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold text-lg shadow-md hover:bg-blue-700 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-blue-300">
+            <button id="restart-btn" class="w-full bg-indigo-600 text-white py-3 px-6 rounded-lg font-semibold text-lg shadow-md hover:bg-indigo-700 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-indigo-300">
                 Practice Again
             </button>
         </div>
@@ -162,98 +167,111 @@
         <!-- ===== SCREEN 4: Admin Panel Screen ===== -->
         <div id="admin-screen" class="screen hidden">
             <div class="flex justify-between items-center mb-6">
-                <h1 class="text-3xl font-bold text-slate-800">Question Bank</h1>
+                <h1 class="text-3xl font-extrabold text-slate-800">Question Bank</h1>
                 <button id="admin-back-btn" class="bg-slate-200 text-slate-800 py-2 px-4 rounded-lg font-semibold hover:bg-slate-300 transition-all">
                     Back to Quiz
                 </button>
             </div>
 
-            <p id="admin-feedback" class="text-center font-medium min-h-[2em] mb-4"></p>
+            <!-- Admin Feedback / Confirmation Area -->
+            <div id="admin-feedback" class="text-center font-medium min-h-[2em] mb-4 p-3 rounded-lg"></div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- All sections are now in a single column -->
+            <div class="space-y-8">
                 
-                <!-- Left Column: Add/View Subjects -->
-                <div class="space-y-6">
+                <!-- Section 1: Manage Subjects -->
+                <div class="bg-slate-50 p-5 rounded-lg border">
+                    <h3 class="text-xl font-semibold mb-4 text-slate-700">Manage Subjects</h3>
+                    
                     <!-- Add Subject -->
-                    <div class="bg-slate-50 p-4 rounded-lg border">
-                        <h3 class="text-lg font-semibold mb-3 text-slate-700">1. Add New Subject</h3>
+                    <div class="mb-4">
+                        <label for="new-subject-name" class="block text-sm font-medium text-slate-700 mb-1">Add New Subject</label>
                         <div class="flex gap-2">
-                            <input type="text" id="new-subject-name" placeholder="Enter new subject name" class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                            <button id="add-subject-btn" class="bg-blue-600 text-white py-2 px-4 rounded-lg font-semibold hover:bg-blue-700">Add</button>
+                            <input type="text" id="new-subject-name" placeholder="Enter new subject name" class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+                            <button id="add-subject-btn" class="bg-indigo-600 text-white py-2 px-4 rounded-lg font-semibold hover:bg-indigo-700">Add</button>
                         </div>
                     </div>
 
-                    <!-- View Subjects -->
-                    <div class="bg-slate-50 p-4 rounded-lg border">
-                        <h3 class="text-lg font-semibold mb-3 text-slate-700">All Subjects</h3>
-                        <ul id="admin-subject-list" class="list-disc list-inside text-slate-600 space-y-1 max-h-40 overflow-y-auto">
+                    <!-- View/Edit Subjects -->
+                    <div>
+                        <h4 class="text-lg font-semibold mb-2 text-slate-700">All Subjects</h4>
+                        <p class="text-sm text-slate-500 mb-3">Click a subject's name to view its questions. Click [Edit] to rename.</p>
+                        <ul id="admin-subject-list" class="space-y-2 max-h-48 overflow-y-auto">
                             <!-- Subject list will be populated by JavaScript -->
                         </ul>
                     </div>
                 </div>
 
-                <!-- Right Column: Add Question -->
-                <div class="bg-slate-50 p-4 rounded-lg border space-y-4">
-                    <h3 class="text-lg font-semibold text-slate-700">2. Add New Question</h3>
+                <!-- Section 2: Edit Questions Panel (Hidden by default) -->
+                <div id="edit-questions-panel" class="bg-slate-50 p-5 rounded-lg border hidden">
+                    <h3 id="edit-questions-title" class="text-xl font-semibold mb-4 text-slate-700">Edit Questions</h3>
+                    <ul id="question-edit-list" class="space-y-2 max-h-60 overflow-y-auto">
+                        <!-- Question list will be populated by JavaScript -->
+                    </ul>
+                </div>
+
+                <!-- Section 3: Add / Edit Question Form -->
+                <div class="bg-slate-50 p-5 rounded-lg border space-y-4">
+                    <h3 id="question-form-title" class="text-xl font-semibold text-slate-700">Add New Question</h3>
                     
+                    <!-- Hidden field to track editing index -->
+                    <input type="hidden" id="editing-question-index" value="-1">
+
                     <div>
                         <label for="admin-subject-select" class="block text-sm font-medium text-slate-700 mb-1">Select Subject</label>
-                        <select id="admin-subject-select" class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                        <select id="admin-subject-select" class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
                             <!-- Options will be populated by JavaScript -->
                         </select>
                     </div>
 
                     <div>
                         <label for="admin-question-text" class="block text-sm font-medium text-slate-700 mb-1">Question</label>
-                        <textarea id="admin-question-text" rows="2" placeholder="What is...?" class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500"></textarea>
+                        <textarea id="admin-question-text" rows="2" placeholder="What is...?" class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500"></textarea>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-2">
+                    <div class="grid grid-cols-2 gap-3">
                         <div>
-                            <label for="admin-option-1" class="block text-sm font-medium text-slate-700 mb-1">Option 1</label>
-                            <input type="text" id="admin-option-1" placeholder="Answer 1" class="w-full p-2 border border-slate-300 rounded-lg">
+                            <label for="admin-option-1" class="block text-sm font-medium text-slate-700 mb-1">Option 1 (Correct Answer)</label>
+                            <input type="text" id="admin-option-1" placeholder="The Correct Answer" class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-green-500">
                         </div>
                         <div>
                             <label for="admin-option-2" class="block text-sm font-medium text-slate-700 mb-1">Option 2</label>
-                            <input type="text" id="admin-option-2" placeholder="Answer 2" class="w-full p-2 border border-slate-300 rounded-lg">
+                            <input type="text" id="admin-option-2" placeholder="Wrong Answer 1" class="w-full p-2 border border-slate-300 rounded-lg">
                         </div>
                         <div>
                             <label for="admin-option-3" class="block text-sm font-medium text-slate-700 mb-1">Option 3</label>
-                            <input type="text" id="admin-option-3" placeholder="Answer 3" class="w-full p-2 border border-slate-300 rounded-lg">
+                            <input type="text" id="admin-option-3" placeholder="Wrong Answer 2" class="w-full p-2 border border-slate-300 rounded-lg">
                         </div>
                         <div>
                             <label for="admin-option-4" class="block text-sm font-medium text-slate-700 mb-1">Option 4</label>
-                            <input type="text" id="admin-option-4" placeholder="Answer 4" class="w-full p-2 border border-slate-300 rounded-lg">
+                            <input type="text" id="admin-option-4" placeholder="Wrong Answer 3" class="w-full p-2 border border-slate-300 rounded-lg">
                         </div>
                     </div>
+                    <p class="text-xs text-slate-500 -mt-2">Note: For simplicity, **Option 1** is always the correct answer when adding/editing.</p>
 
-                    <div>
-                        <label for="admin-correct-answer" class="block text-sm font-medium text-slate-700 mb-1">Correct Answer</label>
-                        <select id="admin-correct-answer" class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                            <option value="1">Option 1</option>
-                            <option value="2">Option 2</option>
-                            <option value="3">Option 3</option>
-                            <option value="4">Option 4</option>
-                        </select>
+
+                    <div class="flex gap-3">
+                        <button id="save-question-btn" class="w-full bg-green-600 text-white py-3 rounded-lg font-semibold shadow-md hover:bg-green-700">
+                            Save Question
+                        </button>
+                        <button id="cancel-edit-btn" class="w-full bg-slate-200 text-slate-800 py-3 rounded-lg font-semibold hover:bg-slate-300 hidden">
+                            Cancel Edit
+                        </button>
                     </div>
-
-                    <button id="add-question-btn" class="w-full bg-green-600 text-white py-3 rounded-lg font-semibold shadow-md hover:bg-green-700">
-                        Save Question
-                    </button>
                 </div>
-            </div>
 
-            <!-- Import/Export Section -->
-            <div class="mt-8 border-t pt-6">
-                <h3 class="text-xl font-semibold text-slate-700 mb-4">Import / Export Data</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <label for="import-export-data" class="block text-sm font-medium text-slate-700 mb-1">Data (JSON format)</label>
-                        <textarea id="import-export-data" rows="5" class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="Paste data to import, or click Export to see data here..."></textarea>
-                    </div>
-                    <div class="flex flex-col space-y-3">
-                        <button id="export-btn" class="w-full bg-blue-500 text-white py-2 px-4 rounded-lg font-semibold hover:bg-blue-600">Export My Question Bank</button>
-                        <button id="import-btn" class="w-full bg-orange-500 text-white py-2 px-4 rounded-lg font-semibold hover:bg-orange-600">Import This Data</button>
+                <!-- Section 4: Import/Export Section -->
+                <div class="mt-8 border-t pt-6">
+                    <h3 class="text-xl font-semibold text-slate-700 mb-4">Import / Export Data</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="import-export-data" class="block text-sm font-medium text-slate-700 mb-1">Data (JSON format)</label>
+                            <textarea id="import-export-data" rows="5" class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500" placeholder="Paste data to import, or click Export to see data here..."></textarea>
+                        </div>
+                        <div class="flex flex-col space-y-3">
+                            <button id="export-btn" class="w-full bg-indigo-500 text-white py-2 px-4 rounded-lg font-semibold hover:bg-indigo-600">Export My Question Bank</button>
+                            <button id="import-btn" class="w-full bg-orange-500 text-white py-2 px-4 rounded-lg font-semibold hover:bg-orange-600">Import This Data</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -264,81 +282,7 @@
     <!-- ===== JavaScript ===== -->
     <script type="module">
         // --- 1. QUIZ DATA ---
-        // This is now the DEFAULT data, used only if localStorage is empty.
-        const defaultQuizData = {
-            "subjects": [
-                {
-                    "name": "JavaScript Basics",
-                    "questions": [
-                        {
-                            "question": "What does 'DOM' stand for?",
-                            "options": ["Document Object Model", "Data Object Model", "Document-oriented-Model", "Desktop Object Management"],
-                            "answer": "Document Object Model"
-                        },
-                        {
-                            "question": "Which keyword is used to declare a variable that cannot be reassigned?",
-                            "options": ["var", "let", "const", "static"],
-                            "answer": "const"
-                        },
-                        {
-                            "question": "What is 'NaN' in JavaScript?",
-                            "options": ["Not a Number", "No and No", "Not a Noun", "Null available Now"],
-                            "answer": "Not a Number"
-                        },
-                        {
-                            "question": "How do you write a single-line comment in JavaScript?",
-                            "options": ["// This is a comment", "<!-- This is a comment -->", "/* This is a comment */", "# This is a comment"],
-                            "answer": "// This is a comment"
-                        },
-                        {
-                            "question": "Which method adds a new item to the end of an array?",
-                            "options": ["arr.pop()", "arr.push()", "arr.shift()", "arr.unshift()"],
-                            "answer": "arr.push()"
-                        },
-                        {
-                            "question": "What does '==' operator compare?",
-                            "options": ["Value and Type", "Value only", "Type only", "Reference only"],
-                            "answer": "Value only"
-                        },
-                        {
-                            "question": "What does '===' operator compare?",
-                            "options": ["Value and Type", "Value only", "Type only", "Reference only"],
-                            "answer": "Value and Type"
-                        }
-                    ]
-                },
-                {
-                    "name": "World Capitals",
-                    "questions": [
-                        {
-                            "question": "What is the capital of Canada?",
-                            "options": ["Toronto", "Vancouver", "Ottawa", "Montreal"],
-                            "answer": "Ottawa"
-                        },
-                        {
-                            "question": "What is the capital of Australia?",
-                            "options": ["Sydney", "Melbourne", "Canberra", "Brisbane"],
-                            "answer": "Canberra"
-                        },
-                        {
-                            "question": "What is the capital of Japan?",
-                            "options": ["Kyoto", "Osaka", "Tokyo", "Hiroshima"],
-                            "answer": "Tokyo"
-                        },
-                        {
-                            "question": "What is the capital of Brazil?",
-                            "options": ["Rio de Janeiro", "São Paulo", "Salvador", "Brasília"],
-                            "answer": "Brasília"
-                        },
-                        {
-                            "question": "What is the capital of Egypt?",
-                            "options": ["Alexandria", "Cairo", "Giza", "Luxor"],
-                            "answer": "Cairo"
-                        }
-                    ]
-                }
-            ]
-        };
+        // NO DEFAULT DATA. Will be loaded from localStorage or initialized as empty.
 
         // --- 2. DOM Element References ---
         const startScreen = document.getElementById('start-screen');
@@ -371,14 +315,26 @@
         const newSubjectName = document.getElementById('new-subject-name');
         const addSubjectBtn = document.getElementById('add-subject-btn');
         const adminSubjectList = document.getElementById('admin-subject-list');
+        
+        // Admin Question Form
+        const questionFormTitle = document.getElementById('question-form-title');
         const adminSubjectSelect = document.getElementById('admin-subject-select');
         const adminQuestionText = document.getElementById('admin-question-text');
-        const adminOption1 = document.getElementById('admin-option-1');
+        const adminOption1 = document.getElementById('admin-option-1'); // Correct Answer
         const adminOption2 = document.getElementById('admin-option-2');
         const adminOption3 = document.getElementById('admin-option-3');
         const adminOption4 = document.getElementById('admin-option-4');
-        const adminCorrectAnswer = document.getElementById('admin-correct-answer');
-        const addQuestionBtn = document.getElementById('add-question-btn');
+        // const adminCorrectAnswer = document.getElementById('admin-correct-answer'); // This is removed, Option 1 is now correct
+        const saveQuestionBtn = document.getElementById('save-question-btn');
+        const cancelEditBtn = document.getElementById('cancel-edit-btn');
+        const editingQuestionIndex = document.getElementById('editing-question-index');
+
+        // Admin Edit Questions Panel
+        const editQuestionsPanel = document.getElementById('edit-questions-panel');
+        const editQuestionsTitle = document.getElementById('edit-questions-title');
+        const questionEditList = document.getElementById('question-edit-list');
+
+        // Admin Import/Export
         const importExportData = document.getElementById('import-export-data');
         const exportBtn = document.getElementById('export-btn');
         const importBtn = document.getElementById('import-btn');
@@ -420,9 +376,59 @@
             manageBankBtn.addEventListener('click', showAdminPanel);
             adminBackBtn.addEventListener('click', showStartScreen);
             addSubjectBtn.addEventListener('click', addSubject);
-            addQuestionBtn.addEventListener('click', addQuestion);
+            saveQuestionBtn.addEventListener('click', saveQuestion);
+            cancelEditBtn.addEventListener('click', clearQuestionForm);
             exportBtn.addEventListener('click', exportData);
             importBtn.addEventListener('click', importData);
+
+            // Event delegation for dynamic buttons
+            addDynamicListeners();
+        }
+
+        /**
+         * Adds event listeners for dynamically created buttons
+         */
+        function addDynamicListeners() {
+            document.body.addEventListener('click', function(e) {
+                // Admin Subject List buttons
+                if (e.target.classList.contains('edit-subject-btn')) {
+                    const oldName = e.target.dataset.name;
+                    editSubject(oldName, e.target.closest('li'));
+                }
+                if (e.target.classList.contains('save-subject-btn')) {
+                    const oldName = e.target.dataset.name;
+                    saveSubjectEdit(oldName, e.target.closest('li'));
+                }
+                if (e.target.classList.contains('cancel-subject-btn')) {
+                    cancelSubjectEdit(e.target.closest('li'));
+                }
+                if (e.target.classList.contains('delete-subject-btn')) {
+                    requestDeleteSubject(e.target.dataset.name);
+                }
+                if (e.target.classList.contains('view-subject-questions')) {
+                    showQuestionsForSubject(e.target.dataset.name);
+                }
+
+                // Admin Question List buttons
+                if (e.target.classList.contains('edit-q-btn')) {
+                    editQuestion(e.target.dataset.subject, e.target.dataset.qIndex);
+                }
+                if (e.target.classList.contains('delete-q-btn')) {
+                    requestDeleteQuestion(e.target.dataset.subject, e.target.dataset.qIndex);
+                }
+
+
+                // Confirmation buttons in adminFeedback
+                if (e.target.id === 'confirm-delete-subject') {
+                    deleteSubject(e.target.dataset.name);
+                }
+                if (e.target.id === 'confirm-delete-question') {
+                    deleteQuestion(e.target.dataset.subject, e.target.dataset.qIndex);
+                }
+                if (e.target.id === 'cancel-delete') {
+                    clearAdminFeedback();
+                }
+            });
         }
 
         // --- Data Management Functions ---
@@ -435,8 +441,9 @@
             if (savedData) {
                 quizData = JSON.parse(savedData);
             } else {
-                quizData = defaultQuizData;
-                saveData(); // Save the default data to localStorage
+                // Start with an empty bank if no data is found
+                quizData = { "subjects": [] }; 
+                saveData(); // Save the empty bank
             }
         }
 
@@ -453,9 +460,13 @@
         function populateStartSubjectSelect() {
             subjectSelect.innerHTML = ''; // Clear existing options
             if (quizData.subjects.length === 0) {
-                subjectSelect.innerHTML = '<option disabled>No subjects found. Add some!</option>';
+                subjectSelect.innerHTML = '<option value="" disabled>No subjects found. Add some!</option>';
+                startBtn.disabled = true;
+                startBtn.classList.add('opacity-50', 'cursor-not-allowed');
                 return;
             }
+            startBtn.disabled = false;
+            startBtn.classList.remove('opacity-50', 'cursor-not-allowed');
             quizData.subjects.forEach(subject => {
                 const option = document.createElement('option');
                 option.value = subject.name;
@@ -472,18 +483,37 @@
             adminSubjectSelect.innerHTML = ''; // Clear dropdown
 
             if (quizData.subjects.length === 0) {
-                adminSubjectList.innerHTML = '<li>No subjects yet.</li>';
+                adminSubjectList.innerHTML = '<li class="!bg-transparent !border-none text-slate-500">No subjects yet. Add one above.</li>';
                 adminSubjectSelect.innerHTML = '<option disabled>Please add a subject first.</option>';
+                saveQuestionBtn.disabled = true;
+                saveQuestionBtn.classList.add('opacity-50', 'cursor-not-allowed');
                 return;
             }
+            
+            saveQuestionBtn.disabled = false;
+            saveQuestionBtn.classList.remove('opacity-50', 'cursor-not-allowed');
 
             quizData.subjects.forEach(subject => {
-                // Add to list
+                // Add to admin list
                 const li = document.createElement('li');
-                li.textContent = `${subject.name} (${subject.questions.length}Q)`;
+                li.innerHTML = `
+                    <div class="flex-grow">
+                        <span class="subject-name-display font-semibold text-indigo-700 cursor-pointer view-subject-questions" data-name="${subject.name}">${subject.name}</span>
+                        <span class="text-sm text-slate-500 ml-2">(${subject.questions.length}Q)</span>
+                        <div class="subject-edit-form hidden mt-2 flex gap-2">
+                            <input type="text" value="${subject.name}" class="w-full p-1 border border-slate-300 rounded-md">
+                            <button class="save-subject-btn text-sm bg-green-500 text-white px-2 py-1 rounded-md" data-name="${subject.name}">Save</button>
+                            <button class="cancel-subject-btn text-sm bg-slate-200 text-slate-700 px-2 py-1 rounded-md">Cancel</button>
+                        </div>
+                    </div>
+                    <div class="flex-shrink-0 space-x-2">
+                        <button class="edit-subject-btn text-sm text-indigo-600 hover:text-indigo-800 font-medium" data-name="${subject.name}">[Edit]</button>
+                        <button class="delete-subject-btn text-sm text-red-600 hover:text-red-800 font-medium" data-name="${subject.name}">[Delete]</button>
+                    </div>
+                `;
                 adminSubjectList.appendChild(li);
 
-                // Add to dropdown
+                // Add to admin dropdown
                 const option = document.createElement('option');
                 option.value = subject.name;
                 option.textContent = subject.name;
@@ -500,8 +530,10 @@
         function showAdminPanel() {
             startScreen.classList.add('hidden');
             adminScreen.classList.remove('hidden');
-            adminFeedback.textContent = '';
+            clearAdminFeedback();
             populateAdminControls();
+            editQuestionsPanel.classList.add('hidden'); // Hide question list
+            clearQuestionForm(); // Clear form
         }
 
         /**
@@ -514,7 +546,7 @@
             populateStartSubjectSelect();
         }
 
-        // --- Admin Panel Functions ---
+        // --- Admin Panel: Subject Functions ---
 
         /**
          * Adds a new subject to the quizData
@@ -538,25 +570,154 @@
         }
 
         /**
-         * Adds a new question to the selected subject
+         * Shows the inline form to edit a subject's name
          */
-        function addQuestion() {
+        function editSubject(oldName, li) {
+            li.querySelector('.subject-name-display').classList.add('hidden');
+            li.querySelector('.subject-edit-form').classList.remove('hidden');
+        }
+
+        /**
+         * Cancels the edit of a subject's name
+         */
+        function cancelSubjectEdit(li) {
+            li.querySelector('.subject-name-display').classList.remove('hidden');
+            li.querySelector('.subject-edit-form').classList.add('hidden');
+            // Reset input value
+            const oldName = li.querySelector('.save-subject-btn').dataset.name;
+            li.querySelector('input').value = oldName;
+        }
+
+        /**
+         * Saves the new name for a subject
+         */
+        function saveSubjectEdit(oldName, li) {
+            const newName = li.querySelector('input').value.trim();
+            if (!newName) {
+                showAdminFeedback("Subject name cannot be empty.", "error");
+                return;
+            }
+            if (newName.toLowerCase() !== oldName.toLowerCase() && quizData.subjects.find(s => s.name.toLowerCase() === newName.toLowerCase())) {
+                showAdminFeedback("Another subject with this name already exists.", "error");
+                return;
+            }
+
+            // Find subject and update name
+            const subject = quizData.subjects.find(s => s.name === oldName);
+            if (subject) {
+                subject.name = newName;
+            }
+
+            saveData();
+            populateAdminControls(); // Refresh admin list
+            populateStartSubjectSelect(); // Refresh start screen dropdown
+            showAdminFeedback(`Subject renamed to '${newName}'.`, "success");
+        }
+
+        /**
+         * Shows confirmation before deleting a subject
+         */
+        function requestDeleteSubject(subjectName) {
+            showAdminFeedback(`Are you sure you want to delete "<strong>${subjectName}</strong>"? This will delete all its questions. <br>
+                <button id="confirm-delete-subject" data-name="${subjectName}" class="bg-red-600 text-white py-1 px-3 rounded-md text-sm mt-2 mr-2">Yes, Delete</button>
+                <button id="cancel-delete" class="bg-slate-200 text-slate-800 py-1 px-3 rounded-md text-sm mt-2">Cancel</button>`, 
+            "warning");
+        }
+
+        /**
+         * Deletes a subject from quizData
+         */
+        function deleteSubject(subjectName) {
+            quizData.subjects = quizData.subjects.filter(s => s.name !== subjectName);
+            saveData();
+            populateAdminControls();
+            populateStartSubjectSelect();
+            editQuestionsPanel.classList.add('hidden'); // Hide question list if it was for this subject
+            clearAdminFeedback();
+            showAdminFeedback(`Subject '${subjectName}' deleted.`, "success");
+        }
+
+        // --- Admin Panel: Question Functions ---
+
+        /**
+         * Shows the list of questions for a specific subject
+         */
+        function showQuestionsForSubject(subjectName) {
+            editQuestionsPanel.classList.remove('hidden');
+            editQuestionsTitle.textContent = `Questions for: ${subjectName}`;
+            questionEditList.innerHTML = '';
+
+            const subject = quizData.subjects.find(s => s.name === subjectName);
+            if (!subject || subject.questions.length === 0) {
+                questionEditList.innerHTML = '<li class="!bg-transparent !border-none text-slate-500">No questions in this subject yet.</li>';
+                return;
+            }
+
+            subject.questions.forEach((q, index) => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <span class="flex-grow truncate pr-4" title="${q.question}">${q.question}</span>
+                    <div class="flex-shrink-0 space-x-2">
+                        <button class="edit-q-btn text-sm text-indigo-600 hover:text-indigo-800 font-medium" data-subject="${subjectName}" data-q-index="${index}">[Edit]</button>
+                        <button class="delete-q-btn text-sm text-red-600 hover:text-red-800 font-medium" data-subject="${subjectName}" data-q-index="${index}">[Delete]</button>
+                    </div>
+                `;
+                questionEditList.appendChild(li);
+            });
+        }
+
+        /**
+         * Populates the form to edit an existing question
+         */
+        function editQuestion(subjectName, qIndex) {
+            const subject = quizData.subjects.find(s => s.name === subjectName);
+            const question = subject.questions[qIndex];
+            if (!question) return;
+
+            // Populate form
+            questionFormTitle.textContent = "Edit Question";
+            adminSubjectSelect.value = subjectName;
+            adminQuestionText.value = question.question;
+            
+            // Re-create options array with correct answer first
+            const correctAnswer = question.answer;
+            const wrongOptions = question.options.filter(opt => opt !== correctAnswer);
+            
+            adminOption1.value = correctAnswer;
+            adminOption2.value = wrongOptions[0] || '';
+            adminOption3.value = wrongOptions[1] || '';
+            adminOption4.value = wrongOptions[2] || '';
+
+            editingQuestionIndex.value = qIndex;
+            saveQuestionBtn.textContent = "Update Question";
+            cancelEditBtn.classList.remove('hidden');
+
+            // Scroll form into view
+            questionFormTitle.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+
+        /**
+         * Adds a new question or updates an existing one
+         */
+        function saveQuestion() {
             const subjectName = adminSubjectSelect.value;
-            const question = adminQuestionText.value.trim();
+            const questionText = adminQuestionText.value.trim();
+            const correctAnswer = adminOption1.value.trim();
             const options = [
-                adminOption1.value.trim(),
+                correctAnswer,
                 adminOption2.value.trim(),
                 adminOption3.value.trim(),
                 adminOption4.value.trim()
             ];
-            const correctIndex = parseInt(adminCorrectAnswer.value) - 1;
+            const qIndex = parseInt(editingQuestionIndex.value);
 
             // Validation
             if (!subjectName) {
                 showAdminFeedback("Please select a subject.", "error");
                 return;
             }
-            if (!question || options.some(opt => !opt)) {
+            if (!questionText || options.some(opt => !opt)) {
                 showAdminFeedback("Please fill in the question and all four options.", "error");
                 return;
             }
@@ -568,24 +729,75 @@
             }
 
             const newQuestion = {
-                question: question,
+                question: questionText,
                 options: options,
-                answer: options[correctIndex]
+                answer: correctAnswer
             };
 
-            subject.questions.push(newQuestion);
+            if (qIndex > -1) {
+                // Update existing question
+                subject.questions[qIndex] = newQuestion;
+                showAdminFeedback(`Question updated in '${subjectName}'.`, "success");
+            } else {
+                // Add new question
+                subject.questions.push(newQuestion);
+                showAdminFeedback(`Question added to '${subjectName}'.`, "success");
+            }
+
             saveData();
             populateAdminControls(); // Refresh subject list (to update question count)
-            showAdminFeedback(`Question added to '${subjectName}'.`, "success");
+            
+            // Refresh question list if it's visible for this subject
+            if (!editQuestionsPanel.classList.contains('hidden') && editQuestionsTitle.textContent.includes(subjectName)) {
+                showQuestionsForSubject(subjectName);
+            }
+            
+            clearQuestionForm();
+        }
 
-            // Clear form
+        /**
+         * Clears the question form and resets it to "Add" mode
+         */
+        function clearQuestionForm() {
+            questionFormTitle.textContent = "Add New Question";
             adminQuestionText.value = '';
             adminOption1.value = '';
             adminOption2.value = '';
             adminOption3.value = '';
             adminOption4.value = '';
-            adminCorrectAnswer.value = '1';
+            editingQuestionIndex.value = -1;
+            saveQuestionBtn.textContent = "Save Question";
+            cancelEditBtn.classList.add('hidden');
         }
+
+        /**
+         * Shows confirmation before deleting a question
+         */
+        function requestDeleteQuestion(subjectName, qIndex) {
+             const question = quizData.subjects.find(s => s.name === subjectName).questions[qIndex];
+            showAdminFeedback(`Are you sure you want to delete this question: "<strong>${question.question.substring(0, 30)}...</strong>"? <br>
+                <button id="confirm-delete-question" data-subject="${subjectName}" data-q-index="${qIndex}" class="bg-red-600 text-white py-1 px-3 rounded-md text-sm mt-2 mr-2">Yes, Delete</button>
+                <button id="cancel-delete" class="bg-slate-200 text-slate-800 py-1 px-3 rounded-md text-sm mt-2">Cancel</button>`, 
+            "warning");
+        }
+
+        /**
+         * Deletes a question from a subject
+         */
+        function deleteQuestion(subjectName, qIndex) {
+            const subject = quizData.subjects.find(s => s.name === subjectName);
+            if (subject) {
+                subject.questions.splice(qIndex, 1);
+                saveData();
+                populateAdminControls(); // Refresh Q count
+                showQuestionsForSubject(subjectName); // Refresh Q list
+                clearAdminFeedback();
+                showAdminFeedback(`Question deleted from '${subjectName}'.`, "success");
+            }
+        }
+
+
+        // --- Admin Panel: Import/Export Functions ---
 
         /**
          * Exports the current quizData to the textarea
@@ -617,6 +829,7 @@
                 saveData();
                 populateAdminControls();
                 populateStartSubjectSelect(); // Update start screen too
+                editQuestionsPanel.classList.add('hidden'); // Hide Q list
                 importExportData.value = ''; // Clear textarea
                 showAdminFeedback("Data imported successfully!", "success");
 
@@ -629,14 +842,26 @@
          * Shows feedback on the admin panel
          */
         function showAdminFeedback(message, type) {
-            adminFeedback.textContent = message;
+            adminFeedback.innerHTML = message;
+            adminFeedback.classList.remove('text-green-600', 'text-red-600', 'text-yellow-700', 'bg-red-100', 'bg-green-100', 'bg-yellow-100');
+            
             if (type === "success") {
-                adminFeedback.classList.add('text-green-600');
-                adminFeedback.classList.remove('text-red-600');
-            } else { // error
-                adminFeedback.classList.add('text-red-600');
-                adminFeedback.classList.remove('text-green-600');
+                adminFeedback.classList.add('text-green-600', 'bg-green-100');
+            } else if (type === "error") {
+                adminFeedback.classList.add('text-red-600', 'bg-red-100');
+            } else if (type === "warning") {
+                adminFeedback.classList.add('text-yellow-700', 'bg-yellow-100');
+            } else {
+                adminFeedback.classList.add('text-slate-700');
             }
+        }
+
+        /**
+         * Clears the admin feedback message
+         */
+        function clearAdminFeedback() {
+            adminFeedback.innerHTML = '';
+            adminFeedback.classList.remove('text-green-600', 'text-red-600', 'text-yellow-700', 'bg-red-100', 'bg-green-100', 'bg-yellow-100');
         }
 
 
@@ -649,25 +874,34 @@
             // Get selected subject and question count
             const subjectName = subjectSelect.value;
             const questionCountValue = questionCountSelect.value;
+
+            if (!subjectName) {
+                // This check is needed in case the selected subject was deleted
+                alert("Please select a valid subject.");
+                return;
+            }
+            
             const subject = quizData.subjects.find(s => s.name === subjectName);
             
             if (!subject) return;
 
             // Shuffle and select questions
             let allSubjectQuestions = [...subject.questions];
+            
+            // Check if there are any questions
+            if (allSubjectQuestions.length === 0) {
+                alert("This subject has no questions yet. Please add some in the 'Manage Question Bank' panel.");
+                return; // Stop quiz from starting
+            }
+
             shuffleArray(allSubjectQuestions); // Shuffle the array
             
             if (questionCountValue === 'all') {
                 currentQuestions = allSubjectQuestions;
             } else {
-                currentQuestions = allSubjectQuestions.slice(0, parseInt(questionCountValue));
-            }
-
-            // Check if there are any questions
-            if (currentQuestions.length === 0) {
-                // Use a custom modal/alert here later, for now, browser alert is fine for this check.
-                alert("This subject has no questions yet. Please add some in the 'Manage Question Bank' panel.");
-                return; // Stop quiz from starting
+                let count = parseInt(questionCountValue);
+                // Ensure we don't try to get more questions than available
+                currentQuestions = allSubjectQuestions.slice(0, Math.min(count, allSubjectQuestions.length));
             }
 
             // Reset state
@@ -892,3 +1126,4 @@
     </script>
 </body>
 </html>
+
