@@ -6,7 +6,7 @@
     <title>Study Helper - Learn Smarter</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/firebase@9.22.0/firebase-app-compat.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/fbase@9.22.0/firebase-auth-compat.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/firebase@9.22.0/firebase-auth-compat.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/firebase@9.22.0/firebase-firestore-compat.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -60,6 +60,17 @@
             from { opacity: 0; }
             to { opacity: 1; }
         }
+        .btn-disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .subject-card {
+            transition: all 0.3s ease;
+        }
+        .subject-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
@@ -67,7 +78,7 @@
     <div id="toast-container"></div>
 
     <!-- Auth Modal -->
-    <div id="auth-modal" class="modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div id="auth-modal" class="modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
         <div class="bg-white rounded-xl shadow-lg p-6 w-full max-w-md mx-4 fade-in">
             <div class="flex justify-between items-center mb-6">
                 <h2 id="auth-modal-title" class="text-2xl font-bold text-gray-800">Welcome to Study Helper</h2>
@@ -80,13 +91,13 @@
             <div id="login-form">
                 <div class="mb-4">
                     <label for="login-email" class="block text-gray-700 mb-2">Email</label>
-                    <input type="email" id="login-email" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <input type="email" id="login-email" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="your@email.com">
                 </div>
                 <div class="mb-6">
                     <label for="login-password" class="block text-gray-700 mb-2">Password</label>
-                    <input type="password" id="login-password" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <input type="password" id="login-password" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Your password">
                 </div>
-                <button id="login-btn" class="w-full bg-blue-600 text-white py-2 rounded-lg font-medium hover:bg-blue-700 transition mb-4">
+                <button id="login-btn" class="w-full bg-blue-600 text-white py-2 rounded-lg font-medium hover:bg-blue-700 transition mb-4 flex items-center justify-center">
                     <span id="login-btn-text">Sign In</span>
                     <span id="login-spinner" class="loading-spinner hidden ml-2"></span>
                 </button>
@@ -110,18 +121,18 @@
             <div id="signup-form" class="hidden">
                 <div class="mb-4">
                     <label for="signup-name" class="block text-gray-700 mb-2">Full Name</label>
-                    <input type="text" id="signup-name" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <input type="text" id="signup-name" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Your full name">
                 </div>
                 <div class="mb-4">
                     <label for="signup-email" class="block text-gray-700 mb-2">Email</label>
-                    <input type="email" id="signup-email" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <input type="email" id="signup-email" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="your@email.com">
                 </div>
                 <div class="mb-6">
                     <label for="signup-password" class="block text-gray-700 mb-2">Password</label>
-                    <input type="password" id="signup-password" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <input type="password" id="signup-password" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="At least 6 characters">
                     <p class="text-xs text-gray-500 mt-1">Password must be at least 6 characters</p>
                 </div>
-                <button id="signup-btn" class="w-full bg-green-600 text-white py-2 rounded-lg font-medium hover:bg-green-700 transition mb-4">
+                <button id="signup-btn" class="w-full bg-green-600 text-white py-2 rounded-lg font-medium hover:bg-green-700 transition mb-4 flex items-center justify-center">
                     <span id="signup-btn-text">Create Account</span>
                     <span id="signup-spinner" class="loading-spinner hidden ml-2"></span>
                 </button>
@@ -138,9 +149,9 @@
                 <p class="text-gray-600 mb-4">Enter your email address and we'll send you a link to reset your password.</p>
                 <div class="mb-6">
                     <label for="reset-email" class="block text-gray-700 mb-2">Email</label>
-                    <input type="email" id="reset-email" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <input type="email" id="reset-email" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="your@email.com">
                 </div>
-                <button id="reset-password-btn" class="w-full bg-blue-600 text-white py-2 rounded-lg font-medium hover:bg-blue-700 transition mb-4">
+                <button id="reset-password-btn" class="w-full bg-blue-600 text-white py-2 rounded-lg font-medium hover:bg-blue-700 transition mb-4 flex items-center justify-center">
                     <span id="reset-btn-text">Send Reset Link</span>
                     <span id="reset-spinner" class="loading-spinner hidden ml-2"></span>
                 </button>
@@ -191,89 +202,74 @@
 
             <!-- Dashboard Stats -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div class="bg-white rounded-xl shadow p-6">
+                <div class="bg-white rounded-xl shadow p-6 subject-card">
                     <div class="flex items-center">
                         <div class="bg-blue-100 p-3 rounded-lg mr-4">
                             <i class="fas fa-book text-blue-600 text-xl"></i>
                         </div>
                         <div>
                             <h3 class="text-lg font-semibold text-gray-800">Subjects</h3>
-                            <p class="text-2xl font-bold text-gray-900" id="subjects-count">5</p>
+                            <p class="text-2xl font-bold text-gray-900" id="subjects-count">0</p>
                         </div>
                     </div>
                 </div>
-                <div class="bg-white rounded-xl shadow p-6">
+                <div class="bg-white rounded-xl shadow p-6 subject-card">
                     <div class="flex items-center">
                         <div class="bg-green-100 p-3 rounded-lg mr-4">
                             <i class="fas fa-question-circle text-green-600 text-xl"></i>
                         </div>
                         <div>
                             <h3 class="text-lg font-semibold text-gray-800">Questions</h3>
-                            <p class="text-2xl font-bold text-gray-900" id="questions-count">42</p>
+                            <p class="text-2xl font-bold text-gray-900" id="questions-count">0</p>
                         </div>
                     </div>
                 </div>
-                <div class="bg-white rounded-xl shadow p-6">
+                <div class="bg-white rounded-xl shadow p-6 subject-card">
                     <div class="flex items-center">
                         <div class="bg-purple-100 p-3 rounded-lg mr-4">
                             <i class="fas fa-chart-line text-purple-600 text-xl"></i>
                         </div>
                         <div>
                             <h3 class="text-lg font-semibold text-gray-800">Quizzes Taken</h3>
-                            <p class="text-2xl font-bold text-gray-900" id="quizzes-count">12</p>
+                            <p class="text-2xl font-bold text-gray-900" id="quizzes-count">0</p>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Recent Activity -->
+            <!-- Quick Actions -->
+            <div class="bg-white rounded-xl shadow p-6 mb-8">
+                <h3 class="text-xl font-bold text-gray-800 mb-4">Quick Actions</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <button id="create-subject-btn" class="bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition flex items-center justify-center">
+                        <i class="fas fa-plus mr-2"></i>
+                        Create New Subject
+                    </button>
+                    <button id="random-quiz-btn" class="bg-green-600 text-white py-3 rounded-lg font-medium hover:bg-green-700 transition flex items-center justify-center">
+                        <i class="fas fa-random mr-2"></i>
+                        Start Random Quiz
+                    </button>
+                </div>
+            </div>
+
+            <!-- Your Subjects -->
             <div class="bg-white rounded-xl shadow p-6">
-                <h3 class="text-xl font-bold text-gray-800 mb-4">Recent Activity</h3>
-                <div class="space-y-4">
-                    <div class="flex items-center justify-between p-4 border border-gray-100 rounded-lg">
-                        <div class="flex items-center">
-                            <div class="bg-blue-100 p-2 rounded-lg mr-4">
-                                <i class="fas fa-check text-blue-600"></i>
-                            </div>
-                            <div>
-                                <h4 class="font-medium text-gray-800">Mathematics Quiz</h4>
-                                <p class="text-sm text-gray-500">Completed 2 days ago</p>
-                            </div>
-                        </div>
-                        <div class="text-right">
-                            <p class="font-bold text-gray-800">85%</p>
-                            <p class="text-sm text-gray-500">Score</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center justify-between p-4 border border-gray-100 rounded-lg">
-                        <div class="flex items-center">
-                            <div class="bg-green-100 p-2 rounded-lg mr-4">
-                                <i class="fas fa-plus text-green-600"></i>
-                            </div>
-                            <div>
-                                <h4 class="font-medium text-gray-800">Science Questions</h4>
-                                <p class="text-sm text-gray-500">Added 10 new questions</p>
-                            </div>
-                        </div>
-                        <div class="text-right">
-                            <p class="font-bold text-gray-800">15</p>
-                            <p class="text-sm text-gray-500">Total</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center justify-between p-4 border border-gray-100 rounded-lg">
-                        <div class="flex items-center">
-                            <div class="bg-purple-100 p-2 rounded-lg mr-4">
-                                <i class="fas fa-book text-purple-600"></i>
-                            </div>
-                            <div>
-                                <h4 class="font-medium text-gray-800">History Subject</h4>
-                                <p class="text-sm text-gray-500">Created new subject</p>
-                            </div>
-                        </div>
-                        <div class="text-right">
-                            <p class="font-bold text-gray-800">1</p>
-                            <p class="text-sm text-gray-500">New</p>
-                        </div>
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-xl font-bold text-gray-800">Your Subjects</h3>
+                    <button id="manage-subjects-btn" class="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition">
+                        Manage Subjects
+                    </button>
+                </div>
+                
+                <div id="subjects-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- Subjects will be populated here -->
+                    <div id="no-subjects-message" class="col-span-full text-center py-8">
+                        <i class="fas fa-folder-open text-gray-400 text-5xl mb-4"></i>
+                        <h4 class="text-lg font-semibold text-gray-600">No subjects yet</h4>
+                        <p class="text-gray-500 mb-4">Create your first subject to get started</p>
+                        <button id="create-first-subject-btn" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+                            Create Your First Subject
+                        </button>
                     </div>
                 </div>
             </div>
@@ -305,15 +301,43 @@
         </div>
     </div>
 
+    <!-- Subject Management Modal -->
+    <div id="subject-modal" class="modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-xl shadow-lg p-6 w-full max-w-md mx-4 fade-in">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800" id="subject-modal-title">Create New Subject</h2>
+                <button id="close-subject-modal" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <div class="mb-4">
+                <label for="subject-name" class="block text-gray-700 mb-2">Subject Name</label>
+                <input type="text" id="subject-name" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g., Mathematics, Science">
+            </div>
+            
+            <div class="flex gap-3">
+                <button id="save-subject-btn" class="w-full bg-blue-600 text-white py-2 rounded-lg font-medium hover:bg-blue-700 transition flex items-center justify-center">
+                    <span id="save-subject-btn-text">Create Subject</span>
+                    <span id="save-subject-spinner" class="loading-spinner hidden ml-2"></span>
+                </button>
+                <button id="cancel-subject-btn" class="w-full bg-gray-200 text-gray-700 py-2 rounded-lg font-medium hover:bg-gray-300 transition">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Firebase Configuration
         const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_PROJECT_ID.appspot.com",
-            messagingSenderId: "YOUR_SENDER_ID",
-            appId: "YOUR_APP_ID"
+            apiKey: "AIzaSyDXZZVwU6Q8l5GtK8ngxfIkQLEVkbihNhM",
+            authDomain: "studyhelper-quizzes.firebaseapp.com",
+            projectId: "studyhelper-quizzes",
+            storageBucket: "studyhelper-quizzes.firebasestorage.app",
+            messagingSenderId: "217416839389",
+            appId: "1:217416839389:web:060ca955eaa8befce12b34",
+            measurementId: "G-4XVEYVNL7L"
         };
 
         // Initialize Firebase
@@ -331,6 +355,9 @@
         const authModalTitle = document.getElementById('auth-modal-title');
         const userDisplayName = document.getElementById('user-display-name');
         const toastContainer = document.getElementById('toast-container');
+        const subjectModal = document.getElementById('subject-modal');
+        const subjectsContainer = document.getElementById('subjects-container');
+        const noSubjectsMessage = document.getElementById('no-subjects-message');
 
         // Buttons
         const openAuthModalBtn = document.getElementById('open-auth-modal');
@@ -345,6 +372,13 @@
         const resetPasswordBtn = document.getElementById('reset-password-btn');
         const backToLoginBtn = document.getElementById('back-to-login');
         const logoutBtn = document.getElementById('logout-btn');
+        const createSubjectBtn = document.getElementById('create-subject-btn');
+        const createFirstSubjectBtn = document.getElementById('create-first-subject-btn');
+        const manageSubjectsBtn = document.getElementById('manage-subjects-btn');
+        const randomQuizBtn = document.getElementById('random-quiz-btn');
+        const closeSubjectModalBtn = document.getElementById('close-subject-modal');
+        const saveSubjectBtn = document.getElementById('save-subject-btn');
+        const cancelSubjectBtn = document.getElementById('cancel-subject-btn');
 
         // Form Inputs
         const loginEmail = document.getElementById('login-email');
@@ -353,49 +387,123 @@
         const signupEmail = document.getElementById('signup-email');
         const signupPassword = document.getElementById('signup-password');
         const resetEmail = document.getElementById('reset-email');
+        const subjectName = document.getElementById('subject-name');
 
         // App State
         let currentUser = null;
+        let userSubjects = [];
 
         // Event Listeners
-        openAuthModalBtn.addEventListener('click', () => {
-            showAuthModal('login');
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Study Helper App Initialized');
+            
+            openAuthModalBtn.addEventListener('click', () => {
+                showAuthModal('login');
+            });
+
+            openGoogleSigninBtn.addEventListener('click', () => {
+                signInWithGoogle();
+            });
+
+            closeAuthModalBtn.addEventListener('click', closeAuthModal);
+
+            loginBtn.addEventListener('click', signInWithEmail);
+
+            signupBtn.addEventListener('click', signUpWithEmail);
+
+            googleSigninBtn.addEventListener('click', signInWithGoogle);
+
+            showSignupBtn.addEventListener('click', () => {
+                showAuthModal('signup');
+            });
+
+            showLoginBtn.addEventListener('click', () => {
+                showAuthModal('login');
+            });
+
+            forgotPasswordBtn.addEventListener('click', () => {
+                showAuthModal('forgot-password');
+            });
+
+            resetPasswordBtn.addEventListener('click', resetPassword);
+
+            backToLoginBtn.addEventListener('click', () => {
+                showAuthModal('login');
+            });
+
+            logoutBtn.addEventListener('click', signOut);
+
+            createSubjectBtn.addEventListener('click', () => {
+                openSubjectModal();
+            });
+
+            createFirstSubjectBtn.addEventListener('click', () => {
+                openSubjectModal();
+            });
+
+            manageSubjectsBtn.addEventListener('click', () => {
+                // In a full implementation, this would open a subject management screen
+                showToast("Subject management feature coming soon!", "success");
+            });
+
+            randomQuizBtn.addEventListener('click', () => {
+                // In a full implementation, this would start a random quiz
+                showToast("Random quiz feature coming soon!", "success");
+            });
+
+            closeSubjectModalBtn.addEventListener('click', closeSubjectModal);
+            cancelSubjectBtn.addEventListener('click', closeSubjectModal);
+            saveSubjectBtn.addEventListener('click', saveSubject);
+
+            // Close modals when clicking outside
+            authModal.addEventListener('click', (e) => {
+                if (e.target === authModal) {
+                    closeAuthModal();
+                }
+            });
+
+            subjectModal.addEventListener('click', (e) => {
+                if (e.target === subjectModal) {
+                    closeSubjectModal();
+                }
+            });
+
+            // Enter key support for forms
+            loginEmail.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') signInWithEmail();
+            });
+            
+            loginPassword.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') signInWithEmail();
+            });
+            
+            signupName.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') signUpWithEmail();
+            });
+            
+            signupEmail.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') signUpWithEmail();
+            });
+            
+            signupPassword.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') signUpWithEmail();
+            });
+            
+            resetEmail.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') resetPassword();
+            });
+
+            subjectName.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') saveSubject();
+            });
+
+            // Initialize app state
+            updateUIForGuest();
         });
-
-        openGoogleSigninBtn.addEventListener('click', () => {
-            signInWithGoogle();
-        });
-
-        closeAuthModalBtn.addEventListener('click', closeAuthModal);
-
-        loginBtn.addEventListener('click', signInWithEmail);
-
-        signupBtn.addEventListener('click', signUpWithEmail);
-
-        googleSigninBtn.addEventListener('click', signInWithGoogle);
-
-        showSignupBtn.addEventListener('click', () => {
-            showAuthModal('signup');
-        });
-
-        showLoginBtn.addEventListener('click', () => {
-            showAuthModal('login');
-        });
-
-        forgotPasswordBtn.addEventListener('click', () => {
-            showAuthModal('forgot-password');
-        });
-
-        resetPasswordBtn.addEventListener('click', resetPassword);
-
-        backToLoginBtn.addEventListener('click', () => {
-            showAuthModal('login');
-        });
-
-        logoutBtn.addEventListener('click', signOut);
 
         // Firebase Auth State Observer
         auth.onAuthStateChanged((user) => {
+            console.log('Auth state changed:', user);
             if (user) {
                 // User is signed in
                 currentUser = user;
@@ -457,6 +565,7 @@
             loginBtnText.textContent = 'Signing In...';
             loginSpinner.classList.remove('hidden');
             loginBtn.disabled = true;
+            loginBtn.classList.add('btn-disabled');
             
             auth.signInWithEmailAndPassword(email, password)
                 .then((userCredential) => {
@@ -485,6 +594,7 @@
                     loginBtnText.textContent = 'Sign In';
                     loginSpinner.classList.add('hidden');
                     loginBtn.disabled = false;
+                    loginBtn.classList.remove('btn-disabled');
                 });
         }
 
@@ -509,6 +619,7 @@
             signupBtnText.textContent = 'Creating Account...';
             signupSpinner.classList.remove('hidden');
             signupBtn.disabled = true;
+            signupBtn.classList.add('btn-disabled');
             
             auth.createUserWithEmailAndPassword(email, password)
                 .then((userCredential) => {
@@ -546,6 +657,7 @@
                     signupBtnText.textContent = 'Create Account';
                     signupSpinner.classList.add('hidden');
                     signupBtn.disabled = false;
+                    signupBtn.classList.remove('btn-disabled');
                 });
         }
 
@@ -558,6 +670,7 @@
                 const originalText = googleBtn.innerHTML;
                 googleBtn.innerHTML = '<div class="loading-spinner"></div> Signing in...';
                 googleBtn.disabled = true;
+                googleBtn.classList.add('btn-disabled');
                 
                 auth.signInWithPopup(provider)
                     .then((result) => {
@@ -575,6 +688,7 @@
                     .finally(() => {
                         googleBtn.innerHTML = originalText;
                         googleBtn.disabled = false;
+                        googleBtn.classList.remove('btn-disabled');
                     });
             } else {
                 // From login screen
@@ -582,6 +696,7 @@
                 const originalText = googleBtn.innerHTML;
                 googleBtn.innerHTML = '<div class="loading-spinner"></div> Signing in...';
                 googleBtn.disabled = true;
+                googleBtn.classList.add('btn-disabled');
                 
                 auth.signInWithPopup(provider)
                     .then((result) => {
@@ -598,6 +713,7 @@
                     .finally(() => {
                         googleBtn.innerHTML = originalText;
                         googleBtn.disabled = false;
+                        googleBtn.classList.remove('btn-disabled');
                     });
             }
         }
@@ -616,6 +732,7 @@
             resetBtnText.textContent = 'Sending...';
             resetSpinner.classList.remove('hidden');
             resetPasswordBtn.disabled = true;
+            resetPasswordBtn.classList.add('btn-disabled');
             
             auth.sendPasswordResetEmail(email)
                 .then(() => {
@@ -639,6 +756,7 @@
                     resetBtnText.textContent = 'Send Reset Link';
                     resetSpinner.classList.add('hidden');
                     resetPasswordBtn.disabled = false;
+                    resetPasswordBtn.classList.remove('btn-disabled');
                 });
         }
 
@@ -682,7 +800,9 @@
             setTimeout(() => {
                 toast.classList.remove('show');
                 setTimeout(() => {
-                    toastContainer.removeChild(toast);
+                    if (toastContainer.contains(toast)) {
+                        toastContainer.removeChild(toast);
+                    }
                 }, 300);
             }, 5000);
         }
@@ -717,6 +837,7 @@
                     if (doc.exists) {
                         const userData = doc.data();
                         updateDashboard(userData);
+                        loadUserSubjects(uid);
                     } else {
                         // Fallback to localStorage
                         loadLocalStorageData(uid);
@@ -729,6 +850,24 @@
                 });
         }
 
+        function loadUserSubjects(uid) {
+            // Load user subjects from Firestore
+            db.collection('users').doc(uid).collection('subjects').get()
+                .then((querySnapshot) => {
+                    userSubjects = [];
+                    querySnapshot.forEach((doc) => {
+                        userSubjects.push({
+                            id: doc.id,
+                            ...doc.data()
+                        });
+                    });
+                    updateSubjectsUI();
+                })
+                .catch((error) => {
+                    console.error('Error loading subjects:', error);
+                });
+        }
+
         function updateDashboard(userData) {
             // Update dashboard with user data
             const subjectsCount = document.getElementById('subjects-count');
@@ -736,8 +875,167 @@
             const quizzesCount = document.getElementById('quizzes-count');
             
             subjectsCount.textContent = userData.subjects ? userData.subjects.length : 0;
-            questionsCount.textContent = userData.questions ? userData.questions.length : 0;
+            
+            // Calculate total questions
+            let totalQuestions = 0;
+            if (userData.subjects) {
+                userData.subjects.forEach(subject => {
+                    totalQuestions += subject.questions ? subject.questions.length : 0;
+                });
+            }
+            questionsCount.textContent = totalQuestions;
+            
             quizzesCount.textContent = userData.quizHistory ? userData.quizHistory.length : 0;
+        }
+
+        function updateSubjectsUI() {
+            subjectsContainer.innerHTML = '';
+            
+            if (userSubjects.length === 0) {
+                noSubjectsMessage.classList.remove('hidden');
+                return;
+            }
+            
+            noSubjectsMessage.classList.add('hidden');
+            
+            userSubjects.forEach(subject => {
+                const subjectCard = document.createElement('div');
+                subjectCard.className = 'bg-white border border-gray-200 rounded-lg p-4 subject-card';
+                subjectCard.innerHTML = `
+                    <div class="flex justify-between items-start mb-2">
+                        <h4 class="font-bold text-lg text-blue-700">${subject.name}</h4>
+                        <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded">${subject.questions ? subject.questions.length : 0} Qs</span>
+                    </div>
+                    <p class="text-gray-600 text-sm mb-4">${subject.description || 'No description'}</p>
+                    <div class="flex gap-2">
+                        <button class="start-quiz-btn flex-1 bg-blue-600 text-white py-2 rounded text-sm font-medium hover:bg-blue-700 transition" data-id="${subject.id}">
+                            Start Quiz
+                        </button>
+                        <button class="edit-subject-btn bg-gray-200 text-gray-700 p-2 rounded text-sm hover:bg-gray-300 transition" data-id="${subject.id}">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                    </div>
+                `;
+                subjectsContainer.appendChild(subjectCard);
+            });
+            
+            // Add event listeners to the new buttons
+            document.querySelectorAll('.start-quiz-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const subjectId = e.target.dataset.id;
+                    startQuiz(subjectId);
+                });
+            });
+            
+            document.querySelectorAll('.edit-subject-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const subjectId = e.target.dataset.id;
+                    editSubject(subjectId);
+                });
+            });
+        }
+
+        function openSubjectModal(subjectId = null) {
+            subjectModal.classList.add('active');
+            const subjectModalTitle = document.getElementById('subject-modal-title');
+            const saveSubjectBtnText = document.getElementById('save-subject-btn-text');
+            
+            if (subjectId) {
+                // Editing existing subject
+                const subject = userSubjects.find(s => s.id === subjectId);
+                if (subject) {
+                    subjectName.value = subject.name;
+                    subjectModalTitle.textContent = 'Edit Subject';
+                    saveSubjectBtnText.textContent = 'Update Subject';
+                    saveSubjectBtn.dataset.subjectId = subjectId;
+                }
+            } else {
+                // Creating new subject
+                subjectName.value = '';
+                subjectModalTitle.textContent = 'Create New Subject';
+                saveSubjectBtnText.textContent = 'Create Subject';
+                delete saveSubjectBtn.dataset.subjectId;
+            }
+        }
+
+        function closeSubjectModal() {
+            subjectModal.classList.remove('active');
+        }
+
+        function saveSubject() {
+            const name = subjectName.value.trim();
+            const subjectId = saveSubjectBtn.dataset.subjectId;
+            
+            if (!name) {
+                showToast('Subject name cannot be empty', 'error');
+                return;
+            }
+            
+            // Show loading state
+            const saveSubjectBtnText = document.getElementById('save-subject-btn-text');
+            const saveSubjectSpinner = document.getElementById('save-subject-spinner');
+            saveSubjectBtnText.textContent = subjectId ? 'Updating...' : 'Creating...';
+            saveSubjectSpinner.classList.remove('hidden');
+            saveSubjectBtn.disabled = true;
+            saveSubjectBtn.classList.add('btn-disabled');
+            
+            if (subjectId) {
+                // Update existing subject
+                db.collection('users').doc(currentUser.uid).collection('subjects').doc(subjectId).update({
+                    name: name,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                })
+                .then(() => {
+                    showToast('Subject updated successfully!', 'success');
+                    closeSubjectModal();
+                    loadUserSubjects(currentUser.uid);
+                })
+                .catch((error) => {
+                    console.error('Error updating subject:', error);
+                    showToast('Failed to update subject', 'error');
+                })
+                .finally(() => {
+                    // Reset button state
+                    saveSubjectBtnText.textContent = 'Update Subject';
+                    saveSubjectSpinner.classList.add('hidden');
+                    saveSubjectBtn.disabled = false;
+                    saveSubjectBtn.classList.remove('btn-disabled');
+                });
+            } else {
+                // Create new subject
+                db.collection('users').doc(currentUser.uid).collection('subjects').add({
+                    name: name,
+                    description: '',
+                    questions: [],
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                })
+                .then(() => {
+                    showToast('Subject created successfully!', 'success');
+                    closeSubjectModal();
+                    loadUserSubjects(currentUser.uid);
+                })
+                .catch((error) => {
+                    console.error('Error creating subject:', error);
+                    showToast('Failed to create subject', 'error');
+                })
+                .finally(() => {
+                    // Reset button state
+                    saveSubjectBtnText.textContent = 'Create Subject';
+                    saveSubjectSpinner.classList.add('hidden');
+                    saveSubjectBtn.disabled = false;
+                    saveSubjectBtn.classList.remove('btn-disabled');
+                });
+            }
+        }
+
+        function startQuiz(subjectId) {
+            // In a full implementation, this would start a quiz
+            showToast(`Starting quiz for subject ${subjectId} - feature coming soon!`, 'success');
+        }
+
+        function editSubject(subjectId) {
+            openSubjectModal(subjectId);
         }
 
         // LocalStorage Fallback Functions
@@ -760,16 +1058,6 @@
                 updateDashboard(userData);
             }
         }
-
-        // Close modal when clicking outside
-        authModal.addEventListener('click', (e) => {
-            if (e.target === authModal) {
-                closeAuthModal();
-            }
-        });
-
-        // Initialize app state
-        updateUIForGuest();
     </script>
 </body>
 </html>
