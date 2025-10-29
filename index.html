@@ -27,12 +27,6 @@
             -moz-osx-font-smoothing: grayscale;
         }
 
-        /* App hidden state (before login) */
-        .app-hidden {
-            display: none;
-            opacity: 0;
-        }
-
         /* Custom transition for screens */
         .screen {
             transition: opacity 0.3s ease-in-out;
@@ -164,39 +158,6 @@
         .modal-overlay.open .modal-content {
             @apply scale-100 opacity-100;
         }
-        
-        /* Auth Modal Styles */
-        #auth-overlay {
-            @apply fixed inset-0 z-[60] bg-slate-100 dark:bg-slate-900 flex items-center justify-center p-4 transition-opacity duration-300;
-        }
-        #auth-overlay.hidden {
-            @apply opacity-0 pointer-events-none;
-        }
-        .auth-tab {
-            @apply p-3 px-4 font-medium text-slate-500 dark:text-slate-400 border-b-2 border-transparent hover:text-indigo-600;
-        }
-        .auth-tab.active {
-            @apply text-indigo-600 dark:text-indigo-400 border-indigo-600 dark:border-indigo-400;
-        }
-        .auth-form {
-            @apply space-y-4;
-        }
-        .auth-form.hidden {
-            display: none;
-        }
-        .auth-input {
-            @apply w-full p-3 border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500;
-        }
-        /* Auth loading spinner */
-        #auth-loader {
-            @apply absolute inset-0 bg-white/50 dark:bg-slate-800/50 flex items-center justify-center;
-        }
-        #auth-loader svg {
-            @apply w-12 h-12 text-indigo-600 animate-spin;
-        }
-        .hidden {
-            display: none;
-        }
 
         /* Toast Notification */
         #toast-container {
@@ -248,79 +209,17 @@
             @apply p-2 rounded-full text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors duration-200;
         }
     </style>
-    <link rel="stylesheet" href="style.css">
 </head>
 <body class="bg-slate-100 dark:bg-slate-900 min-h-screen text-slate-800 dark:text-slate-200 overflow-hidden">
 
     <!-- Toast Notification Container -->
     <div id="toast-container"></div>
-
-    <!-- ===== AUTHENTICATION OVERLAY ===== -->
-    <div id="auth-overlay">
-        <div id="auth-modal" class="bg-white dark:bg-slate-800 rounded-xl shadow-2xl p-6 sm:p-8 w-full max-w-md relative overflow-hidden">
-            
-            <h1 class="text-3xl font-extrabold text-center text-indigo-600 dark:text-indigo-400 mb-4">Study Helper</h1>
-            
-            <!-- Auth Tabs -->
-            <div class="flex border-b dark:border-slate-700 mb-6">
-                <button id="auth-tab-login" class="auth-tab active" data-form="login-form">Login</button>
-                <button id="auth-tab-signup" class="auth-tab" data-form="signup-form">Sign Up</button>
-            </div>
-
-            <!-- Error Message Area -->
-            <p id="auth-error" class="text-center text-red-500 dark:text-red-400 mb-4 h-5"></p>
-
-            <!-- Login Form -->
-            <form id="login-form" class="auth-form">
-                <input id="login-email" type="email" placeholder="Email" class="auth-input" required>
-                <input id="login-password" type="password" placeholder="Password" class="auth-input" required>
-                <button type_submit" id="login-btn" class="btn btn-primary w-full py-3">Login</button>
-                <a href="#" id="forgot-pass-link" class="text-sm text-indigo-600 dark:text-indigo-400 hover:underline text-center block">Forgot Password?</a>
-            </form>
-
-            <!-- Sign Up Form -->
-            <form id="signup-form" class="auth-form hidden">
-                <input id="signup-email" type="email" placeholder="Email" class="auth-input" required>
-                <input id="signup-password" type="password" placeholder="Password (min. 6 characters)" class="auth-input" required>
-                <button type="submit" id="signup-btn" class="btn btn-primary w-full py-3">Create Account</button>
-            </form>
-
-            <!-- Forgot Password Form -->
-            <form id="forgot-form" class="auth-form hidden">
-                <p class="text-sm text-slate-600 dark:text-slate-300 text-center">Enter your email and we'll send you a reset link.</p>
-                <input id="forgot-email" type="email" placeholder="Email" class="auth-input" required>
-                <button type="submit" id="forgot-btn" class="btn btn-primary w-full py-3">Send Reset Link</button>
-                <a href="#" id="back-to-login-link" class="text-sm text-indigo-600 dark:text-indigo-400 hover:underline text-center block">Back to Login</a>
-            </form>
-
-            <!-- Divider -->
-            <div class="flex items-center my-6">
-                <span class="flex-grow border-t dark:border-slate-700"></span>
-                <span class="mx-4 text-sm text-slate-500">OR</span>
-                <span class="flex-grow border-t dark:border-slate-700"></span>
-            </div>
-
-            <!-- Google Sign-in -->
-            <button id="google-signin-btn" class="btn btn-secondary w-full py-3 flex items-center justify-center gap-3">
-                <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8c-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4C12.955 4 4 12.955 4 24s8.955 20 20 20s20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z"/><path fill="#FF3D00" d="M6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4C16.318 4 9.656 8.337 6.306 14.691z"/><path fill="#4CAF50" d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238C29.211 35.091 26.715 36 24 36c-5.223 0-9.62-3.657-11.297-8.46l-6.522 5.025C9.505 39.556 16.227 44 24 44z"/><path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303c-.792 2.237-2.231 4.166-4.087 5.574l6.19 5.238C39.73 34.806 44 28.099 44 20c0-1.341-.138-2.65-.389-3.917z"/></svg>
-                <span>Sign in with Google</span>
-            </button>
-
-            <!-- Auth Loader -->
-            <div id="auth-loader" class="hidden">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-            </div>
-        </div>
-    </div>
     
     <!-- Sidebar Overlay (for mobile) -->
-    <div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-30 md:hidden hidden app-hidden"></div>
+    <div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-30 md:hidden hidden"></div>
 
     <!-- Sidebar -->
-    <nav id="sidebar" class="fixed top-0 left-0 h-full w-64 bg-white dark:bg-slate-800 shadow-xl z-40 transform -translate-x-full md:translate-x-0 flex flex-col app-hidden">
+    <nav id="sidebar" class="fixed top-0 left-0 h-full w-64 bg-white dark:bg-slate-800 shadow-xl z-40 transform -translate-x-full md:translate-x-0 flex flex-col">
         <!-- Logo/Header -->
         <div class="p-4 flex items-center justify-between border-b dark:border-slate-700 h-16">
             <h1 class="text-2xl font-extrabold text-indigo-600 dark:text-indigo-400">Study Helper</h1>
@@ -353,9 +252,9 @@
     </nav>
 
     <!-- Main Content -->
-    <main id="main-content" class="flex-grow md:ml-64 h-screen flex flex-col app-hidden">
+    <main id="main-content" class="flex-grow md:ml-64 h-screen flex flex-col">
         <!-- Header Bar -->
-        <header id="header" class="fixed top-0 left-0 md:left-64 right-0 bg-white/80 dark:bg-slate-800/80 backdrop-blur-md shadow-sm z-20 h-16 flex items-center justify-between px-4 md:px-8 app-hidden">
+        <header id="header" class="fixed top-0 left-0 md:left-64 right-0 bg-white/80 dark:bg-slate-800/80 backdrop-blur-md shadow-sm z-20 h-16 flex items-center justify-between px-4 md:px-8">
             <!-- Hamburger button for mobile -->
             <button id="hamburger-btn" class="md:hidden icon-btn">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
@@ -364,24 +263,14 @@
             <!-- Screen Title (Dynamic) -->
             <h2 id="header-title" class="text-xl font-semibold ml-2 md:ml-0">Home</h2>
             
-            <div class="flex items-center gap-2">
-                <!-- User Display -->
-                <span id="user-display" class="text-sm text-slate-600 dark:text-slate-300 hidden md:block"></span>
-                
-                <!-- Logout Button -->
-                <button id="logout-btn" class="icon-btn" title="Logout">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
-                </button>
-                
-                <!-- Theme Toggle -->
-                <button id="theme-toggle-btn" class="icon-btn">
-                    <!-- Sun Icon -->
-                    <svg id="theme-icon-light" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-                    <!-- Moon Icon -->
-                    <svg id="theme-icon-dark" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
-                    <span id="theme-toggle-text" class="sr-only">Toggle Theme</span>
-                </button>
-            </div>
+            <!-- Theme Toggle -->
+            <button id="theme-toggle-btn" class="icon-btn">
+                <!-- Sun Icon -->
+                <svg id="theme-icon-light" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                <!-- Moon Icon -->
+                <svg id="theme-icon-dark" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+                <span id="theme-toggle-text" class="sr-only">Toggle Theme</span>
+            </button>
         </header>
 
         <!-- Content Area: All screens will be injected here -->
@@ -651,7 +540,7 @@
                             <h3 class="text-xl font-semibold text-slate-700 dark:text-slate-300 mb-4">Import / Export Data</h3>
                             
                             <!-- File Inputs -->
-                            <input type="file" id="import-subject-file" class="hidden-file-input" accept=".json" multiple>
+                            <input type="file" id="import-subject-file" class="hidden-file-input" accept=".json">
                             <input type="file" id="import-backup-file" class="hidden-file-input" accept=".json">
                             
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -693,7 +582,7 @@
                 <h3 id="question-form-title" class="text-2xl font-semibold text-slate-800 dark:text-slate-200">Add New Question</h3>
                 
                 <input type="hidden" id="editing-question-index" value="-1">
-                <input type="hidden" id="editing-subject-id" value="">
+                <input type="hidden" id="editing-subject-name" value="">
 
                 <div>
                     <label for="admin-subject-select" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Subject</label>
@@ -770,63 +659,14 @@
     </div>
 
     <!-- ===== JavaScript ===== -->
-    
-    <!-- Firebase SDKs -->
     <script type="module">
-        // Import Firebase modules
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { 
-            getAuth, 
-            onAuthStateChanged,
-            signInWithEmailAndPassword,
-            createUserWithEmailAndPassword,
-            signInWithPopup,
-            GoogleAuthProvider,
-            sendPasswordResetEmail,
-            signOut,
-            signInWithCustomToken,
-            signInAnonymously
-        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { 
-            getFirestore, 
-            doc, 
-            getDoc, 
-            setDoc, 
-            addDoc,
-            updateDoc,
-            deleteDoc,
-            collection, 
-            query, 
-            onSnapshot,
-            writeBatch,
-            getDocs,
-            Timestamp
-        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        // --- 0. FIREBASE CONFIG ---
-        // Get Firebase config from global scope (provided by Canvas environment)
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-
-        // Initialize Firebase
-        let app, auth, db;
-        try {
-            app = initializeApp(firebaseConfig);
-            auth = getAuth(app);
-            db = getFirestore(app);
-        } catch (e) {
-            console.error("Firebase initialization error:", e);
-            showToast("Could not connect to Firebase. Please check config.", "error");
-        }
-        
         // --- 1. LOCAL STORAGE KEYS ---
-        // Local storage is only for theme, not data
+        const DB_KEY = 'quizDataBank';
+        const HISTORY_KEY = 'quizHistory';
+        const SETTINGS_KEY = 'quizSettings';
         const THEME_KEY = 'theme';
 
         // --- 2. DOM Element References ---
-        // App Containers
-        const appElements = document.querySelectorAll('.app-hidden');
-        
         // Layout
         const sidebar = document.getElementById('sidebar');
         const sidebarCloseBtn = document.getElementById('sidebar-close-btn');
@@ -843,34 +683,6 @@
         const themeIconLight = document.getElementById('theme-icon-light');
         const themeIconDark = document.getElementById('theme-icon-dark');
         const themeToggleText = document.getElementById('theme-toggle-text');
-        const userDisplay = document.getElementById('user-display');
-        const logoutBtn = document.getElementById('logout-btn');
-        
-        // Auth Overlay
-        const authOverlay = document.getElementById('auth-overlay');
-        const authModal = document.getElementById('auth-modal');
-        const authError = document.getElementById('auth-error');
-        const authLoader = document.getElementById('auth-loader');
-        const authTabLogin = document.getElementById('auth-tab-login');
-        const authTabSignup = document.getElementById('auth-tab-signup');
-        // Auth Forms
-        const loginForm = document.getElementById('login-form');
-        const signupForm = document.getElementById('signup-form');
-        const forgotForm = document.getElementById('forgot-form');
-        // Login
-        const loginEmail = document.getElementById('login-email');
-        const loginPassword = document.getElementById('login-password');
-        const loginBtn = document.getElementById('login-btn');
-        const forgotPassLink = document.getElementById('forgot-pass-link');
-        const googleSigninBtn = document.getElementById('google-signin-btn');
-        // Signup
-        const signupEmail = document.getElementById('signup-email');
-        const signupPassword = document.getElementById('signup-password');
-        const signupBtn = document.getElementById('signup-btn');
-        // Forgot
-        const forgotEmail = document.getElementById('forgot-email');
-        const forgotBtn = document.getElementById('forgot-btn');
-        const backToLoginLink = document.getElementById('back-to-login-link');
         
         // Screens
         const homeScreen = document.getElementById('home-screen');
@@ -935,7 +747,7 @@
         const saveQuestionBtn = document.getElementById('save-question-btn');
         const cancelEditBtn = document.getElementById('cancel-edit-btn');
         const editingQuestionIndex = document.getElementById('editing-question-index');
-        const editingSubjectId = document.getElementById('editing-subject-id');
+        const editingSubjectName = document.getElementById('editing-subject-name');
         
         // Confirmation Modal
         const confirmModalOverlay = document.getElementById('confirm-modal-overlay');
@@ -972,17 +784,9 @@
         const resetAllDataBtn = document.getElementById('reset-all-data-btn');
 
         // --- 3. State Variables ---
-        let userId = null; // Current user's UID
-        let quizData = { subjects: [] }; // Local cache for subjects
-        let quizHistory = []; // Local cache for history
-        let quizSettings = {}; // Local cache for settings
-        
-        // Firestore unsubscribe functions
-        let unsubSubjects = null;
-        let unsubHistory = null;
-        let unsubSettings = null;
-
-        // Quiz state
+        let quizData;
+        let quizHistory;
+        let quizSettings;
         let currentQuestions = [];
         let currentQuestionIndex = 0;
         let currentSubjectName = '';
@@ -1005,62 +809,23 @@
          */
         function init() {
             loadTheme();
-            addAuthEventListeners(); // Add listeners for login forms
-            
-            // Listen for auth state changes
-            onAuthStateChanged(auth, handleAuthStateChange);
-            
-            // Auto-sign in using token if available
-            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                setAuthLoading(true);
-                signInWithCustomToken(auth, __initial_auth_token)
-                    .catch((error) => {
-                        console.error("Custom token sign-in error:", error);
-                        setAuthLoading(false);
-                    });
-            } else {
-                // If no token, user must log in manually
-                console.log("No auth token found. User must log in.");
-            }
-        }
-        
-        /**
-         * Initializes the main app UI (called after login)
-         */
-        function initAppUI() {
-            addAppEventListeners();
-            addDynamicListeners();
-            showScreen('home-screen'); // Show home screen by default
+            loadSettings();
+            loadData();
+            loadHistory();
+
+            checkEmptyState();
+            checkRandomQuizButton();
+
+            addEventListeners();
+
+            // Show home screen by default
+            showScreen('home-screen');
         }
 
         /**
-         * Adds event listeners for auth forms
+         * Adds all application event listeners
          */
-        function addAuthEventListeners() {
-            // Tab switching
-            authTabLogin.addEventListener('click', () => switchAuthTab('login'));
-            authTabSignup.addEventListener('click', () => switchAuthTab('signup'));
-            forgotPassLink.addEventListener('click', (e) => {
-                e.preventDefault();
-                switchAuthTab('forgot');
-            });
-            backToLoginLink.addEventListener('click', (e) => {
-                e.preventDefault();
-                switchAuthTab('login');
-            });
-
-            // Form submissions
-            loginForm.addEventListener('submit', handleEmailLogin);
-            signupForm.addEventListener('submit', handleEmailSignUp);
-            forgotForm.addEventListener('submit', handleForgotPassword);
-            googleSigninBtn.addEventListener('click', handleGoogleSignIn);
-            logoutBtn.addEventListener('click', handleLogout);
-        }
-
-        /**
-         * Adds all application event listeners (non-auth)
-         */
-        function addAppEventListeners() {
+        function addEventListeners() {
             // Layout/Navigation
             hamburgerBtn.addEventListener('click', () => toggleSidebar(true));
             sidebarCloseBtn.addEventListener('click', () => toggleSidebar(false));
@@ -1108,10 +873,7 @@
             addSubjectBtn.addEventListener('click', addSubject);
             addQuestionModalBtn.addEventListener('click', () => {
                 const subjectName = editQuestionsTitle.textContent.replace('Questions for: ', '');
-                const subject = quizData.subjects.find(s => s.name === subjectName);
-                if (subject) {
-                    openQuestionModal(subject.id);
-                }
+                openQuestionModal(subjectName);
             });
 
             // Admin: Question Modal
@@ -1148,6 +910,9 @@
             exportSubjectBtn.addEventListener('click', openExportModal);
             exportBackupBtn.addEventListener('click', exportBackupFile);
             resetAllDataBtn.addEventListener('click', requestResetAllData);
+
+            // Dynamic Listeners (Event Delegation)
+            addDynamicListeners();
         }
 
         /**
@@ -1157,184 +922,44 @@
             document.body.addEventListener('click', function(e) {
                 // Home Screen Cards
                 if (e.target.classList.contains('start-quiz-btn')) {
-                    startQuiz(e.target.dataset.id);
+                    startQuiz(e.target.dataset.name);
                 }
                 if (e.target.classList.contains('delete-subject-home-btn')) {
-                    requestDeleteSubject(e.target.dataset.id, e.target.dataset.name);
+                    requestDeleteSubject(e.target.dataset.name);
                 }
                 
                 // Admin Subject List buttons
                 if (e.target.classList.contains('edit-subject-btn')) {
-                    editSubject(e.target.dataset.id, e.target.closest('li'));
+                    editSubject(e.target.dataset.name, e.target.closest('li'));
                 }
                 if (e.target.classList.contains('save-subject-btn')) {
-                    saveSubjectEdit(e.target.dataset.id, e.target.closest('li'));
+                    saveSubjectEdit(e.target.dataset.name, e.target.closest('li'));
                 }
                 if (e.target.classList.contains('cancel-subject-btn')) {
                     cancelSubjectEdit(e.target.closest('li'));
                 }
                 if (e.target.classList.contains('delete-subject-btn')) {
-                    requestDeleteSubject(e.target.dataset.id, e.target.dataset.name);
+                    requestDeleteSubject(e.target.dataset.name);
                 }
                 if (e.target.classList.contains('view-subject-questions')) {
-                    showQuestionsForSubject(e.target.dataset.id);
+                    showQuestionsForSubject(e.target.dataset.name);
                 }
 
                 // Admin Question List buttons
                 if (e.target.classList.contains('edit-q-btn')) {
-                    openQuestionModal(e.target.dataset.subjectId, e.target.dataset.qIndex);
+                    openQuestionModal(e.target.dataset.subject, e.target.dataset.qIndex);
                 }
                 if (e.target.classList.contains('delete-q-btn')) {
-                    requestDeleteQuestion(e.target.dataset.subjectId, e.target.dataset.qIndex);
+                    requestDeleteQuestion(e.target.dataset.subject, e.target.dataset.qIndex);
                 }
             });
         }
         
-        // --- Auth Functions ---
-
-        /**
-         * Gatekeeper function, called when auth state changes
-         */
-        function handleAuthStateChange(user) {
-            setAuthLoading(false); // Hide loader once auth state is resolved
-            if (user) {
-                // User is signed in
-                userId = user.uid;
-                userDisplay.textContent = user.email;
-                
-                // Show main app, hide auth
-                authOverlay.classList.add('hidden');
-                appElements.forEach(el => el.classList.remove('app-hidden'));
-                
-                // Initialize app UI and load data
-                initAppUI();
-                loadAllFirestoreData();
-
-            } else {
-                // User is signed out
-                userId = null;
-                
-                // Show auth, hide main app
-                authOverlay.classList.remove('hidden');
-                appElements.forEach(el => el.classList.add('app-hidden'));
-                
-                // Unsubscribe from any active listeners
-                unloadAllFirestoreData();
-                
-                // Clear local data caches
-                quizData = { subjects: [] };
-                quizHistory = [];
-                
-                // Clear UI
-                checkEmptyState();
-                populateHistoryTable();
-                populateOverallStats();
-            }
-        }
-
-        function switchAuthTab(formName) {
-            authError.textContent = ''; // Clear errors
-            [loginForm, signupForm, forgotForm].forEach(form => {
-                form.classList.toggle('hidden', form.id !== `${formName}-form`);
-            });
-            [authTabLogin, authTabSignup].forEach(tab => {
-                tab.classList.toggle('active', tab.dataset.form === `${formName}-form`);
-            });
-        }
-
-        function setAuthLoading(isLoading) {
-            authLoader.classList.toggle('hidden', !isLoading);
-            [loginBtn, signupBtn, forgotBtn, googleSigninBtn].forEach(btn => {
-                btn.disabled = isLoading;
-            });
-        }
-
-        async function handleEmailLogin(e) {
-            e.preventDefault();
-            authError.textContent = '';
-            setAuthLoading(true);
-            try {
-                await signInWithEmailAndPassword(auth, loginEmail.value, loginPassword.value);
-                // onAuthStateChanged will handle the rest
-                showToast("Login successful!", "success");
-            } catch (error) {
-                authError.textContent = getFriendlyAuthError(error);
-                setAuthLoading(false);
-            }
-        }
-
-        async function handleEmailSignUp(e) {
-            e.preventDefault();
-            authError.textContent = '';
-            setAuthLoading(true);
-            try {
-                await createUserWithEmailAndPassword(auth, signupEmail.value, signupPassword.value);
-                // onAuthStateChanged will handle the rest
-                showToast("Account created successfully!", "success");
-            } catch (error) {
-                authError.textContent = getFriendlyAuthError(error);
-                setAuthLoading(false);
-            }
-        }
-        
-        async function handleGoogleSignIn() {
-            authError.textContent = '';
-            setAuthLoading(true);
-            const provider = new GoogleAuthProvider();
-            try {
-                await signInWithPopup(auth, provider);
-                // onAuthStateChanged will handle the rest
-                showToast("Signed in with Google!", "success");
-            } catch (error) {
-                authError.textContent = getFriendlyAuthError(error);
-                setAuthLoading(false);
-            }
-        }
-        
-        async function handleForgotPassword(e) {
-            e.preventDefault();
-            authError.textContent = '';
-            setAuthLoading(true);
-            try {
-                await sendPasswordResetEmail(auth, forgotEmail.value);
-                showToast("Password reset email sent. Check your inbox.", "success");
-                switchAuthTab('login');
-            } catch (error) {
-                authError.textContent = getFriendlyAuthError(error);
-            }
-            setAuthLoading(false);
-        }
-
-        async function handleLogout() {
-            try {
-                await signOut(auth);
-                // onAuthStateChanged will handle the rest
-                showToast("Logged out successfully.", "success");
-            } catch (error) {
-                showToast(`Logout failed: ${error.message}`, "error");
-            }
-        }
-        
-        function getFriendlyAuthError(error) {
-            switch (error.code) {
-                case 'auth/user-not-found':
-                case 'auth/wrong-password':
-                    return 'Invalid email or password.';
-                case 'auth/email-already-in-use':
-                    return 'This email is already in use.';
-                case 'auth/weak-password':
-                    return 'Password must be at least 6 characters.';
-                case 'auth/invalid-email':
-                    return 'Please enter a valid email address.';
-                case 'auth/popup-closed-by-user':
-                    return 'Sign-in popup closed. Please try again.';
-                default:
-                    return 'An error occurred. Please try again.';
-            }
-        }
-
         // --- Layout & Screen Management ---
 
+        /**
+         * Toggles the sidebar open or closed
+         */
         function toggleSidebar(open) {
             if (open) {
                 sidebar.classList.remove('-translate-x-full');
@@ -1353,38 +978,50 @@
             }
         }
 
+        /**
+         * Hides all screens and shows the target screen
+         */
         function showScreen(screenId) {
             let title = 'Home';
             
+            // Don't hide quiz/results screen if that's what we're showing
             if (screenId !== 'quiz-screen' && screenId !== 'results-screen') {
+                // Show sidebar
                 sidebar.classList.add('md:translate-x-0');
                 header.classList.add('md:left-64');
                 mainContent.classList.add('md:ml-64');
                 hamburgerBtn.classList.remove('md:hidden');
                 
             } else {
+                // Quiz or Results screen is active - hide sidebar
                 sidebar.classList.remove('md:translate-x-0');
                 header.classList.remove('md:left-64');
                 mainContent.classList.remove('md:ml-64');
-                hamburgerBtn.classList.add('md:hidden');
+                hamburgerBtn.classList.add('md:hidden'); // Hide hamburger on desktop
                 
+                // Close mobile sidebar if open
                 if (window.innerWidth < 768) {
                     toggleSidebar(false);
                 }
             }
 
             allScreens.forEach(screen => {
-                screen.classList.toggle('screen-hidden', screen.id !== screenId);
                 if (screen.id === screenId) {
+                    screen.classList.remove('screen-hidden');
                     screen.style.animation = 'fadeIn 0.3s ease-out';
                     setTimeout(() => screen.style.animation = '', 300);
+                } else {
+                    screen.classList.add('screen-hidden');
                 }
             });
             
+            // Update active sidebar link and header title
             sidebarLinks.forEach(link => {
-                link.classList.toggle('active', link.dataset.screen === screenId);
                 if (link.dataset.screen === screenId) {
+                    link.classList.add('active');
                     title = link.querySelector('span').textContent;
+                } else {
+                    link.classList.remove('active');
                 }
             });
             
@@ -1411,14 +1048,20 @@
             }
         }
         
+        /**
+         * Checks if this is a new user (no subjects) and shows the "Get Started" message
+         */
         function checkEmptyState() {
-            const hasSubjects = quizData && quizData.subjects.length > 0;
-            getStartedContainer.classList.toggle('hidden', hasSubjects);
-            subjectCardsContainer.classList.toggle('hidden', !hasSubjects);
-            quickActionsContainer.classList.toggle('hidden', !hasSubjects);
-            quizSettingsContainer.classList.toggle('hidden', !hasSubjects);
-            
-            if (hasSubjects) {
+            if (quizData.subjects.length === 0) {
+                getStartedContainer.classList.remove('hidden');
+                subjectCardsContainer.classList.add('hidden');
+                quickActionsContainer.classList.add('hidden');
+                quizSettingsContainer.classList.add('hidden');
+            } else {
+                getStartedContainer.classList.add('hidden');
+                subjectCardsContainer.classList.remove('hidden');
+                quickActionsContainer.classList.remove('hidden');
+                quizSettingsContainer.classList.remove('hidden');
                 populateSubjectCards();
             }
         }
@@ -1435,10 +1078,17 @@
         }
         
         function setTheme(theme) {
-            document.documentElement.classList.toggle('dark', theme === 'dark');
-            themeIconLight.classList.toggle('hidden', theme === 'dark');
-            themeIconDark.classList.toggle('hidden', theme === 'light');
-            localStorage.setItem(THEME_KEY, theme);
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark');
+                themeIconLight.classList.add('hidden');
+                themeIconDark.classList.remove('hidden');
+                localStorage.setItem(THEME_KEY, 'dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+                themeIconLight.classList.remove('hidden');
+                themeIconDark.classList.add('hidden');
+                localStorage.setItem(THEME_KEY, 'light');
+            }
         }
         
         function toggleTheme() {
@@ -1446,82 +1096,42 @@
             setTheme(currentTheme === 'dark' ? 'light' : 'dark');
         }
         
-        // --- Firestore Data Functions ---
+        // --- Settings Management ---
         
-        /**
-         * Detaches all active Firestore listeners
-         */
-        function unloadAllFirestoreData() {
-            if (unsubSubjects) unsubSubjects();
-            if (unsubHistory) unsubHistory();
-            if (unsubSettings) unsubSettings();
-            unsubSubjects = null;
-            unsubHistory = null;
-            unsubSettings = null;
-        }
-
-        /**
-         * Attaches all Firestore listeners for the logged-in user
-         */
-        function loadAllFirestoreData() {
-            if (!userId) return;
+        function loadSettings() {
+            const savedSettings = JSON.parse(localStorage.getItem(SETTINGS_KEY)) || {};
+            quizSettings = {
+                count: savedSettings.count || '5',
+                customCount: savedSettings.customCount || 10,
+                timeLimit: savedSettings.timeLimit || '20',
+                customTime: savedSettings.customTime || 60,
+                showTimer: savedSettings.showTimer === false ? false : true // default to true
+            };
             
-            // Ensure old listeners are detached before attaching new ones
-            unloadAllFirestoreData();
-            
-            // Setup listeners
-            setupSettingsListener();
-            setupSubjectListener();
-            setupHistoryListener();
-        }
+            questionCountSelect.value = quizSettings.count;
+            customQuestionCount.value = quizSettings.customCount;
+            timeLimitSelect.value = quizSettings.timeLimit;
+            customTimeLimit.value = quizSettings.customTime;
+            showTimerToggle.checked = quizSettings.showTimer;
 
-        /**
-         * Loads and listens for changes to user settings
-         */
-        function setupSettingsListener() {
-            if (!userId) return;
-            const settingsPath = `artifacts/${appId}/users/${userId}/settings/main`;
-            unsubSettings = onSnapshot(doc(db, settingsPath), (settingsDoc) => {
-                if (settingsDoc.exists()) {
-                    quizSettings = settingsDoc.data();
-                } else {
-                    // No settings doc, create one with defaults
-                    quizSettings = {
-                        count: '5', customCount: 10,
-                        timeLimit: '20', customTime: 60,
-                        showTimer: true
-                    };
-                    setDoc(doc(db, settingsPath), quizSettings);
-                }
-                updateSettingsUI();
-            });
+            // Show/hide custom inputs based on loaded settings
+            customQuestionCount.classList.toggle('hidden', quizSettings.count !== 'custom_count');
+            customTimeLimit.classList.toggle('hidden', quizSettings.timeLimit !== 'custom_time');
+            
+            saveSettings(); // Save to ensure it's in storage
         }
         
-        /**
-         * Updates the UI to reflect the loaded quizSettings
-         */
-        function updateSettingsUI() {
-            questionCountSelect.value = quizSettings.count || '5';
-            customQuestionCount.value = quizSettings.customCount || 10;
-            timeLimitSelect.value = quizSettings.timeLimit || '20';
-            customTimeLimit.value = quizSettings.customTime || 60;
-            showTimerToggle.checked = quizSettings.showTimer === false ? false : true;
-            
-            customQuestionCount.classList.toggle('hidden', (quizSettings.count || '5') !== 'custom_count');
-            customTimeLimit.classList.toggle('hidden', (quizSettings.timeLimit || '20') !== 'custom_time');
-        }
-
         function handleSettingChange() {
-            // Show/hide custom inputs
-            customQuestionCount.classList.toggle('hidden', questionCountSelect.value !== 'custom_count');
-            customTimeLimit.classList.toggle('hidden', timeLimitSelect.value !== 'custom_time');
+            const countVal = questionCountSelect.value;
+            const timeVal = timeLimitSelect.value;
+            
+            customQuestionCount.classList.toggle('hidden', countVal !== 'custom_count');
+            customTimeLimit.classList.toggle('hidden', timeVal !== 'custom_time');
             
             saveSettings();
         }
 
-        async function saveSettings() {
-            if (!userId) return;
-            const settingsPath = `artifacts/${appId}/users/${userId}/settings/main`;
+        function saveSettings() {
             quizSettings = {
                 count: questionCountSelect.value,
                 customCount: parseInt(customQuestionCount.value) || 1,
@@ -1529,18 +1139,12 @@
                 customTime: parseInt(customTimeLimit.value) || 1,
                 showTimer: showTimerToggle.checked
             };
-            try {
-                // Use setDoc with merge to create/update
-                await setDoc(doc(db, settingsPath), quizSettings, { merge: true });
-            } catch (e) {
-                console.error("Error saving settings: ", e);
-                showToast("Could not save settings.", "error");
-            }
+            localStorage.setItem(SETTINGS_KEY, JSON.stringify(quizSettings));
         }
-        
+
         function getQuizSettings() {
-            const countSetting = quizSettings.count || '5';
-            const timeSetting = quizSettings.timeLimit || '20';
+            const countSetting = quizSettings.count;
+            const timeSetting = quizSettings.timeLimit;
             
             const questionCount = (countSetting === 'custom_count') 
                 ? quizSettings.customCount
@@ -1556,61 +1160,21 @@
                 showTimer: quizSettings.showTimer
             };
         }
-
-        /**
-         * Loads and listens for changes to user subjects
-         */
-        function setupSubjectListener() {
-            if (!userId) return;
-            const subjectsPath = `artifacts/${appId}/users/${userId}/subjects`;
-            const q = query(collection(db, subjectsPath));
-            
-            unsubSubjects = onSnapshot(q, (snapshot) => {
-                quizData.subjects = snapshot.docs.map(subjectDoc => ({
-                    id: subjectDoc.id,
-                    ...subjectDoc.data()
-                }));
-                
-                // Refresh all UI that depends on subjects
-                checkEmptyState();
-                checkRandomQuizButton();
-                populateAdminControls();
-                if (!editQuestionsPanel.classList.contains('hidden')) {
-                    const currentSubjectId = editingSubjectId.value; // Check if a list is active
-                    if(currentSubjectId) showQuestionsForSubject(currentSubjectId);
-                }
-            }, (error) => {
-                console.error("Error loading subjects: ", error);
-                showToast("Could not load subjects.", "error");
-            });
+        
+        // --- Data (Subjects/Questions) Management ---
+        
+        function loadData() {
+            const savedData = localStorage.getItem(DB_KEY);
+            if (savedData) {
+                quizData = JSON.parse(savedData);
+            } else {
+                quizData = { "subjects": [] }; 
+                saveData();
+            }
         }
 
-        /**
-         * Loads and listens for changes to user history
-         */
-        function setupHistoryListener() {
-            if (!userId) return;
-            const historyPath = `artifacts/${appId}/users/${userId}/history`;
-            const q = query(collection(db, historyPath));
-            
-            unsubHistory = onSnapshot(q, (snapshot) => {
-                quizHistory = snapshot.docs.map(historyDoc => {
-                    const data = historyDoc.data();
-                    // Convert Firestore Timestamps to JS Dates
-                    return {
-                        id: historyDoc.id,
-                        ...data,
-                        date: data.date.toDate ? data.date.toDate() : new Date(data.date) 
-                    };
-                });
-                
-                // Refresh UI
-                populateHistoryTable();
-                populateOverallStats();
-            }, (error) => {
-                console.error("Error loading history: ", error);
-                showToast("Could not load history.", "error");
-            });
+        function saveData() {
+            localStorage.setItem(DB_KEY, JSON.stringify(quizData));
         }
 
         /**
@@ -1618,8 +1182,8 @@
          */
         function populateSubjectCards() {
             subjectCardsContainer.innerHTML = '';
-            if (!quizData.subjects || quizData.subjects.length === 0) {
-                checkEmptyState();
+            if (quizData.subjects.length === 0) {
+                checkEmptyState(); // This will show the "Get Started" screen
                 return;
             }
             
@@ -1630,8 +1194,8 @@
                     <h3 class="font-bold text-lg text-indigo-600 dark:text-indigo-400 truncate">${subject.name}</h3>
                     <p class="text-sm text-slate-500 dark:text-slate-400 mb-3">${subject.questions.length} questions</p>
                     <div class="flex gap-2">
-                        <button class="start-quiz-btn btn btn-primary flex-1 text-sm py-2" data-id="${subject.id}" ${subject.questions.length === 0 ? 'disabled' : ''}>Start Quiz</button>
-                        <button class="delete-subject-home-btn btn btn-danger !p-2 text-sm" data-id="${subject.id}" data-name="${subject.name}">
+                        <button class="start-quiz-btn btn btn-primary flex-1 text-sm py-2" data-name="${subject.name}" ${subject.questions.length === 0 ? 'disabled' : ''}>Start Quiz</button>
+                        <button class="delete-subject-home-btn btn btn-danger !p-2 text-sm" data-name="${subject.name}">
                             <svg class="w-4 h-4 pointer-events-none" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z" clip-rule="evenodd"></path></svg>
                         </button>
                     </div>
@@ -1647,7 +1211,7 @@
             adminSubjectList.innerHTML = '';
             adminSubjectSelect.innerHTML = '';
 
-            if (!quizData.subjects || quizData.subjects.length === 0) {
+            if (quizData.subjects.length === 0) {
                 adminSubjectList.innerHTML = '<li class="!bg-transparent !border-none text-slate-500 dark:text-slate-400">No subjects yet. Add one above.</li>';
                 adminSubjectSelect.innerHTML = '<option disabled>Please add a subject first.</option>';
                 return;
@@ -1658,30 +1222,38 @@
                 const li = document.createElement('li');
                 li.innerHTML = `
                     <div class="flex-grow">
-                        <span class="subject-name-display font-semibold text-indigo-700 dark:text-indigo-400 cursor-pointer view-subject-questions" data-id="${subject.id}">${subject.name}</span>
+                        <span class="subject-name-display font-semibold text-indigo-700 dark:text-indigo-400 cursor-pointer view-subject-questions" data-name="${subject.name}">${subject.name}</span>
                         <span class="text-sm text-slate-500 dark:text-slate-400 ml-2">(${subject.questions.length}Q)</span>
                         <div class="subject-edit-form hidden mt-2 flex gap-2">
                             <input type="text" value="${subject.name}" class="w-full p-1 border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-md">
-                            <button class="save-subject-btn text-sm bg-green-500 text-white px-2 py-1 rounded-md" data-id="${subject.id}">Save</button>
+                            <button class="save-subject-btn text-sm bg-green-500 text-white px-2 py-1 rounded-md" data-name="${subject.name}">Save</button>
                             <button class="cancel-subject-btn text-sm bg-slate-200 text-slate-700 px-2 py-1 rounded-md">Cancel</button>
                         </div>
                     </div>
                     <div class="flex-shrink-0 space-x-2">
-                        <button class="edit-subject-btn text-sm text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 font-medium" data-id="${subject.id}">[Edit]</button>
-                        <button class="delete-subject-btn text-sm text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 font-medium" data-id="${subject.id}" data-name="${subject.name}">[Delete]</button>
+                        <button class="edit-subject-btn text-sm text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 font-medium" data-name="${subject.name}">[Edit]</button>
+                        <button class="delete-subject-btn text-sm text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 font-medium" data-name="${subject.name}">[Delete]</button>
                     </div>
                 `;
                 adminSubjectList.appendChild(li);
 
                 // Add to admin dropdown
                 const option = document.createElement('option');
-                option.value = subject.id;
+                option.value = subject.name;
                 option.textContent = subject.name;
                 adminSubjectSelect.appendChild(option.cloneNode(true));
             });
         }
         
-        // --- History Management (Local UI) ---
+        // --- History Management ---
+        
+        function loadHistory() {
+            quizHistory = JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
+        }
+        
+        function saveHistory() {
+            localStorage.setItem(HISTORY_KEY, JSON.stringify(quizHistory));
+        }
         
         function populateHistoryTable() {
             historyTableBody.innerHTML = '';
@@ -1725,7 +1297,7 @@
             const totalQuizzes = quizHistory.length;
             let totalScore = 0;
             let totalQs = 0;
-            const subjectStats = {}; 
+            const subjectStats = {}; // { subjectName: { score: 0, total: 0 } }
             
             quizHistory.forEach(entry => {
                 totalScore += entry.score;
@@ -1745,6 +1317,7 @@
             
             Object.keys(subjectStats).forEach(subjectName => {
                 const stats = subjectStats[subjectName];
+                // Require at least 5 questions to be considered for "best"
                 if (stats.total >= 5) { 
                     const avg = stats.total > 0 ? (stats.score / stats.total) : 0;
                     if (avg > bestAvg) {
@@ -1769,32 +1342,18 @@
             );
         }
         
-        async function clearHistory() {
-            if (!userId) return;
-            const historyPath = `artifacts/${appId}/users/${userId}/history`;
-            try {
-                // Get all docs in the collection
-                const querySnapshot = await getDocs(query(collection(db, historyPath)));
-                const batch = writeBatch(db);
-                querySnapshot.docs.forEach(historyDoc => {
-                    batch.delete(historyDoc.ref);
-                });
-                await batch.commit();
-                showToast("Quiz history cleared.", "success");
-                // UI will update via onSnapshot
-            } catch (e) {
-                console.error("Error clearing history: ", e);
-                showToast("Could not clear history.", "error");
-            }
+        function clearHistory() {
+            quizHistory = [];
+            saveHistory();
+            populateHistoryTable();
+            populateOverallStats();
+            showToast("Quiz history cleared.", "success");
         }
 
-        // --- Admin Panel: Subject Functions (Firestore) ---
+        // --- Admin Panel: Subject Functions ---
         
-        async function addSubject() {
-            if (!userId) return;
-            const subjectsPath = `artifacts/${appId}/users/${userId}/subjects`;
+        function addSubject() {
             const name = newSubjectName.value.trim();
-            
             if (!name) {
                 showToast("Subject name cannot be empty.", "error");
                 return;
@@ -1804,27 +1363,24 @@
                 return;
             }
 
-            try {
-                await addDoc(collection(db, subjectsPath), {
-                    name: name,
-                    questions: []
-                });
-                newSubjectName.value = '';
-                showToast(`Subject '${name}' added successfully.`, "success");
-                // UI will update via onSnapshot
-            } catch (e) {
-                console.error("Error adding subject: ", e);
-                showToast("Could not add subject.", "error");
-            }
+            quizData.subjects.push({ name: name, questions: [] });
+            saveData();
+            populateAdminControls();
+            checkRandomQuizButton(); // Update random quiz button state
+            checkEmptyState(); // Check if we should hide "get started"
+            newSubjectName.value = '';
+            showToast(`Subject '${name}' added successfully.`, "success");
         }
 
-        function editSubject(subjectId, li) {
+        function editSubject(oldName, li) {
+            // Close any other open edit forms
             document.querySelectorAll('.subject-edit-form').forEach(form => {
                 if (!form.classList.contains('hidden')) {
                     form.classList.add('hidden');
                     form.closest('li').querySelector('.subject-name-display').classList.remove('hidden');
                 }
             });
+            // Open this one
             li.querySelector('.subject-name-display').classList.add('hidden');
             li.querySelector('.subject-edit-form').classList.remove('hidden');
         }
@@ -1832,87 +1388,67 @@
         function cancelSubjectEdit(li) {
             li.querySelector('.subject-name-display').classList.remove('hidden');
             li.querySelector('.subject-edit-form').classList.add('hidden');
+            const oldName = li.querySelector('.save-subject-btn').dataset.name;
+            li.querySelector('input').value = oldName;
         }
 
-        async function saveSubjectEdit(subjectId, li) {
-            if (!userId) return;
-            const subjectsPath = `artifacts/${appId}/users/${userId}/subjects`;
-            
+        function saveSubjectEdit(oldName, li) {
             const newName = li.querySelector('input').value.trim();
             if (!newName) {
                 showToast("Subject name cannot be empty.", "error");
                 return;
             }
-            
-            const oldSubject = quizData.subjects.find(s => s.id === subjectId);
-            if (newName.toLowerCase() !== oldSubject.name.toLowerCase() && quizData.subjects.find(s => s.name.toLowerCase() === newName.toLowerCase())) {
+            if (newName.toLowerCase() !== oldName.toLowerCase() && quizData.subjects.find(s => s.name.toLowerCase() === newName.toLowerCase())) {
                 showToast("Another subject with this name already exists.", "error");
                 return;
             }
 
-            try {
-                const docRef = doc(db, subjectsPath, subjectId);
-                await updateDoc(docRef, { name: newName });
-                
-                // Update history (this is a "denormalized" update, good practice)
-                const batch = writeBatch(db);
-                const historyPath = `artifacts/${appId}/users/${userId}/history`;
-                const q = query(collection(db, historyPath), where("subjectName", "==", oldSubject.name));
-                const historySnapshot = await getDocs(q);
-                historySnapshot.docs.forEach(historyDoc => {
-                    batch.update(historyDoc.ref, { subjectName: newName });
-                });
-                await batch.commit();
-
-                showToast(`Subject renamed to '${newName}'.`, "success");
-                // UI will update via onSnapshot
-            } catch (e) {
-                console.error("Error renaming subject: ", e);
-                showToast("Could not rename subject.", "error");
+            const subject = quizData.subjects.find(s => s.name === oldName);
+            if (subject) {
+                subject.name = newName;
             }
+            // Also update history
+            quizHistory.forEach(entry => {
+                if (entry.subjectName === oldName) {
+                    entry.subjectName = newName;
+                }
+            });
+            saveHistory();
+            saveData();
+            populateAdminControls();
+            showToast(`Subject renamed to '${newName}'.`, "success");
         }
 
-        function requestDeleteSubject(subjectId, subjectName) {
+        function requestDeleteSubject(subjectName) {
             showConfirmationModal(
                 `Delete Subject?`,
                 `Are you sure you want to delete "<strong>${subjectName}</strong>"? This will delete all its questions.`,
-                () => deleteSubject(subjectId),
+                () => deleteSubject(subjectName),
                 "Yes, Delete"
             );
         }
 
-        async function deleteSubject(subjectId) {
-            if (!userId) return;
-            const subjectsPath = `artifacts/${appId}/users/${userId}/subjects`;
-            
-            try {
-                await deleteDoc(doc(db, subjectsPath, subjectId));
-                editQuestionsPanel.classList.add('hidden');
-                showToast(`Subject deleted.`, "success");
-                // UI will update via onSnapshot
-            } catch (e) {
-                console.error("Error deleting subject: ", e);
-                showToast("Could not delete subject.", "error");
-            }
+        function deleteSubject(subjectName) {
+            quizData.subjects = quizData.subjects.filter(s => s.name !== subjectName);
+            saveData();
+            populateAdminControls();
+            populateSubjectCards(); // Refresh home screen
+            checkRandomQuizButton(); // Update random quiz button
+            checkEmptyState(); // Check if last subject was deleted
+            editQuestionsPanel.classList.add('hidden');
+            showToast(`Subject '${subjectName}' deleted.`, "success");
         }
 
-        // --- Admin Panel: Question Functions (Firestore) ---
+        // --- Admin Panel: Question Functions ---
 
-        function showQuestionsForSubject(subjectId) {
+        function showQuestionsForSubject(subjectName) {
             editQuestionsPanel.classList.remove('hidden');
+            editQuestionsTitle.textContent = `Questions for: ${subjectName}`;
             questionEditList.innerHTML = '';
-            
-            const subject = quizData.subjects.find(s => s.id === subjectId);
-            if (!subject) {
-                editQuestionsPanel.classList.add('hidden');
-                return;
-            }
-            
-            editingSubjectId.value = subjectId; // Store for "Add New" button
-            editQuestionsTitle.textContent = `Questions for: ${subject.name}`;
             editQuestionsPanel.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
-            if (!subject.questions || subject.questions.length === 0) {
+            const subject = quizData.subjects.find(s => s.name === subjectName);
+            if (!subject || subject.questions.length === 0) {
                 questionEditList.innerHTML = '<li class="!bg-transparent !border-none text-slate-500 dark:text-slate-400">No questions in this subject yet.</li>';
                 return;
             }
@@ -1922,15 +1458,15 @@
                 li.innerHTML = `
                     <span class="flex-grow truncate pr-4" title="${q.question}">${q.question}</span>
                     <div class="flex-shrink-0 space-x-2">
-                        <button class="edit-q-btn text-sm text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 font-medium" data-subject-id="${subject.id}" data-q-index="${index}">[Edit]</button>
-                        <button class="delete-q-btn text-sm text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 font-medium" data-subject-id="${subject.id}" data-q-index="${index}">[Delete]</button>
+                        <button class="edit-q-btn text-sm text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 font-medium" data-subject="${subjectName}" data-q-index="${index}">[Edit]</button>
+                        <button class="delete-q-btn text-sm text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 font-medium" data-subject="${subjectName}" data-q-index="${index}">[Delete]</button>
                     </div>
                 `;
                 questionEditList.appendChild(li);
             });
         }
         
-        function openQuestionModal(subjectId, qIndex = -1) {
+        function openQuestionModal(subjectName, qIndex = -1) {
             clearQuestionForm();
             populateAdminControls(); // Ensure dropdown is up to date
             
@@ -1938,12 +1474,12 @@
 
             if (qIndex > -1) {
                 // Editing existing question
-                const subject = quizData.subjects.find(s => s.id === subjectId);
+                const subject = quizData.subjects.find(s => s.name === subjectName);
                 const question = subject.questions[qIndex];
                 if (!question) return;
 
                 questionFormTitle.textContent = "Edit Question";
-                adminSubjectSelect.value = subject.id;
+                adminSubjectSelect.value = subjectName;
                 adminQuestionText.value = question.question;
                 
                 const correctAnswer = question.answer;
@@ -1955,13 +1491,13 @@
                 adminOption4.value = wrongOptions[2] || '';
 
                 editingQuestionIndex.value = qIndex;
-                editingSubjectId.value = subjectId; // Store original subject ID
+                editingSubjectName.value = subjectName; // Store original subject
                 saveQuestionBtn.textContent = "Update Question";
             } else {
                 // Adding new question
                 questionFormTitle.textContent = "Add New Question";
-                if(subjectId) {
-                    adminSubjectSelect.value = subjectId;
+                if(subjectName) {
+                    adminSubjectSelect.value = subjectName;
                 }
             }
             
@@ -1972,11 +1508,8 @@
             questionModalOverlay.classList.remove('open');
         }
 
-        async function saveQuestion() {
-            if (!userId) return;
-            const subjectsPath = `artifacts/${appId}/users/${userId}/subjects`;
-            
-            const subjectId = adminSubjectSelect.value;
+        function saveQuestion() {
+            const subjectName = adminSubjectSelect.value;
             const questionText = adminQuestionText.value.trim();
             const correctAnswer = adminOption1.value.trim();
             const options = [
@@ -1984,25 +1517,26 @@
                 adminOption2.value.trim(),
                 adminOption3.value.trim(),
                 adminOption4.value.trim()
-            ].filter(opt => opt); 
+            ].filter(opt => opt); // Filter out empty strings
             const qIndex = parseInt(editingQuestionIndex.value);
-            const originalSubjectId = editingSubjectId.value;
+            const originalSubjectName = editingSubjectName.value;
 
-            if (!subjectId) {
+            if (!subjectName) {
                 showToast("Please select a subject.", "error");
                 return;
             }
-            if (!questionText || options.length < 2) { 
+            if (!questionText || options.length < 2) { // Must have at least a question and 2 options
                 showToast("Please fill in the question and at least 2 options (including correct answer).", "error");
                 return;
             }
 
-            const subject = quizData.subjects.find(s => s.id === subjectId);
+            const subject = quizData.subjects.find(s => s.name === subjectName);
             if (!subject) {
                 showToast("Selected subject not found.", "error");
                 return;
             }
             
+            // Pad options array to 4, as old code might expect it
             const finalOptions = [
                 correctAnswer,
                 adminOption2.value.trim() || 'Option A',
@@ -2012,48 +1546,44 @@
 
             const newQuestion = {
                 question: questionText,
-                options: finalOptions,
+                options: finalOptions, // Save all 4
                 answer: correctAnswer
             };
 
-            try {
-                if (qIndex > -1) {
-                    // --- Was Editing ---
-                    if (originalSubjectId !== subjectId) {
-                        // Subject was changed
-                        // 1. Remove from old subject
-                        const oldSubject = quizData.subjects.find(s => s.id === originalSubjectId);
-                        if(oldSubject) {
-                            const oldQuestions = [...oldSubject.questions];
-                            oldQuestions.splice(qIndex, 1);
-                            await updateDoc(doc(db, subjectsPath, originalSubjectId), { questions: oldQuestions });
-                        }
-                        // 2. Add to new subject
-                        const newQuestions = [...subject.questions, newQuestion];
-                        await updateDoc(doc(db, subjectsPath, subjectId), { questions: newQuestions });
-                        
-                        showToast(`Question moved to '${subject.name}'.`, "success");
-                    } else {
-                        // Subject is the same, just update
-                        const updatedQuestions = [...subject.questions];
-                        updatedQuestions[qIndex] = newQuestion;
-                        await updateDoc(doc(db, subjectsPath, subjectId), { questions: updatedQuestions });
-                        showToast(`Question updated in '${subject.name}'.`, "success");
+            if (qIndex > -1) {
+                // --- Was Editing ---
+                if (originalSubjectName !== subjectName) {
+                    // Subject was changed, remove from old subject
+                    const oldSubject = quizData.subjects.find(s => s.name === originalSubjectName);
+                    if(oldSubject) {
+                        oldSubject.questions.splice(qIndex, 1);
                     }
+                    // Add to new subject
+                    subject.questions.push(newQuestion);
+                    showToast(`Question moved to '${subjectName}'.`, "success");
                 } else {
-                    // --- Was Adding New ---
-                    const updatedQuestions = [...subject.questions, newQuestion];
-                    await updateDoc(doc(db, subjectsPath, subjectId), { questions: updatedQuestions });
-                    showToast(`Question added to '${subject.name}'.`, "success");
+                    // Subject is the same, just update
+                    subject.questions[qIndex] = newQuestion;
+                    showToast(`Question updated in '${subjectName}'.`, "success");
                 }
-                
-                // UI will update via onSnapshot
-                closeQuestionModal();
-                
-            } catch (e) {
-                console.error("Error saving question: ", e);
-                showToast("Could not save question.", "error");
+            } else {
+                // --- Was Adding New ---
+                subject.questions.push(newQuestion);
+                showToast(`Question added to '${subjectName}'.`, "success");
             }
+
+            saveData();
+            populateAdminControls();
+            populateSubjectCards(); // Refresh counts on home screen
+            checkRandomQuizButton(); // Update random quiz button
+            
+            // Refresh question list if it's visible
+            if (!editQuestionsPanel.classList.contains('hidden')) {
+                const currentListSubject = editQuestionsTitle.textContent.replace('Questions for: ', '');
+                showQuestionsForSubject(currentListSubject);
+            }
+            
+            closeQuestionModal();
         }
 
         function clearQuestionForm() {
@@ -2064,41 +1594,34 @@
             adminOption3.value = '';
             adminOption4.value = '';
             editingQuestionIndex.value = -1;
-            editingSubjectId.value = '';
+            editingSubjectName.value = '';
             saveQuestionBtn.textContent = "Save Question";
         }
 
-        function requestDeleteQuestion(subjectId, qIndex) {
-            const subject = quizData.subjects.find(s => s.id === subjectId);
-            const question = subject.questions[qIndex];
+        function requestDeleteQuestion(subjectName, qIndex) {
+            const question = quizData.subjects.find(s => s.name === subjectName).questions[qIndex];
             showConfirmationModal(
                 "Delete Question?",
                 `Are you sure you want to delete: "<strong>${question.question.substring(0, 40)}...</strong>"?`,
-                () => deleteQuestion(subjectId, qIndex),
+                () => deleteQuestion(subjectName, qIndex),
                 "Yes, Delete"
             );
         }
 
-        async function deleteQuestion(subjectId, qIndex) {
-            if (!userId) return;
-            const subjectsPath = `artifacts/${appId}/users/${userId}/subjects`;
-            
-            const subject = quizData.subjects.find(s => s.id === subjectId);
+        function deleteQuestion(subjectName, qIndex) {
+            const subject = quizData.subjects.find(s => s.name === subjectName);
             if (subject) {
-                try {
-                    const updatedQuestions = [...subject.questions];
-                    updatedQuestions.splice(qIndex, 1);
-                    await updateDoc(doc(db, subjectsPath, subjectId), { questions: updatedQuestions });
-                    showToast(`Question deleted.`, "success");
-                    // UI will update via onSnapshot
-                } catch (e) {
-                    console.error("Error deleting question: ", e);
-                    showToast("Could not delete question.", "error");
-                }
+                subject.questions.splice(qIndex, 1);
+                saveData();
+                populateAdminControls();
+                populateSubjectCards(); // Refresh counts on home screen
+                checkRandomQuizButton(); // Update random quiz button
+                showQuestionsForSubject(subjectName); // Refresh list
+                showToast(`Question deleted from '${subjectName}'.`, "success");
             }
         }
 
-        // --- Data Screen: Import/Export Functions (Firestore) ---
+        // --- Data Screen: Import/Export Functions ---
         
         function openExportModal() {
             exportSubjectList.innerHTML = ''; // Clear old list
@@ -2110,8 +1633,8 @@
                     const li = document.createElement('li');
                     li.className = "flex items-center p-2 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700";
                     li.innerHTML = `
-                        <input id="export-check-${subject.id}" type="checkbox" data-id="${subject.id}" class="h-4 w-4 text-indigo-600 border-slate-300 dark:border-slate-600 rounded focus:ring-indigo-500 mr-3">
-                        <label for="export-check-${subject.id}" class="flex-grow cursor-pointer">${subject.name} <span class="text-sm text-slate-500">(${subject.questions.length}Q)</span></label>
+                        <input id="export-check-${subject.name}" type="checkbox" data-name="${subject.name}" class="h-4 w-4 text-indigo-600 border-slate-300 dark:border-slate-600 rounded focus:ring-indigo-500 mr-3">
+                        <label for="export-check-${subject.name}" class="flex-grow cursor-pointer">${subject.name} <span class="text-sm text-slate-500">(${subject.questions.length}Q)</span></label>
                     `;
                     exportSubjectList.appendChild(li);
                 });
@@ -2129,12 +1652,10 @@
             const checkboxes = exportSubjectList.querySelectorAll('input[type="checkbox"]:checked');
             
             checkboxes.forEach(check => {
-                const subjectId = check.dataset.id;
-                const subject = quizData.subjects.find(s => s.id === subjectId);
+                const subjectName = check.dataset.name;
+                const subject = quizData.subjects.find(s => s.name === subjectName);
                 if (subject) {
-                    // Omit the 'id' field from the export
-                    const { id, ...subjectData } = subject; 
-                    selectedSubjects.push(subjectData);
+                    selectedSubjects.push(subject);
                 }
             });
 
@@ -2154,133 +1675,105 @@
         }
 
         function populateExportSubjectButton() {
-            exportSubjectBtn.disabled = !quizData.subjects || quizData.subjects.length === 0;
-            exportSubjectBtn.textContent = (quizData.subjects && quizData.subjects.length > 0) ? "Export Subjects..." : "No Subjects to Export";
+            if (quizData.subjects.length === 0) {
+                exportSubjectBtn.disabled = true;
+                exportSubjectBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                exportSubjectBtn.textContent = "No Subjects to Export";
+            } else {
+                exportSubjectBtn.disabled = false;
+                exportSubjectBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                exportSubjectBtn.textContent = "Export Subjects...";
+            }
         }
         
         function importSubjectFile(event) {
-            const files = event.target.files;
-            if (!files || files.length === 0) return;
+            const file = event.target.files[0];
+            if (!file) return;
             
-            subjectsToImport = [];
-            let filesRead = 0;
-
-            Array.from(files).forEach(file => {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    try {
-                        const data = JSON.parse(e.target.result);
-                        let subjects = [];
-                        if (data.subjects && Array.isArray(data.subjects)) {
-                            subjects = data.subjects;
-                        } else if (data.name && Array.isArray(data.questions)) {
-                            subjects = [data];
-                        }
-                        
-                        subjects.forEach(s => {
-                            if(s.name && Array.isArray(s.questions)) {
-                                subjectsToImport.push(s);
-                            }
-                        });
-
-                    } catch (error) {
-                        showToast(`Could not read file ${file.name}.`, "error");
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    
+                    let subjects = [];
+                    if (data.subjects && Array.isArray(data.subjects)) {
+                        // New multi-subject format
+                        subjects = data.subjects;
+                    } else if (data.name && Array.isArray(data.questions)) {
+                        // Old single-subject format
+                        subjects = [data];
+                    } else {
+                        throw new Error("Invalid subject file format.");
                     }
                     
-                    filesRead++;
-                    if (filesRead === files.length) {
-                        // All files processed
-                        if (subjectsToImport.length === 0) {
-                            showToast("No valid subjects found in file(s).", "error");
-                            return;
-                        }
-                        
-                        const conflicts = subjectsToImport
-                            .filter(s_new => quizData.subjects.find(s_db => s_db.name === s_new.name))
-                            .map(s => s.name);
-                        
-                        if (conflicts.length > 0) {
-                            showConfirmationModal(
-                                "Overwrite Subjects?",
-                                `These subjects already exist: <strong>${conflicts.join(', ')}</strong>. Do you want to overwrite them?`,
-                                () => confirmImportSubjects(true),
-                                "Yes, Overwrite"
-                            );
-                        } else {
-                            confirmImportSubjects(false); // No conflict, add directly
-                        }
+                    if (subjects.length === 0) {
+                        throw new Error("No subjects found in file.");
                     }
-                };
-                reader.readAsText(file);
-            });
+
+                    subjectsToImport = subjects; // Store temporarily
+                    
+                    const conflicts = subjectsToImport
+                        .filter(s_new => quizData.subjects.find(s_db => s_db.name === s_new.name))
+                        .map(s => s.name);
+                    
+                    if (conflicts.length > 0) {
+                        showConfirmationModal(
+                            "Overwrite Subjects?",
+                            `These subjects already exist: <strong>${conflicts.join(', ')}</strong>. Do you want to overwrite them?`,
+                            () => confirmImportSubjects(true),
+                            "Yes, Overwrite"
+                        );
+                    } else {
+                        confirmImportSubjects(false); // No conflict, add directly
+                    }
+                } catch (error) {
+                    showToast(`Import failed: ${error.message}`, "error");
+                }
+            };
+            reader.readAsText(file);
             event.target.value = null; // Clear input
         }
 
-        async function confirmImportSubjects(overwrite) {
-            if (!subjectsToImport || subjectsToImport.length === 0 || !userId) return;
+        function confirmImportSubjects(overwrite) {
+            if (!subjectsToImport || subjectsToImport.length === 0) return;
             
-            const subjectsPath = `artifacts/${appId}/users/${userId}/subjects`;
-            const batch = writeBatch(db);
             let importedCount = 0;
             let overwrittenCount = 0;
             
             subjectsToImport.forEach(subject => {
-                const existing = quizData.subjects.find(s => s.name === subject.name);
-                if (existing) {
+                const index = quizData.subjects.findIndex(s => s.name === subject.name);
+                if (index > -1) {
                     // Conflict
                     if (overwrite) {
-                        const docRef = doc(db, subjectsPath, existing.id);
-                        batch.set(docRef, subject); // Overwrite
+                        quizData.subjects[index] = subject;
                         overwrittenCount++;
                     }
                 } else {
                     // No conflict
-                    const docRef = doc(collection(db, subjectsPath));
-                    batch.set(docRef, subject); // Add new
+                    quizData.subjects.push(subject);
                     importedCount++;
                 }
             });
             
-            try {
-                await batch.commit();
-                showToast(`Import complete: ${importedCount} added, ${overwrittenCount} overwritten.`, "success");
-            } catch (e) {
-                console.error("Error importing subjects: ", e);
-                showToast("Import failed.", "error");
-            }
-            
+            saveData();
+            showToast(`Import complete: ${importedCount} added, ${overwrittenCount} overwritten.`, "success");
             subjectsToImport = []; // Clear temp
+            
+            // Refresh relevant UI
+            populateAdminControls();
+            populateSubjectCards();
+            checkEmptyState();
         }
 
-        async function exportBackupFile() {
-            if (!userId) return;
-            
-            try {
-                // 1. Get Subjects
-                const subjectsPath = `artifacts/${appId}/users/${userId}/subjects`;
-                const subjectsSnapshot = await getDocs(query(collection(db, subjectsPath)));
-                const subjects = subjectsSnapshot.docs.map(subjectDoc => subjectDoc.data());
-                
-                // 2. Get History
-                const historyPath = `artifacts/${appId}/users/${userId}/history`;
-                const historySnapshot = await getDocs(query(collection(db, historyPath)));
-                const history = historySnapshot.docs.map(historyDoc => historyDoc.data());
-
-                // 3. Get Settings (local cache is fine)
-                const backupData = {
-                    quizData: { subjects: subjects },
-                    history: history,
-                    settings: quizSettings
-                };
-                
-                const dataStr = JSON.stringify(backupData, null, 2);
-                downloadJSON(dataStr, `study_helper_backup_${new Date().toISOString().split('T')[0]}.json`);
-                showToast("Full app backup exported.", "success");
-                
-            } catch (e) {
-                console.error("Error exporting backup: ", e);
-                showToast("Export failed.", "error");
-            }
+        function exportBackupFile() {
+            const backupData = {
+                quizData: quizData,
+                history: quizHistory,
+                settings: quizSettings
+            };
+            const dataStr = JSON.stringify(backupData, null, 2);
+            downloadJSON(dataStr, `study_helper_backup_${new Date().toISOString().split('T')[0]}.json`);
+            showToast("Full app backup exported.", "success");
         }
         
         let backupToImport = null;
@@ -2299,7 +1792,7 @@
                     
                     showConfirmationModal(
                         "Restore Backup?",
-                        "<strong>This will overwrite ALL current subjects, history, and settings for this user.</strong> Are you sure?",
+                        "<strong>This will overwrite ALL current subjects, history, and settings.</strong> Are you sure?",
                         () => confirmImportBackup(true),
                         "Yes, Overwrite All"
                     );
@@ -2312,95 +1805,48 @@
             event.target.value = null; // Clear input
         }
 
-        async function confirmImportBackup(confirmed) {
-            if (!confirmed || !backupToImport || !userId) {
+        function confirmImportBackup(confirmed) {
+            if (!confirmed || !backupToImport) {
                 backupToImport = null;
                 return;
             }
             
-            setAuthLoading(true);
-            showToast("Restoring backup... This may take a moment.", "warning");
+            // Restore data
+            quizData = backupToImport.quizData;
+            quizHistory = backupToImport.history;
+            quizSettings = backupToImport.settings;
             
-            try {
-                // 1. Wipe existing data
-                await resetAllData(false); // false = don't show toast
-
-                const batch = writeBatch(db);
-
-                // 2. Import Settings
-                const settingsPath = `artifacts/${appId}/users/${userId}/settings/main`;
-                batch.set(doc(db, settingsPath), backupToImport.settings);
-                
-                // 3. Import Subjects
-                const subjectsPath = `artifacts/${appId}/users/${userId}/subjects`;
-                backupToImport.quizData.subjects.forEach(subject => {
-                    batch.set(doc(collection(db, subjectsPath)), subject);
-                });
-                
-                // 4. Import History
-                const historyPath = `artifacts/${appId}/users/${userId}/history`;
-                backupToImport.history.forEach(entry => {
-                    // Convert JS dates back to Timestamps if necessary
-                    entry.date = new Date(entry.date); // Ensure it's a Date object
-                    batch.set(doc(collection(db, historyPath)), entry);
-                });
-
-                await batch.commit();
-                showToast("Backup restored successfully!", "success");
-                // Data will reload via onSnapshot listeners
-                
-            } catch (e) {
-                console.error("Error restoring backup: ", e);
-                showToast("Restore failed.", "error");
-            }
+            // Save all data
+            saveData();
+            saveHistory();
+            localStorage.setItem(SETTINGS_KEY, JSON.stringify(quizSettings));
             
             backupToImport = null;
-            setAuthLoading(false);
+            showToast("Backup restored successfully! Reloading app...", "success");
+            
+            // Reload the app to apply all new data
+            setTimeout(() => {
+                location.reload();
+            }, 1500);
         }
 
         function requestResetAllData() {
             showConfirmationModal(
                 "Reset All Data?",
-                "<strong>DANGER:</strong> This will delete ALL subjects, questions, history, and settings for your account.",
-                () => resetAllData(true),
+                "<strong>DANGER:</strong> This will delete ALL subjects, questions, history, and settings. This cannot be undone.",
+                resetAllData,
                 "Yes, Delete Everything"
             );
         }
 
-        async function resetAllData(showSuccessToast = true) {
-            if (!userId) return;
-            
-            // Unsubscribe to prevent UI flicker
-            unloadAllFirestoreData();
-            
-            try {
-                const batch = writeBatch(db);
-
-                // 1. Delete Subjects
-                const subjectsPath = `artifacts/${appId}/users/${userId}/subjects`;
-                const subjectsSnapshot = await getDocs(query(collection(db, subjectsPath)));
-                subjectsSnapshot.docs.forEach(d => batch.delete(d.ref));
-                
-                // 2. Delete History
-                const historyPath = `artifacts/${appId}/users/${userId}/history`;
-                const historySnapshot = await getDocs(query(collection(db, historyPath)));
-                historySnapshot.docs.forEach(d => batch.delete(d.ref));
-                
-                // 3. Delete Settings
-                const settingsPath = `artifacts/${appId}/users/${userId}/settings/main`;
-                batch.delete(doc(db, settingsPath));
-                
-                await batch.commit();
-                
-                if(showSuccessToast) showToast("All account data has been reset.", "success");
-                
-            } catch (e) {
-                console.error("Error resetting data: ", e);
-                if(showSuccessToast) showToast("Could not reset data.", "error");
-            }
-            
-            // Re-attach listeners
-            loadAllFirestoreData();
+        function resetAllData() {
+            localStorage.removeItem(DB_KEY);
+            localStorage.removeItem(HISTORY_KEY);
+            localStorage.removeItem(SETTINGS_KEY);
+            showToast("All data has been reset. Reloading app...", "success");
+            setTimeout(() => {
+                location.reload();
+            }, 1500);
         }
 
         /**
@@ -2420,6 +1866,9 @@
 
         // --- Feedback Functions (Toast & Modal) ---
         
+        /**
+         * Shows a toast notification
+         */
         function showToast(message, type = 'success') {
             const toastContainer = document.getElementById('toast-container');
             const toast = document.createElement('div');
@@ -2449,32 +1898,47 @@
             }, 3000);
         }
 
+        /**
+         * Shows the generic confirmation modal
+         */
         function showConfirmationModal(title, message, callback, confirmText = "Confirm", isDanger = true) {
             confirmModalTitle.textContent = title;
             confirmModalMessage.innerHTML = message;
             onConfirmCallback = callback;
             confirmModalConfirmBtn.textContent = confirmText;
             
-            confirmModalConfirmBtn.classList.toggle('btn-danger', isDanger);
-            confirmModalConfirmBtn.classList.toggle('btn-primary', !isDanger);
+            // Style confirm button
+            confirmModalConfirmBtn.classList.remove('btn-danger', 'btn-primary');
+            if (isDanger) {
+                confirmModalConfirmBtn.classList.add('btn-danger');
+            } else {
+                confirmModalConfirmBtn.classList.add('btn-primary');
+            }
             
             confirmModalOverlay.classList.add('open');
         }
         
+        /**
+         * Closes the generic confirmation modal
+         */
         function closeConfirmationModal() {
             confirmModalOverlay.classList.remove('open');
             onConfirmCallback = null;
         }
 
-        // --- Quiz Logic (Unchanged, but uses Firestore-loaded data) ---
+        // --- Quiz Logic ---
         
-        function startQuiz(subjectId) {
-            const subject = quizData.subjects.find(s => s.id === subjectId);
+        /**
+         * Starts the quiz
+         */
+        function startQuiz(subjectName) {
+            const subject = quizData.subjects.find(s => s.name === subjectName);
             if (!subject || subject.questions.length === 0) {
                 showToast("This subject has no questions.", "error");
                 return;
             }
 
+            // Get settings
             const { count, timeLimit, showTimer } = getQuizSettings();
             
             if (count !== 'all' && subject.questions.length < count) {
@@ -2484,7 +1948,7 @@
 
             isTimerVisible = showTimer;
             timePerQuestion = timeLimit;
-            currentSubjectName = subject.name; // Use name for history
+            currentSubjectName = subjectName;
             
             let allSubjectQuestions = [...subject.questions];
             shuffleArray(allSubjectQuestions);
@@ -2517,14 +1981,19 @@
         }
 
         function checkRandomQuizButton() {
-            const allQuestions = (quizData.subjects || []).flatMap(s => s.questions);
-            randomQuizBtn.disabled = allQuestions.length === 0;
-            randomQuizBtn.title = allQuestions.length === 0 ? "Add some questions to any subject to enable Random Quiz" : "";
+            const allQuestions = quizData.subjects.flatMap(s => s.questions);
+            if (allQuestions.length === 0) {
+                randomQuizBtn.disabled = true;
+                randomQuizBtn.title = "Add some questions to any subject to enable Random Quiz";
+            } else {
+                randomQuizBtn.disabled = false;
+                randomQuizBtn.title = "";
+            }
         }
         
         function startRandomQuiz() {
             const { count, timeLimit, showTimer } = getQuizSettings();
-            const allQuestions = (quizData.subjects || []).flatMap(s => s.questions);
+            const allQuestions = quizData.subjects.flatMap(s => s.questions);
 
             if (allQuestions.length === 0) {
                 showToast("You don't have any questions in your bank! Add some first.", "error");
@@ -2561,6 +2030,9 @@
             updateProgressBar();
         }
 
+        /**
+         * Displays the current question and options
+         */
         function showQuestion() {
             optionsContainer.innerHTML = '';
             feedbackMessage.textContent = '';
@@ -2569,6 +2041,7 @@
             const question = currentQuestions[currentQuestionIndex];
             questionText.textContent = question.question;
 
+            // Use only valid options (filter out empty ones if any)
             const validOptions = question.options.filter(opt => opt && opt.trim() !== '');
             const shuffledOptions = [...validOptions];
             shuffleArray(shuffledOptions);
@@ -2582,13 +2055,17 @@
                 optionsContainer.appendChild(button);
             });
             
-            questionStartTime = Date.now();
+            questionStartTime = Date.now(); // Start timer for this question
         }
 
+        /**
+         * Handles the click of an answer option
+         */
         function handleOptionClick(event) {
+            // Stop the timer for this question
             clearInterval(timerInterval);
             
-            const timeTaken = (Date.now() - questionStartTime) / 1000; 
+            const timeTaken = (Date.now() - questionStartTime) / 1000; // in seconds
             answerTimes.push(timeTaken);
             
             const selectedButton = event.target;
@@ -2624,7 +2101,11 @@
             nextBtn.classList.remove('hidden');
         }
 
+        /**
+         * Moves to the next question or ends the quiz
+         */
         function nextQuestion() {
+            // Restart timer for next question
             if (timePerQuestion !== 'unlimited') {
                 startTimer();
             }
@@ -2638,15 +2119,19 @@
             }
         }
 
-        async function endQuiz(wasQuit = false) {
+        /**
+         * Ends the quiz and displays the results
+         */
+        function endQuiz(wasQuit = false) {
             clearInterval(timerInterval);
             
+            // Don't save history if user quit with 0 answers
             if (wasQuit && userAnswers.length === 0) {
                 showScreen('home-screen');
                 return;
             }
 
-            finalScore.textContent = `${score} / ${userAnswers.length}`; 
+            finalScore.textContent = `${score} / ${userAnswers.length}`; // Score based on answered
             percentageDisplay.textContent = `${userAnswers.length > 0 ? (score / userAnswers.length * 100).toFixed(1) : 0}%`;
 
             if (wasQuit) {
@@ -2655,31 +2140,35 @@
                 document.getElementById('results-summary-container').querySelector('h3').textContent = `Review Your Answers:`;
             }
             
-            // Save to history (Firestore)
+            // Save to history
             const historyEntry = {
+                id: Date.now(),
                 subjectName: currentSubjectName,
                 score: score,
-                totalQuestions: userAnswers.length,
-                date: Timestamp.now() // Use Firestore Timestamp
+                totalQuestions: userAnswers.length, // Only log answered questions
+                date: new Date().toISOString()
             };
             
-            if (userAnswers.length > 0 && userId) {
-                try {
-                    const historyPath = `artifacts/${appId}/users/${userId}/history`;
-                    await addDoc(collection(db, historyPath), historyEntry);
-                    // UI will update via onSnapshot
-                } catch (e) {
-                    console.error("Error saving history: ", e);
-                    showToast("Could not save quiz history.", "error");
-                }
+            // Only save if at least one question was answered
+            if (userAnswers.length > 0) {
+                quizHistory.push(historyEntry);
+                saveHistory();
             }
 
+            // Show performance stats
             showPerformanceStats();
+            
+            // Show results summary
             showResultsSummary();
+            
             showScreen('results-screen');
         }
 
+        /**
+         * Populates the performance insights on the results screen
+         */
         function showPerformanceStats() {
+            // 1. Fastest Answer
             if (answerTimes.length > 0) {
                 const minTime = Math.min(...answerTimes);
                 fastestAnswer.textContent = `${minTime.toFixed(1)}s`;
@@ -2687,6 +2176,7 @@
                 fastestAnswer.textContent = 'N/A';
             }
             
+            // 2. Weekly Accuracy
             const oneWeekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
             const weeklyHistory = quizHistory.filter(entry => new Date(entry.date).getTime() >= oneWeekAgo);
             
@@ -2703,10 +2193,11 @@
                 weeklyAccuracy.textContent = 'N/A';
             }
             
+            // 3. Strongest Subject
             if (quizHistory.length > 0) {
-                const subjectStats = {};
+                const subjectStats = {}; // { subjectName: { score: 0, total: 0 } }
                 quizHistory.forEach(entry => {
-                    if (entry.subjectName === 'Random Quiz') return;
+                    if (entry.subjectName === 'Random Quiz') return; // Ignore random quizzes
                     if (!subjectStats[entry.subjectName]) {
                         subjectStats[entry.subjectName] = { score: 0, total: 0 };
                     }
@@ -2719,7 +2210,7 @@
                 
                 Object.keys(subjectStats).forEach(subjectName => {
                     const stats = subjectStats[subjectName];
-                    if (stats.total >= 5) {
+                    if (stats.total >= 5) { // Min 5 questions answered
                         const avg = stats.total > 0 ? (stats.score / stats.total) : 0;
                         if (avg > bestAvg) {
                             bestAvg = avg;
@@ -2733,6 +2224,9 @@
             }
         }
 
+        /**
+         * Populates the results summary section
+         */
         function showResultsSummary() {
             resultsSummary.innerHTML = '';
             userAnswers.forEach((answer, index) => {
@@ -2752,15 +2246,22 @@
             });
         }
 
+        /**
+         * Resets the quiz to go back to the home screen
+         */
         function restartQuiz() {
             progressBarInner.style.width = '0%';
             showScreen('home-screen');
         }
 
+        /**
+         * Starts and updates the timer
+         */
         function startTimer() {
             clearInterval(timerInterval);
             
             if (timePerQuestion === 'unlimited') {
+                // Count up
                 timeElapsed = 0;
                 timerDisplay.textContent = `Time: ${formatTime(timeElapsed)}`;
                 timerInterval = setInterval(() => {
@@ -2768,22 +2269,27 @@
                     timerDisplay.textContent = `Time: ${formatTime(timeElapsed)}`;
                 }, 1000);
             } else {
-                timeRemaining = timePerQuestion; 
+                // Count down
+                timeRemaining = timePerQuestion; // Time per question
                 timerDisplay.textContent = `Time: ${formatTime(timeRemaining)}`;
                 timerInterval = setInterval(() => {
                     timeRemaining--;
                     timerDisplay.textContent = `Time: ${formatTime(timeRemaining)}`;
                     if (timeRemaining <= 0) {
+                        // Time's up for this question!
                         handleTimeUp();
                     }
                 }, 1000);
             }
         }
         
+        /**
+         * Handle when timer runs out for a question
+         */
         function handleTimeUp() {
-            clearInterval(timerInterval); 
+            clearInterval(timerInterval); // Stop this question's timer
             
-            answerTimes.push(timePerQuestion);
+            answerTimes.push(timePerQuestion); // Log max time
             const correctAnswer = currentQuestions[currentQuestionIndex].answer;
 
             Array.from(optionsContainer.children).forEach(btn => {
@@ -2803,21 +2309,31 @@
                 correct: correctAnswer
             });
 
-            scoreDisplay.textContent = `Score: ${score}`;
+            scoreDisplay.textContent = `Score: ${score}`; // Score doesn't change
             nextBtn.classList.remove('hidden');
         }
 
+
+        /**
+         * Formats seconds into MM:SS format
+         */
         function formatTime(seconds) {
             const minutes = Math.floor(seconds / 60);
             const secs = seconds % 60;
             return `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
         }
 
+        /**
+         * Updates the visual progress bar
+         */
         function updateProgressBar() {
             const progress = ((currentQuestionIndex + 1) / currentQuestions.length) * 100;
             progressBarInner.style.width = `${progress}%`;
         }
 
+        /**
+         * Shuffles an array in place (Fisher-Yates shuffle)
+         */
         function shuffleArray(array) {
             for (let i = array.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
@@ -2826,17 +2342,7 @@
         }
 
         // --- 5. Initial Run ---
-        // Must be called after all functions are defined
-        if (db && auth) {
-            document.addEventListener('DOMContentLoaded', init);
-        } else {
-            document.addEventListener('DOMContentLoaded', () => {
-                document.body.innerHTML = `<div class="p-8 text-center text-red-500">
-                    <h1 class="text-2xl font-bold">Firebase Configuration Error</h1>
-                    <p>Could not initialize Firebase. Please ensure the \`__firebase_config\` variable is set correctly.</p>
-                </div>`;
-            });
-        }
+        document.addEventListener('DOMContentLoaded', init);
 
     </script>
 </body>
