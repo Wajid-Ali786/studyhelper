@@ -109,6 +109,20 @@
             position: absolute;
             z-index: -1;
         }
+
+        /* Custom input number styles */
+        input[type=number] {
+            @apply text-center p-2 border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500;
+        }
+        /* Hide number input arrows */
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
     </style>
 </head>
 <body class="bg-slate-100 dark:bg-slate-900 min-h-screen flex items-center justify-center p-4 transition-colors duration-300">
@@ -134,24 +148,25 @@
                 <h2 class="text-xl font-semibold mb-4">Your Subjects</h2>
                 <div id="subject-cards-container" class="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-60 overflow-y-auto pr-2">
                     <!-- Subject cards will be populated by JavaScript -->
-                    <!-- Example Card Structure:
-                    <div class="p-4 bg-slate-50 dark:bg-slate-700 rounded-lg shadow-sm border border-slate-200 dark:border-slate-600">
-                        <h3 class="font-bold text-lg text-indigo-600 dark:text-indigo-400">Subject Name</h3>
-                        <p class="text-sm text-slate-500 dark:text-slate-400 mb-3">10 questions</p>
-                        <div class="flex gap-2">
-                            <button class="flex-1 bg-indigo-600 text-white py-2 px-3 text-sm rounded-md font-semibold hover:bg-indigo-700">Start Quiz</button>
-                            <button class="bg-red-500 text-white p-2 text-sm rounded-md font-semibold hover:bg-red-600">Del</button>
-                        </div>
-                    </div>
-                    -->
                 </div>
                 <p id="no-subjects-msg" class="text-slate-500 dark:text-slate-400 hidden">No subjects found. Go to "Manage Question Bank" to add one!</p>
+            </div>
+            
+            <!-- Quick Actions -->
+            <div class="grid grid-cols-2 gap-4 mb-6">
+                <button id="random-quiz-btn" class="w-full bg-green-600 text-white py-3 px-6 rounded-lg font-semibold shadow-md hover:bg-green-700 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-green-300">
+                    🚀 Random Quiz
+                </button>
+                <button id="manage-bank-btn" class="w-full bg-slate-600 text-white py-3 px-6 rounded-lg font-semibold shadow-md hover:bg-slate-700 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-slate-300">
+                    Manage Bank
+                </button>
             </div>
             
             <!-- Quiz Settings -->
             <div class="space-y-6 bg-slate-50 dark:bg-slate-700/50 p-4 rounded-lg border dark:border-slate-700">
                 <h2 class="text-xl font-semibold mb-2">Quiz Settings</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                
+                <div id="quiz-settings-inputs" class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <!-- Number of Questions Selection -->
                     <div>
                         <label for="question-count-select" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Number of Questions</label>
@@ -159,39 +174,39 @@
                             <option value="5">5 Questions</option>
                             <option value="10">10 Questions</option>
                             <option value="all">All Questions</option>
+                            <option value="custom_count">Custom...</option>
                         </select>
+                        <input type="number" id="custom-question-count" class="w-full mt-2 hidden" min="1" placeholder="Enter count">
                     </div>
                     
                     <!-- Time per Question Selection -->
                     <div>
-                        <label for="time-limit-select" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Time per Question</label>
+                        <label for="time-limit-select" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Time per Question</Sabel>
                         <select id="time-limit-select" class="w-full p-3 border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
                             <option value="unlimited">Unlimited</option>
                             <option value="10">10 Seconds</option>
                             <option value="20" selected>20 Seconds</option>
                             <option value="30">30 Seconds</option>
+                            <option value="custom_time">Custom...</option>
                         </select>
+                        <input type="number" id="custom-time-limit" class="w-full mt-2 hidden" min="1" placeholder="Enter seconds">
                     </div>
                 </div>
+                
                 <div class="flex items-center">
                     <input id="show-timer-toggle" type="checkbox" class="h-4 w-4 text-indigo-600 border-slate-300 dark:border-slate-600 rounded focus:ring-indigo-500">
                     <label for="show-timer-toggle" class="ml-2 block text-sm text-slate-700 dark:text-slate-300">Show Timer During Quiz</label>
                 </div>
             </div>
 
-            <!-- Action Buttons -->
+            <!-- Navigation Buttons -->
             <div class="grid grid-cols-2 gap-4 mt-6">
-                <button id="manage-bank-btn" class="w-full bg-slate-600 text-white py-3 px-6 rounded-lg font-semibold shadow-md hover:bg-slate-700 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-slate-300">
-                    Manage Question Bank
-                </button>
                 <button id="view-history-btn" class="w-full bg-indigo-600 text-white py-3 px-6 rounded-lg font-semibold shadow-md hover:bg-indigo-700 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-indigo-300">
                     📊 Quiz History
                 </button>
-            </div>
-            
-            <!-- Last Score Display -->
-            <div class="text-center mt-8">
-                <p class="text-slate-500 dark:text-slate-400">Your last score: <span id="last-score" class="font-bold text-slate-700 dark:text-slate-300">N/A</span></p>
+                <button id="view-settings-btn" class="w-full bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 py-3 px-6 rounded-lg font-semibold shadow-md hover:bg-slate-300 dark:hover:bg-slate-600 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-slate-300">
+                    ⚙️ Settings & Data
+                </button>
             </div>
         </div>
 
@@ -222,8 +237,11 @@
             <p id="feedback-message" class="text-center font-medium min-h-[2em] mb-4"></p>
 
             <!-- Next Button -->
-            <button id="next-btn" class="w-full bg-slate-700 text-white py-3 px-6 rounded-lg font-semibold text-lg shadow-md hover:bg-slate-800 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-slate-300 hidden">
+            <button id="next-btn" class="w-full bg-slate-700 text-white py-3 px-6 rounded-lg font-semibold text-lg shadow-md hover:bg-slate-800 transition-all duration-300 focus:outline-none focus:ring-slate-300 hidden">
                 Next Question
+            </button>
+            <button id="quit-quiz-btn" class="w-full bg-red-600 text-white py-2 px-4 rounded-lg font-semibold text-sm shadow-md hover:bg-red-700 transition-all duration-300 focus:outline-none focus:ring-red-300 mt-3">
+                Quit Quiz
             </button>
         </div>
 
@@ -266,7 +284,7 @@
 
             <!-- Restart Button -->
             <button id="restart-btn" class="w-full bg-indigo-600 text-white py-3 px-6 rounded-lg font-semibold text-lg shadow-md hover:bg-indigo-700 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-indigo-300">
-                Practice Again
+                Back to Home
             </button>
         </div>
 
@@ -275,7 +293,7 @@
             <div class="flex justify-between items-center mb-6">
                 <h1 class="text-3xl font-extrabold">Question Bank</h1>
                 <button id="admin-back-btn" class="bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 py-2 px-4 rounded-lg font-semibold hover:bg-slate-300 dark:hover:bg-slate-600 transition-all">
-                    Back to Quiz
+                    Back to Home
                 </button>
             </div>
 
@@ -283,7 +301,7 @@
             <div id="admin-feedback" class="text-center font-medium min-h-[2em] mb-4 p-3 rounded-lg"></div>
 
             <!-- All sections are now in a single column -->
-            <div class="space-y-8">
+            <div class="space-y-8 max-h-[70vh] overflow-y-auto pr-2">
                 
                 <!-- Section 1: Manage Subjects -->
                 <div class="bg-slate-50 dark:bg-slate-700/50 p-5 rounded-lg border dark:border-slate-700">
@@ -364,28 +382,6 @@
                         </button>
                     </div>
                 </div>
-
-                <!-- Section 4: Import/Export Section -->
-                <div class="mt-8 border-t dark:border-slate-700 pt-6">
-                    <h3 class="text-xl font-semibold text-slate-700 dark:text-slate-300 mb-4">Import / Export Data</h3>
-                    
-                    <!-- File Inputs -->
-                    <input type="file" id="import-subject-file" class="hidden-file-input" accept=".json">
-                    <input type="file" id="import-backup-file" class="hidden-file-input" accept=".json">
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <!-- Import -->
-                        <div class="flex flex-col space-y-3">
-                            <label id="import-subject-file-btn" for="import-subject-file" class="w-full text-center bg-orange-500 text-white py-2 px-4 rounded-lg font-semibold hover:bg-orange-600 cursor-pointer">Import Subject (.json)</label>
-                            <label id="import-backup-file-btn" for="import-backup-file" class="w-full text-center bg-orange-700 text-white py-2 px-4 rounded-lg font-semibold hover:bg-orange-800 cursor-pointer">Import Full Backup (.json)</label>
-                        </div>
-                        <!-- Export -->
-                        <div class="flex flex-col space-y-3">
-                            <button id="export-subject-btn" class="w-full bg-indigo-500 text-white py-2 px-4 rounded-lg font-semibold hover:bg-indigo-600">Export Selected Subject</button>
-                            <button id="export-backup-btn" class="w-full bg-indigo-700 text-white py-2 px-4 rounded-lg font-semibold hover:bg-indigo-800">Export Full Backup</button>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
         
@@ -397,9 +393,34 @@
                     Back to Home
                 </button>
             </div>
+
+            <!-- Overall Stats -->
+            <div id="overall-stats" class="mb-6">
+                <h3 class="text-xl font-semibold mb-3">Overall Statistics</h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
+                    <div class="bg-slate-50 dark:bg-slate-700 p-3 rounded-lg">
+                        <p class="text-sm text-slate-500 dark:text-slate-400">Total Quizzes</p>
+                        <p id="stat-total-quizzes" class="text-lg font-semibold">0</p>
+                    </div>
+                    <div class="bg-slate-50 dark:bg-slate-700 p-3 rounded-lg">
+                        <p class="text-sm text-slate-500 dark:text-slate-400">Total Questions</p>
+                        <p id="stat-total-questions" class="text-lg font-semibold">0</p>
+                    </div>
+                    <div class="bg-slate-50 dark:bg-slate-700 p-3 rounded-lg">
+                        <p class="text-sm text-slate-500 dark:text-slate-400">Avg. Score</p>
+                        <p id="stat-avg-score" class="text-lg font-semibold">0%</p>
+                    </div>
+                    <div class="bg-slate-50 dark:bg-slate-700 p-3 rounded-lg">
+                        <p class="text-sm text-slate-500 dark:text-slate-400">Best Subject</p>
+                        <p id="stat-best-subject" class="text-lg font-semibold">N/A</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="history-feedback" class="text-center font-medium min-h-[2em] mb-4 p-3 rounded-lg"></div>
             
             <div class="flex justify-between items-center mb-4">
-                <div class="flex gap-2">
+                <div class="flex gap-2 items-center">
                     <label for="sort-history-by" class="text-sm font-medium">Sort by:</label>
                     <select id="sort-history-by" class="text-sm p-1 border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-md">
                         <option value="date_desc">Date (Newest)</option>
@@ -430,6 +451,53 @@
             </div>
             <p id="no-history-msg" class="text-center text-slate-500 dark:text-slate-400 mt-6 hidden">No quiz history found. Complete a quiz to see your results!</p>
         </div>
+        
+        <!-- ===== SCREEN 6: Settings & Data Screen ===== -->
+        <div id="data-screen" class="screen hidden text-slate-800 dark:text-slate-200">
+            <div class="flex justify-between items-center mb-6">
+                <h1 class="text-3xl font-extrabold">Settings & Data</h1>
+                <button id="data-back-btn" class="bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 py-2 px-4 rounded-lg font-semibold hover:bg-slate-300 dark:hover:bg-slate-600 transition-all">
+                    Back to Home
+                </button>
+            </div>
+            
+            <div id="data-feedback" class="text-center font-medium min-h-[2em] mb-4 p-3 rounded-lg"></div>
+
+            <div class="space-y-8 max-h-[70vh] overflow-y-auto pr-2">
+                <!-- Section 1: Import/Export Section -->
+                <div class="bg-slate-50 dark:bg-slate-700/50 p-5 rounded-lg border dark:border-slate-700">
+                    <h3 class="text-xl font-semibold text-slate-700 dark:text-slate-300 mb-4">Import / Export Data</h3>
+                    
+                    <!-- File Inputs -->
+                    <input type="file" id="import-subject-file" class="hidden-file-input" accept=".json">
+                    <input type="file" id="import-backup-file" class="hidden-file-input" accept=".json">
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Import -->
+                        <div class="flex flex-col space-y-3">
+                            <label id="import-subject-file-btn" for="import-subject-file" class="w-full text-center bg-orange-500 text-white py-2 px-4 rounded-lg font-semibold hover:bg-orange-600 cursor-pointer">Import Subject (.json)</label>
+                            <label id="import-backup-file-btn" for="import-backup-file" class="w-full text-center bg-orange-700 text-white py-2 px-4 rounded-lg font-semibold hover:bg-orange-800 cursor-pointer">Import Full Backup (.json)</label>
+                        </div>
+                        <!-- Export -->
+                        <div class="flex flex-col space-y-3">
+                            <button id="export-subject-btn" class="w-full bg-indigo-500 text-white py-2 px-4 rounded-lg font-semibold hover:bg-indigo-600">Export Subject...</button>
+                            <button id="export-backup-btn" class="w-full bg-indigo-700 text-white py-2 px-4 rounded-lg font-semibold hover:bg-indigo-800">Export Full Backup</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 2: Danger Zone -->
+                <div class="bg-red-50 dark:bg-red-900/20 p-5 rounded-lg border border-red-200 dark:border-red-900/50">
+                    <h3 class="text-xl font-semibold text-red-800 dark:text-red-300 mb-4">Danger Zone</h3>
+                    <p class="text-sm text-red-700 dark:text-red-400 mb-4">These actions cannot be undone. Be careful.</p>
+                    <div class="flex gap-4">
+                        <button id="reset-all-data-btn" class="w-full bg-red-600 text-white py-2 px-4 rounded-lg font-semibold hover:bg-red-700">
+                            Reset All App Data
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
     </div>
 
@@ -448,6 +516,7 @@
         const resultsScreen = document.getElementById('results-screen');
         const adminScreen = document.getElementById('admin-screen');
         const historyScreen = document.getElementById('history-screen');
+        const dataScreen = document.getElementById('data-screen');
 
         // Theme
         const themeToggleBtn = document.getElementById('theme-toggle-btn');
@@ -457,12 +526,17 @@
         // Start Screen
         const subjectCardsContainer = document.getElementById('subject-cards-container');
         const noSubjectsMsg = document.getElementById('no-subjects-msg');
-        const questionCountSelect = document.getElementById('question-count-select');
-        const timeLimitSelect = document.getElementById('time-limit-select');
-        const showTimerToggle = document.getElementById('show-timer-toggle');
+        const randomQuizBtn = document.getElementById('random-quiz-btn');
         const manageBankBtn = document.getElementById('manage-bank-btn');
         const viewHistoryBtn = document.getElementById('view-history-btn');
-        const lastScoreDisplay = document.getElementById('last-score');
+        const viewSettingsBtn = document.getElementById('view-settings-btn');
+        
+        // Start Screen (Settings)
+        const questionCountSelect = document.getElementById('question-count-select');
+        const customQuestionCount = document.getElementById('custom-question-count');
+        const timeLimitSelect = document.getElementById('time-limit-select');
+        const customTimeLimit = document.getElementById('custom-time-limit');
+        const showTimerToggle = document.getElementById('show-timer-toggle');
 
         // Quiz Screen
         const timerDisplay = document.getElementById('timer');
@@ -472,6 +546,7 @@
         const optionsContainer = document.getElementById('options-container');
         const feedbackMessage = document.getElementById('feedback-message');
         const nextBtn = document.getElementById('next-btn');
+        const quitQuizBtn = document.getElementById('quit-quiz-btn');
 
         // Results Screen
         const finalScore = document.getElementById('final-score');
@@ -501,17 +576,30 @@
         const saveQuestionBtn = document.getElementById('save-question-btn');
         const cancelEditBtn = document.getElementById('cancel-edit-btn');
         const editingQuestionIndex = document.getElementById('editing-question-index');
-        const importSubjectFileInput = document.getElementById('import-subject-file');
-        const importBackupFileInput = document.getElementById('import-backup-file');
-        const exportSubjectBtn = document.getElementById('export-subject-btn');
-        const exportBackupBtn = document.getElementById('export-backup-btn');
-
+        
         // History Screen
         const historyBackBtn = document.getElementById('history-back-btn');
+        const historyFeedback = document.getElementById('history-feedback');
         const sortHistoryBy = document.getElementById('sort-history-by');
         const clearHistoryBtn = document.getElementById('clear-history-btn');
         const historyTableBody = document.getElementById('history-table-body');
         const noHistoryMsg = document.getElementById('no-history-msg');
+        // History Stats
+        const statTotalQuizzes = document.getElementById('stat-total-quizzes');
+        const statTotalQuestions = document.getElementById('stat-total-questions');
+        const statAvgScore = document.getElementById('stat-avg-score');
+        const statBestSubject = document.getElementById('stat-best-subject');
+
+        // Data Screen
+        const dataBackBtn = document.getElementById('data-back-btn');
+        const dataFeedback = document.getElementById('data-feedback');
+        const importSubjectFileInput = document.getElementById('import-subject-file');
+        const importBackupFileInput = document.getElementById('import-backup-file');
+        const importSubjectFileBtn = document.getElementById('import-subject-file-btn');
+        const importBackupFileBtn = document.getElementById('import-backup-file-btn');
+        const exportSubjectBtn = document.getElementById('export-subject-btn');
+        const exportBackupBtn = document.getElementById('export-backup-btn');
+        const resetAllDataBtn = document.getElementById('reset-all-data-btn');
 
         // --- 3. State Variables ---
         let quizData;
@@ -542,7 +630,7 @@
             loadHistory();
 
             populateSubjectCards();
-            updateLastScore();
+            checkRandomQuizButton();
 
             addEventListeners();
         }
@@ -555,19 +643,29 @@
             themeToggleBtn.addEventListener('click', toggleTheme);
 
             // Screen Navigation
-            manageBankBtn.addEventListener('click', showAdminPanel);
-            viewHistoryBtn.addEventListener('click', showHistoryPanel);
+            manageBankBtn.addEventListener('click', () => showScreen(adminScreen));
+            viewHistoryBtn.addEventListener('click', () => showScreen(historyScreen));
+            viewSettingsBtn.addEventListener('click', () => showScreen(dataScreen));
             adminBackBtn.addEventListener('click', () => showScreen(startScreen));
             historyBackBtn.addEventListener('click', () => showScreen(startScreen));
+            dataBackBtn.addEventListener('click', () => showScreen(startScreen));
             restartBtn.addEventListener('click', restartQuiz);
 
             // Quiz Logic
+            randomQuizBtn.addEventListener('click', startRandomQuiz);
             nextBtn.addEventListener('click', nextQuestion);
+            quitQuizBtn.addEventListener('click', () => {
+                if (confirm("Are you sure you want to quit this quiz?")) {
+                    endQuiz(true); // true = quit early
+                }
+            });
             
             // Settings
-            questionCountSelect.addEventListener('change', saveSettings);
-            timeLimitSelect.addEventListener('change', saveSettings);
-            showTimerToggle.addEventListener('change', saveSettings);
+            questionCountSelect.addEventListener('change', handleSettingChange);
+            customQuestionCount.addEventListener('change', handleSettingChange);
+            timeLimitSelect.addEventListener('change', handleSettingChange);
+            customTimeLimit.addEventListener('change', handleSettingChange);
+            showTimerToggle.addEventListener('change', handleSettingChange);
 
             // History
             sortHistoryBy.addEventListener('change', populateHistoryTable);
@@ -580,13 +678,14 @@
             saveQuestionBtn.addEventListener('click', saveQuestion);
             cancelEditBtn.addEventListener('click', clearQuestionForm);
 
-            // Admin: Import/Export
-            document.getElementById('import-subject-file-btn').addEventListener('click', () => importSubjectFileInput.click());
-            document.getElementById('import-backup-file-btn').addEventListener('click', () => importBackupFileInput.click());
+            // Data Screen: Import/Export
+            importSubjectFileBtn.addEventListener('click', () => importSubjectFileInput.click());
+            importBackupFileBtn.addEventListener('click', () => importBackupFileInput.click());
             importSubjectFileInput.addEventListener('change', importSubjectFile);
             importBackupFileInput.addEventListener('change', importBackupFile);
             exportSubjectBtn.addEventListener('click', exportSubjectFile);
             exportBackupBtn.addEventListener('click', exportBackupFile);
+            resetAllDataBtn.addEventListener('click', requestResetAllData);
 
             // Dynamic Listeners (Event Delegation)
             addDynamicListeners();
@@ -602,7 +701,7 @@
                     startQuiz(e.target.dataset.name);
                 }
                 if (e.target.classList.contains('delete-subject-home-btn')) {
-                    requestDeleteSubject(e.target.dataset.name);
+                    requestDeleteSubject(e.target.dataset.name, 'admin'); // 'admin' feedback
                 }
                 
                 // Admin Subject List buttons
@@ -616,7 +715,7 @@
                     cancelSubjectEdit(e.target.closest('li'));
                 }
                 if (e.target.classList.contains('delete-subject-btn')) {
-                    requestDeleteSubject(e.target.dataset.name);
+                    requestDeleteSubject(e.target.dataset.name, 'admin');
                 }
                 if (e.target.classList.contains('view-subject-questions')) {
                     showQuestionsForSubject(e.target.dataset.name);
@@ -630,7 +729,7 @@
                     requestDeleteQuestion(e.target.dataset.subject, e.target.dataset.qIndex);
                 }
 
-                // Confirmation buttons in adminFeedback
+                // Confirmation buttons in feedback divs
                 if (e.target.id === 'confirm-delete-subject') {
                     deleteSubject(e.target.dataset.name);
                 }
@@ -646,8 +745,11 @@
                 if (e.target.id === 'confirm-import-backup') {
                     confirmImportBackup(true);
                 }
+                if (e.target.id === 'confirm-reset-all') {
+                    resetAllData();
+                }
                 if (e.target.id === 'cancel-action') {
-                    clearAdminFeedback();
+                    clearAllFeedback();
                 }
             });
         }
@@ -660,8 +762,6 @@
         function showScreen(screenToShow) {
             allScreens.forEach(screen => {
                 if (!screen.classList.contains('hidden')) {
-                    // Add fade-out effects manually if needed, 
-                    // but for simplicity, just hide.
                     screen.classList.add('hidden');
                 }
             });
@@ -669,7 +769,7 @@
             // Refresh dynamic content when showing screen
             if (screenToShow === startScreen) {
                 populateSubjectCards();
-                updateLastScore();
+                checkRandomQuizButton();
             }
             if (screenToShow === adminScreen) {
                 populateAdminControls();
@@ -678,6 +778,10 @@
             }
             if (screenToShow === historyScreen) {
                 populateHistoryTable();
+                populateOverallStats();
+            }
+            if (screenToShow === dataScreen) {
+                populateExportSubjectButton();
             }
             
             screenToShow.classList.remove('hidden');
@@ -687,9 +791,6 @@
             setTimeout(() => screenToShow.style.animation = '', 300);
         }
         
-        function showAdminPanel() { showScreen(adminScreen); }
-        function showHistoryPanel() { showScreen(historyScreen); }
-
         // --- Theme Management ---
         
         function loadTheme() {
@@ -726,24 +827,63 @@
             const savedSettings = JSON.parse(localStorage.getItem(SETTINGS_KEY)) || {};
             quizSettings = {
                 count: savedSettings.count || '5',
+                customCount: savedSettings.customCount || 10,
                 timeLimit: savedSettings.timeLimit || '20',
+                customTime: savedSettings.customTime || 60,
                 showTimer: savedSettings.showTimer === false ? false : true // default to true
             };
             
             questionCountSelect.value = quizSettings.count;
+            customQuestionCount.value = quizSettings.customCount;
             timeLimitSelect.value = quizSettings.timeLimit;
+            customTimeLimit.value = quizSettings.customTime;
             showTimerToggle.checked = quizSettings.showTimer;
+
+            // Show/hide custom inputs based on loaded settings
+            customQuestionCount.classList.toggle('hidden', quizSettings.count !== 'custom_count');
+            customTimeLimit.classList.toggle('hidden', quizSettings.timeLimit !== 'custom_time');
             
             saveSettings(); // Save to ensure it's in storage
         }
         
+        function handleSettingChange() {
+            const countVal = questionCountSelect.value;
+            const timeVal = timeLimitSelect.value;
+            
+            customQuestionCount.classList.toggle('hidden', countVal !== 'custom_count');
+            customTimeLimit.classList.toggle('hidden', timeVal !== 'custom_time');
+            
+            saveSettings();
+        }
+
         function saveSettings() {
             quizSettings = {
                 count: questionCountSelect.value,
+                customCount: parseInt(customQuestionCount.value) || 1,
                 timeLimit: timeLimitSelect.value,
+                customTime: parseInt(customTimeLimit.value) || 1,
                 showTimer: showTimerToggle.checked
             };
             localStorage.setItem(SETTINGS_KEY, JSON.stringify(quizSettings));
+        }
+
+        function getQuizSettings() {
+            const countSetting = quizSettings.count;
+            const timeSetting = quizSettings.timeLimit;
+            
+            const questionCount = (countSetting === 'custom_count') 
+                ? quizSettings.customCount
+                : (countSetting === 'all' ? 'all' : parseInt(countSetting));
+
+            const timePerQ = (timeSetting === 'custom_time')
+                ? quizSettings.customTime
+                : (timeSetting === 'unlimited' ? 'unlimited' : parseInt(timeSetting));
+
+            return {
+                count: questionCount,
+                timeLimit: timePerQ,
+                showTimer: quizSettings.showTimer
+            };
         }
         
         // --- Data (Subjects/Questions) Management ---
@@ -783,7 +923,7 @@
                     <h3 class="font-bold text-lg text-indigo-600 dark:text-indigo-400 truncate">${subject.name}</h3>
                     <p class="text-sm text-slate-500 dark:text-slate-400 mb-3">${subject.questions.length} questions</p>
                     <div class="flex gap-2">
-                        <button class="start-quiz-btn flex-1 bg-indigo-600 text-white py-2 px-3 text-sm rounded-md font-semibold hover:bg-indigo-700" data-name="${subject.name}">Start Quiz</button>
+                        <button class="start-quiz-btn flex-1 bg-indigo-600 text-white py-2 px-3 text-sm rounded-md font-semibold hover:bg-indigo-700" data-name="${subject.name}" ${subject.questions.length === 0 ? 'disabled' : ''} ${subject.questions.length === 0 ? 'opacity-50 cursor-not-allowed' : ''}>Start Quiz</button>
                         <button class="delete-subject-home-btn bg-red-500 text-white p-2 text-sm rounded-md font-semibold hover:bg-red-600" data-name="${subject.name}">
                             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z" clip-rule="evenodd"></path></svg>
                         </button>
@@ -805,15 +945,11 @@
                 adminSubjectSelect.innerHTML = '<option disabled>Please add a subject first.</option>';
                 saveQuestionBtn.disabled = true;
                 saveQuestionBtn.classList.add('opacity-50', 'cursor-not-allowed');
-                exportSubjectBtn.disabled = true;
-                exportSubjectBtn.classList.add('opacity-50', 'cursor-not-allowed');
                 return;
             }
             
             saveQuestionBtn.disabled = false;
             saveQuestionBtn.classList.remove('opacity-50', 'cursor-not-allowed');
-            exportSubjectBtn.disabled = false;
-            exportSubjectBtn.classList.remove('opacity-50', 'cursor-not-allowed');
 
             quizData.subjects.forEach(subject => {
                 // Add to admin list
@@ -852,25 +988,18 @@
         function saveHistory() {
             localStorage.setItem(HISTORY_KEY, JSON.stringify(quizHistory));
         }
-
-        function updateLastScore() {
-            const lastScore = localStorage.getItem('lastQuizScore');
-            if (lastScore) {
-                lastScoreDisplay.textContent = lastScore;
-            }
-        }
         
         function populateHistoryTable() {
             historyTableBody.innerHTML = '';
             
             if (quizHistory.length === 0) {
                 noHistoryMsg.classList.remove('hidden');
-                historyTableBody.classList.add('hidden');
+                historyTableContainer.classList.add('hidden');
                 return;
             }
             
             noHistoryMsg.classList.add('hidden');
-            historyTableBody.classList.remove('hidden');
+            historyTableContainer.classList.remove('hidden');
 
             const sortMethod = sortHistoryBy.value;
             const sortedHistory = [...quizHistory].sort((a, b) => {
@@ -898,18 +1027,60 @@
             });
         }
         
+        function populateOverallStats() {
+            const totalQuizzes = quizHistory.length;
+            let totalScore = 0;
+            let totalQs = 0;
+            const subjectStats = {}; // { subjectName: { score: 0, total: 0 } }
+            
+            quizHistory.forEach(entry => {
+                totalScore += entry.score;
+                totalQs += entry.totalQuestions;
+                
+                if (!subjectStats[entry.subjectName]) {
+                    subjectStats[entry.subjectName] = { score: 0, total: 0 };
+                }
+                subjectStats[entry.subjectName].score += entry.score;
+                subjectStats[entry.subjectName].total += entry.totalQuestions;
+            });
+            
+            const avgScore = totalQs > 0 ? (totalScore / totalQs * 100) : 0;
+            
+            let bestSubject = 'N/A';
+            let bestAvg = -1;
+            
+            Object.keys(subjectStats).forEach(subjectName => {
+                const stats = subjectStats[subjectName];
+                // Require at least 5 questions to be considered for "best"
+                if (stats.total >= 5) { 
+                    const avg = stats.total > 0 ? (stats.score / stats.total) : 0;
+                    if (avg > bestAvg) {
+                        bestAvg = avg;
+                        bestSubject = subjectName;
+                    }
+                }
+            });
+
+            statTotalQuizzes.textContent = totalQuizzes;
+            statTotalQuestions.textContent = totalQs;
+            statAvgScore.textContent = `${avgScore.toFixed(1)}%`;
+            statBestSubject.textContent = bestSubject;
+        }
+
         function requestClearHistory() {
-            showAdminFeedback(`Are you sure you want to delete <strong>ALL</strong> quiz history? This cannot be undone. <br>
+            showFeedback(`Are you sure you want to delete <strong>ALL</strong> quiz history? This cannot be undone. <br>
                 <button id="confirm-clear-history" class="bg-red-600 text-white py-1 px-3 rounded-md text-sm mt-2 mr-2">Yes, Delete History</button>
                 <button id="cancel-action" class="bg-slate-200 dark:bg-slate-600 text-slate-800 dark:text-slate-200 py-1 px-3 rounded-md text-sm mt-2">Cancel</button>`, 
-            "warning", historyScreen); // Show feedback on history screen
+            "warning", "history");
         }
         
         function clearHistory() {
             quizHistory = [];
             saveHistory();
             populateHistoryTable();
-            clearAdminFeedback(historyScreen); // Clear feedback on history screen
+            populateOverallStats();
+            clearFeedback("history");
+            showFeedback("Quiz history cleared.", "success", "history");
         }
 
         // --- Admin Panel: Subject Functions ---
@@ -917,22 +1088,31 @@
         function addSubject() {
             const name = newSubjectName.value.trim();
             if (!name) {
-                showAdminFeedback("Subject name cannot be empty.", "error");
+                showFeedback("Subject name cannot be empty.", "error", "admin");
                 return;
             }
             if (quizData.subjects.find(s => s.name.toLowerCase() === name.toLowerCase())) {
-                showAdminFeedback("Subject with this name already exists.", "error");
+                showFeedback("Subject with this name already exists.", "error", "admin");
                 return;
             }
 
             quizData.subjects.push({ name: name, questions: [] });
             saveData();
             populateAdminControls();
+            checkRandomQuizButton(); // Update random quiz button state
             newSubjectName.value = '';
-            showAdminFeedback(`Subject '${name}' added successfully.`, "success");
+            showFeedback(`Subject '${name}' added successfully.`, "success", "admin");
         }
 
         function editSubject(oldName, li) {
+            // Close any other open edit forms
+            document.querySelectorAll('.subject-edit-form').forEach(form => {
+                if (!form.classList.contains('hidden')) {
+                    form.classList.add('hidden');
+                    form.previousElementSibling.classList.remove('hidden'); // Show name
+                }
+            });
+            // Open this one
             li.querySelector('.subject-name-display').classList.add('hidden');
             li.querySelector('.subject-edit-form').classList.remove('hidden');
         }
@@ -947,11 +1127,11 @@
         function saveSubjectEdit(oldName, li) {
             const newName = li.querySelector('input').value.trim();
             if (!newName) {
-                showAdminFeedback("Subject name cannot be empty.", "error");
+                showFeedback("Subject name cannot be empty.", "error", "admin");
                 return;
             }
             if (newName.toLowerCase() !== oldName.toLowerCase() && quizData.subjects.find(s => s.name.toLowerCase() === newName.toLowerCase())) {
-                showAdminFeedback("Another subject with this name already exists.", "error");
+                showFeedback("Another subject with this name already exists.", "error", "admin");
                 return;
             }
 
@@ -968,14 +1148,14 @@
             saveHistory();
             saveData();
             populateAdminControls();
-            showAdminFeedback(`Subject renamed to '${newName}'.`, "success");
+            showFeedback(`Subject renamed to '${newName}'.`, "success", "admin");
         }
 
-        function requestDeleteSubject(subjectName) {
-            showAdminFeedback(`Are you sure you want to delete "<strong>${subjectName}</strong>"? This will delete all its questions. <br>
+        function requestDeleteSubject(subjectName, feedbackLocation = 'admin') {
+            showFeedback(`Are you sure you want to delete "<strong>${subjectName}</strong>"? This will delete all its questions. <br>
                 <button id="confirm-delete-subject" data-name="${subjectName}" class="bg-red-600 text-white py-1 px-3 rounded-md text-sm mt-2 mr-2">Yes, Delete</button>
                 <button id="cancel-action" class="bg-slate-200 dark:bg-slate-600 text-slate-800 dark:text-slate-200 py-1 px-3 rounded-md text-sm mt-2">Cancel</button>`, 
-            "warning");
+            "warning", feedbackLocation);
         }
 
         function deleteSubject(subjectName) {
@@ -983,9 +1163,10 @@
             saveData();
             populateAdminControls();
             populateSubjectCards(); // Refresh home screen
+            checkRandomQuizButton(); // Update random quiz button
             editQuestionsPanel.classList.add('hidden');
-            clearAdminFeedback();
-            showAdminFeedback(`Subject '${subjectName}' deleted.`, "success");
+            clearFeedback("admin");
+            showFeedback(`Subject '${subjectName}' deleted.`, "success", "admin");
         }
 
         // --- Admin Panel: Question Functions ---
@@ -994,6 +1175,7 @@
             editQuestionsPanel.classList.remove('hidden');
             editQuestionsTitle.textContent = `Questions for: ${subjectName}`;
             questionEditList.innerHTML = '';
+            editQuestionsPanel.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
             const subject = quizData.subjects.find(s => s.name === subjectName);
             if (!subject || subject.questions.length === 0) {
@@ -1050,17 +1232,17 @@
             const qIndex = parseInt(editingQuestionIndex.value);
 
             if (!subjectName) {
-                showAdminFeedback("Please select a subject.", "error");
+                showFeedback("Please select a subject.", "error", "admin");
                 return;
             }
             if (!questionText || options.length < 2) { // Must have at least a question and 2 options
-                showAdminFeedback("Please fill in the question and at least 2 options (including correct answer).", "error");
+                showFeedback("Please fill in the question and at least 2 options (including correct answer).", "error", "admin");
                 return;
             }
 
             const subject = quizData.subjects.find(s => s.name === subjectName);
             if (!subject) {
-                showAdminFeedback("Selected subject not found.", "error");
+                showFeedback("Selected subject not found.", "error", "admin");
                 return;
             }
             
@@ -1080,14 +1262,16 @@
 
             if (qIndex > -1) {
                 subject.questions[qIndex] = newQuestion;
-                showAdminFeedback(`Question updated in '${subjectName}'.`, "success");
+                showFeedback(`Question updated in '${subjectName}'.`, "success", "admin");
             } else {
                 subject.questions.push(newQuestion);
-                showAdminFeedback(`Question added to '${subjectName}'.`, "success");
+                showFeedback(`Question added to '${subjectName}'.`, "success", "admin");
             }
 
             saveData();
             populateAdminControls();
+            populateSubjectCards(); // Refresh counts on home screen
+            checkRandomQuizButton(); // Update random quiz button
             
             if (!editQuestionsPanel.classList.contains('hidden') && editQuestionsTitle.textContent.includes(subjectName)) {
                 showQuestionsForSubject(subjectName);
@@ -1109,10 +1293,10 @@
 
         function requestDeleteQuestion(subjectName, qIndex) {
              const question = quizData.subjects.find(s => s.name === subjectName).questions[qIndex];
-            showAdminFeedback(`Are you sure you want to delete this question: "<strong>${question.question.substring(0, 30)}...</strong>"? <br>
+            showFeedback(`Are you sure you want to delete this question: "<strong>${question.question.substring(0, 30)}...</strong>"? <br>
                 <button id="confirm-delete-question" data-subject="${subjectName}" data-q-index="${qIndex}" class="bg-red-600 text-white py-1 px-3 rounded-md text-sm mt-2 mr-2">Yes, Delete</button>
                 <button id="cancel-action" class="bg-slate-200 dark:bg-slate-600 text-slate-800 dark:text-slate-200 py-1 px-3 rounded-md text-sm mt-2">Cancel</button>`, 
-            "warning");
+            "warning", "admin");
         }
 
         function deleteQuestion(subjectName, qIndex) {
@@ -1121,29 +1305,42 @@
                 subject.questions.splice(qIndex, 1);
                 saveData();
                 populateAdminControls();
+                populateSubjectCards(); // Refresh counts on home screen
+                checkRandomQuizButton(); // Update random quiz button
                 showQuestionsForSubject(subjectName);
-                clearAdminFeedback();
-                showAdminFeedback(`Question deleted from '${subjectName}'.`, "success");
+                clearFeedback("admin");
+                showFeedback(`Question deleted from '${subjectName}'.`, "success", "admin");
             }
         }
 
-        // --- Admin Panel: Import/Export Functions ---
+        // --- Data Screen: Import/Export Functions ---
+
+        function populateExportSubjectButton() {
+            if (quizData.subjects.length === 0) {
+                exportSubjectBtn.disabled = true;
+                exportSubjectBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                exportSubjectBtn.textContent = "No Subjects to Export";
+            } else {
+                exportSubjectBtn.disabled = false;
+                exportSubjectBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                exportSubjectBtn.textContent = "Export Subject...";
+            }
+        }
 
         function exportSubjectFile() {
-            const subjectName = adminSubjectSelect.value;
-            if (!subjectName) {
-                showAdminFeedback("No subject selected to export.", "error");
-                return;
-            }
+            const subjectName = prompt(`Which subject do you want to export? (Case sensitive)\n\nAvailable:\n${quizData.subjects.map(s => s.name).join('\n')}`);
+            
+            if (!subjectName) return; // User cancelled
+            
             const subject = quizData.subjects.find(s => s.name === subjectName);
             if (!subject) {
-                showAdminFeedback("Selected subject not found.", "error");
+                showFeedback("Selected subject not found. Check spelling and case.", "error", "data");
                 return;
             }
             
             const dataStr = JSON.stringify(subject, null, 2);
             downloadJSON(dataStr, `${subject.name.replace(/ /g, '_')}_quiz.json`);
-            showAdminFeedback(`Exported subject '${subject.name}'.`, "success");
+            showFeedback(`Exported subject '${subject.name}'.`, "success", "data");
         }
         
         let subjectToImport = null;
@@ -1163,15 +1360,15 @@
                     const existing = quizData.subjects.find(s => s.name === subject.name);
                     
                     if (existing) {
-                        showAdminFeedback(`Subject "<strong>${subject.name}</strong>" already exists. Do you want to overwrite it? <br>
+                        showFeedback(`Subject "<strong>${subject.name}</strong>" already exists. Do you want to overwrite it? <br>
                             <button id="confirm-import-subject" data-subject="${subject.name}" class="bg-orange-600 text-white py-1 px-3 rounded-md text-sm mt-2 mr-2">Yes, Overwrite</button>
                             <button id="cancel-action" class="bg-slate-200 dark:bg-slate-600 text-slate-800 dark:text-slate-200 py-1 px-3 rounded-md text-sm mt-2">Cancel</button>`, 
-                        "warning");
+                        "warning", "data");
                     } else {
                         confirmImportSubject(null, false); // No conflict, add directly
                     }
                 } catch (error) {
-                    showAdminFeedback(`Import failed: ${error.message}`, "error");
+                    showFeedback(`Import failed: ${error.message}`, "error", "data");
                 }
             };
             reader.readAsText(file);
@@ -1189,8 +1386,7 @@
             }
             
             saveData();
-            populateAdminControls();
-            showAdminFeedback(`Subject '${subjectToImport.name}' imported successfully.`, "success");
+            showFeedback(`Subject '${subjectToImport.name}' imported successfully.`, "success", "data");
             subjectToImport = null; // Clear temp
         }
 
@@ -1202,7 +1398,7 @@
             };
             const dataStr = JSON.stringify(backupData, null, 2);
             downloadJSON(dataStr, `study_helper_backup_${new Date().toISOString().split('T')[0]}.json`);
-            showAdminFeedback("Full app backup exported.", "success");
+            showFeedback("Full app backup exported.", "success", "data");
         }
         
         let backupToImport = null;
@@ -1219,13 +1415,13 @@
                     }
                     backupToImport = data; // Store temp
                     
-                    showAdminFeedback(`Are you sure you want to restore from this backup? <strong>This will overwrite ALL current subjects, history, and settings.</strong> <br>
+                    showFeedback(`Are you sure you want to restore from this backup? <strong>This will overwrite ALL current subjects, history, and settings.</strong> <br>
                         <button id="confirm-import-backup" class="bg-red-600 text-white py-1 px-3 rounded-md text-sm mt-2 mr-2">Yes, Overwrite Everything</button>
                         <button id="cancel-action" class="bg-slate-200 dark:bg-slate-600 text-slate-800 dark:text-slate-200 py-1 px-3 rounded-md text-sm mt-2">Cancel</button>`, 
-                    "warning");
+                    "warning", "data");
                     
                 } catch (error) {
-                    showAdminFeedback(`Import failed: ${error.message}`, "error");
+                    showFeedback(`Import failed: ${error.message}`, "error", "data");
                 }
             };
             reader.readAsText(file);
@@ -1235,7 +1431,7 @@
         function confirmImportBackup(confirmed) {
             if (!confirmed || !backupToImport) {
                 backupToImport = null;
-                clearAdminFeedback();
+                clearFeedback("data");
                 return;
             }
             
@@ -1250,9 +1446,26 @@
             localStorage.setItem(SETTINGS_KEY, JSON.stringify(quizSettings));
             
             backupToImport = null;
-            showAdminFeedback("Backup restored successfully! Reloading app...", "success");
+            showFeedback("Backup restored successfully! Reloading app...", "success", "data");
             
             // Reload the app to apply all new data
+            setTimeout(() => {
+                location.reload();
+            }, 1500);
+        }
+
+        function requestResetAllData() {
+            showFeedback(`<strong>DANGER:</strong> Are you sure you want to reset all app data? This will delete ALL subjects, questions, history, and settings. <br>
+                <button id="confirm-reset-all" class="bg-red-600 text-white py-1 px-3 rounded-md text-sm mt-2 mr-2">Yes, Delete Everything</button>
+                <button id="cancel-action" class="bg-slate-200 dark:bg-slate-600 text-slate-800 dark:text-slate-200 py-1 px-3 rounded-md text-sm mt-2">Cancel</button>`, 
+            "warning", "data");
+        }
+
+        function resetAllData() {
+            localStorage.removeItem(DB_KEY);
+            localStorage.removeItem(HISTORY_KEY);
+            localStorage.removeItem(SETTINGS_KEY);
+            showFeedback("All data has been reset. Reloading app...", "success", "data");
             setTimeout(() => {
                 location.reload();
             }, 1500);
@@ -1275,24 +1488,19 @@
 
         // --- Feedback Functions ---
         
-        function showAdminFeedback(message, type, screen = adminScreen) {
-            const feedbackEl = (screen === adminScreen) ? adminFeedback : document.getElementById('admin-feedback-history'); // Assume history has one
-            if (screen === historyScreen) {
-                // Special case for history screen, use its feedback el
-                // This requires adding an <div id="admin-feedback-history">...</div> to history screen
-                // For now, let's just use the main admin one, but on the history screen
-                // Re-using adminFeedback, but it's on a different screen...
-                // Let's create a temp feedback on history screen if it doesn't exist
-                let historyFeedback = document.getElementById('history-feedback');
-                if (!historyFeedback) {
-                    historyFeedback = document.createElement('div');
-                    historyFeedback.id = 'history-feedback';
-                    historyFeedback.className = 'text-center font-medium min-h-[2em] mb-4 p-3 rounded-lg';
-                    clearHistoryBtn.before(historyFeedback);
-                }
-                feedbackEl = historyFeedback;
+        function showFeedback(message, type, location = "admin") {
+            let feedbackEl;
+            switch(location) {
+                case "history":
+                    feedbackEl = historyFeedback;
+                    break;
+                case "data":
+                    feedbackEl = dataFeedback;
+                    break;
+                case "admin":
+                default:
+                    feedbackEl = adminFeedback;
             }
-            
             
             feedbackEl.innerHTML = message;
             feedbackEl.classList.remove('text-green-600', 'text-red-600', 'text-yellow-700', 'bg-red-100', 'bg-green-100', 'bg-yellow-100', 'dark:bg-red-900/50', 'dark:bg-green-900/50', 'dark:bg-yellow-900/50');
@@ -1306,15 +1514,29 @@
             }
         }
         
-        function clearAdminFeedback(screen = adminScreen) {
-            let feedbackEl = adminFeedback;
-             if (screen === historyScreen) {
-                 feedbackEl = document.getElementById('history-feedback');
-             }
+        function clearFeedback(location = "admin") {
+            let feedbackEl;
+            switch(location) {
+                case "history":
+                    feedbackEl = historyFeedback;
+                    break;
+                case "data":
+                    feedbackEl = dataFeedback;
+                    break;
+                case "admin":
+                default:
+                    feedbackEl = adminFeedback;
+            }
              if (feedbackEl) {
                  feedbackEl.innerHTML = '';
                  feedbackEl.className = 'text-center font-medium min-h-[2em] mb-4 p-3 rounded-lg';
              }
+        }
+
+        function clearAllFeedback() {
+            clearFeedback("admin");
+            clearFeedback("history");
+            clearFeedback("data");
         }
 
         // --- Quiz Logic ---
@@ -1330,20 +1552,24 @@
             }
 
             // Get settings
-            const questionCountValue = quizSettings.count;
-            timePerQuestion = quizSettings.timeLimit;
-            isTimerVisible = quizSettings.showTimer;
+            const { count, timeLimit, showTimer } = getQuizSettings();
+            
+            if (count !== 'all' && subject.questions.length < count) {
+                alert(`This subject only has ${subject.questions.length} questions. You can't start a quiz with ${count} questions.`);
+                return;
+            }
 
+            isTimerVisible = showTimer;
+            timePerQuestion = timeLimit;
             currentSubjectName = subjectName;
             
             let allSubjectQuestions = [...subject.questions];
             shuffleArray(allSubjectQuestions);
             
-            if (questionCountValue === 'all') {
+            if (count === 'all') {
                 currentQuestions = allSubjectQuestions;
             } else {
-                let count = parseInt(questionCountValue);
-                currentQuestions = allSubjectQuestions.slice(0, Math.min(count, allSubjectQuestions.length));
+                currentQuestions = allSubjectQuestions.slice(0, count);
             }
             
             if (currentQuestions.length === 0) {
@@ -1359,14 +1585,61 @@
             scoreDisplay.textContent = `Score: 0`;
             feedbackMessage.textContent = '';
             
-            // Setup timer
-            if (timePerQuestion === 'unlimited') {
-                timeElapsed = 0;
-            } else {
-                timeRemaining = currentQuestions.length * parseInt(timePerQuestion);
-            }
             startTimer();
+            timerDisplay.classList.toggle('hidden', !isTimerVisible);
+
+            showScreen(quizScreen);
+            showQuestion();
+            updateProgressBar();
+        }
+
+        function checkRandomQuizButton() {
+            const allQuestions = quizData.subjects.flatMap(s => s.questions);
+            if (allQuestions.length === 0) {
+                randomQuizBtn.disabled = true;
+                randomQuizBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                randomQuizBtn.title = "Add some questions to any subject to enable Random Quiz";
+            } else {
+                randomQuizBtn.disabled = false;
+                randomQuizBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                randomQuizBtn.title = "";
+            }
+        }
+        
+        function startRandomQuiz() {
+            const { count, timeLimit, showTimer } = getQuizSettings();
+            const allQuestions = quizData.subjects.flatMap(s => s.questions);
+
+            if (allQuestions.length === 0) {
+                alert("You don't have any questions in your bank! Add some first.");
+                return;
+            }
+            if (count !== 'all' && allQuestions.length < count) {
+                alert(`You only have ${allQuestions.length} questions in total. You can't start a quiz with ${count} questions.`);
+                return;
+            }
             
+            isTimerVisible = showTimer;
+            timePerQuestion = timeLimit;
+            currentSubjectName = "Random Quiz";
+
+            shuffleArray(allQuestions);
+
+            if (count === 'all') {
+                currentQuestions = allQuestions;
+            } else {
+                currentQuestions = allQuestions.slice(0, count);
+            }
+
+            // Reset state
+            currentQuestionIndex = 0;
+            score = 0;
+            userAnswers = [];
+            answerTimes = [];
+            scoreDisplay.textContent = `Score: 0`;
+            feedbackMessage.textContent = '';
+            
+            startTimer();
             timerDisplay.classList.toggle('hidden', !isTimerVisible);
 
             showScreen(quizScreen);
@@ -1406,6 +1679,9 @@
          * Handles the click of an answer option
          */
         function handleOptionClick(event) {
+            // Stop the timer for this question
+            clearInterval(timerInterval);
+            
             const timeTaken = (Date.now() - questionStartTime) / 1000; // in seconds
             answerTimes.push(timeTaken);
             
@@ -1446,6 +1722,11 @@
          * Moves to the next question or ends the quiz
          */
         function nextQuestion() {
+            // Restart timer for next question
+            if (timePerQuestion !== 'unlimited') {
+                startTimer();
+            }
+            
             currentQuestionIndex++;
             if (currentQuestionIndex < currentQuestions.length) {
                 showQuestion();
@@ -1458,29 +1739,41 @@
         /**
          * Ends the quiz and displays the results
          */
-        function endQuiz() {
+        function endQuiz(wasQuit = false) {
             clearInterval(timerInterval);
 
             const total = currentQuestions.length;
             const percent = total > 0 ? (score / total * 100) : 0;
             
-            finalScore.textContent = `${score} / ${total}`;
-            percentageDisplay.textContent = `${percent.toFixed(1)}%`;
+            // Don't save history if user quit with 0 answers
+            if (wasQuit && userAnswers.length === 0) {
+                showScreen(startScreen);
+                return;
+            }
 
-            // Save score to localStorage
-            const scoreString = `${score} / ${total}`;
-            localStorage.setItem('lastQuizScore', scoreString);
+            finalScore.textContent = `${score} / ${userAnswers.length}`; // Score based on answered
+            percentageDisplay.textContent = `${userAnswers.length > 0 ? (score / userAnswers.length * 100).toFixed(1) : 0}%`;
+
+            if (wasQuit) {
+                document.getElementById('results-summary-container').querySelector('h3').textContent = `Review (Quiz Incomplete):`;
+            } else {
+                document.getElementById('results-summary-container').querySelector('h3').textContent = `Review Your Answers:`;
+            }
             
             // Save to history
             const historyEntry = {
                 id: Date.now(),
                 subjectName: currentSubjectName,
                 score: score,
-                totalQuestions: total,
+                totalQuestions: userAnswers.length, // Only log answered questions
                 date: new Date().toISOString()
             };
-            quizHistory.push(historyEntry);
-            saveHistory();
+            
+            // Only save if at least one question was answered
+            if (userAnswers.length > 0) {
+                quizHistory.push(historyEntry);
+                saveHistory();
+            }
 
             // Show performance stats
             showPerformanceStats();
@@ -1524,6 +1817,7 @@
             if (quizHistory.length > 0) {
                 const subjectStats = {}; // { subjectName: { score: 0, total: 0 } }
                 quizHistory.forEach(entry => {
+                    if (entry.subjectName === 'Random Quiz') return; // Ignore random quizzes
                     if (!subjectStats[entry.subjectName]) {
                         subjectStats[entry.subjectName] = { score: 0, total: 0 };
                     }
@@ -1536,10 +1830,12 @@
                 
                 Object.keys(subjectStats).forEach(subjectName => {
                     const stats = subjectStats[subjectName];
-                    const avg = stats.total > 0 ? (stats.score / stats.total) : 0;
-                    if (avg > bestAvg) {
-                        bestAvg = avg;
-                        bestSubject = subjectName;
+                    if (stats.total >= 5) { // Min 5 questions answered
+                        const avg = stats.total > 0 ? (stats.score / stats.total) : 0;
+                        if (avg > bestAvg) {
+                            bestAvg = avg;
+                            bestSubject = subjectName;
+                        }
                     }
                 });
                 strongestSubject.textContent = bestSubject;
@@ -1575,7 +1871,6 @@
          */
         function restartQuiz() {
             progressBarInner.style.width = '0%';
-            updateLastScore();
             showScreen(startScreen);
         }
 
@@ -1595,18 +1890,49 @@
                 }, 1000);
             } else {
                 // Count down
-                timeRemaining = currentQuestions.length * parseInt(timePerQuestion);
+                timeRemaining = timePerQuestion; // Time per question
                 timerDisplay.textContent = `Time: ${formatTime(timeRemaining)}`;
                 timerInterval = setInterval(() => {
                     timeRemaining--;
                     timerDisplay.textContent = `Time: ${formatTime(timeRemaining)}`;
                     if (timeRemaining <= 0) {
-                        clearInterval(timerInterval);
-                        endQuiz();
+                        // Time's up for this question!
+                        handleTimeUp();
                     }
                 }, 1000);
             }
         }
+        
+        /**
+         * Handle when timer runs out for a question
+         */
+        function handleTimeUp() {
+            clearInterval(timerInterval); // Stop this question's timer
+            
+            answerTimes.push(timePerQuestion); // Log max time
+            const correctAnswer = currentQuestions[currentQuestionIndex].answer;
+
+            Array.from(optionsContainer.children).forEach(btn => {
+                btn.disabled = true;
+                if (btn.dataset.answer === correctAnswer) {
+                    btn.classList.add('correct');
+                }
+            });
+
+            feedbackMessage.textContent = `Time's up! The correct answer was: ${correctAnswer}`;
+            feedbackMessage.classList.add('text-red-600', 'dark:text-red-400');
+            feedbackMessage.classList.remove('text-green-600', 'dark:text-green-400');
+            
+            userAnswers.push({
+                question: currentQuestions[currentQuestionIndex].question,
+                chosen: "Time's up",
+                correct: correctAnswer
+            });
+
+            scoreDisplay.textContent = `Score: ${score}`; // Score doesn't change
+            nextBtn.classList.remove('hidden');
+        }
+
 
         /**
          * Formats seconds into MM:SS format
@@ -1621,7 +1947,7 @@
          * Updates the visual progress bar
          */
         function updateProgressBar() {
-            const progress = (currentQuestionIndex / currentQuestions.length) * 100;
+            const progress = ((currentQuestionIndex + 1) / currentQuestions.length) * 100;
             progressBarInner.style.width = `${progress}%`;
         }
 
@@ -1641,5 +1967,4 @@
     </script>
 </body>
 </html>
-
 
