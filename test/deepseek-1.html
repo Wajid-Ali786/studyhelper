@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Study Helper</title>
+    <title>Study Helper - Your Personal Study Companion</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -23,6 +23,16 @@
             from { opacity: 0; }
             to { opacity: 1; }
         }
+        .nav-link.active {
+            background-color: rgb(224 231 255);
+            color: rgb(79 70 229);
+            border-right: 3px solid rgb(79 70 229);
+        }
+        .dark .nav-link.active {
+            background-color: rgb(55 65 81);
+            color: rgb(165 180 252);
+            border-right: 3px solid rgb(165 180 252);
+        }
     </style>
 </head>
 <body class="bg-gray-50 dark:bg-gray-900">
@@ -32,14 +42,14 @@
     <!-- Main Layout -->
     <div class="flex h-screen">
         <!-- Sidebar -->
-        <div id="sidebar" class="sidebar-transition bg-white dark:bg-gray-800 shadow-lg w-64 flex flex-col">
+        <div id="sidebar" class="sidebar-transition bg-white dark:bg-gray-800 shadow-lg w-64 flex flex-col md:translate-x-0 -translate-x-full fixed md:relative z-30 h-full">
             <!-- App Header -->
             <div class="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
                 <div class="flex items-center">
                     <i class="fas fa-graduation-cap text-indigo-600 dark:text-indigo-400 text-xl mr-2"></i>
                     <span class="text-lg font-bold text-gray-800 dark:text-white">Study Helper</span>
                 </div>
-                <button id="sidebar-toggle" class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200">
+                <button id="sidebar-toggle" class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 md:hidden">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
@@ -48,32 +58,32 @@
             <nav class="flex-1 p-4">
                 <ul class="space-y-2">
                     <li>
-                        <a href="#" data-page="dashboard" class="nav-link active">
-                            <i class="fas fa-home mr-3"></i>
+                        <a href="#" data-page="dashboard" class="nav-link active flex items-center p-3 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition duration-200">
+                            <i class="fas fa-home mr-3 w-5 text-center"></i>
                             <span>Dashboard</span>
                         </a>
                     </li>
                     <li>
-                        <a href="#" data-page="manage" class="nav-link">
-                            <i class="fas fa-book mr-3"></i>
+                        <a href="#" data-page="manage" class="nav-link flex items-center p-3 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition duration-200">
+                            <i class="fas fa-book mr-3 w-5 text-center"></i>
                             <span>Manage Question Bank</span>
                         </a>
                     </li>
                     <li>
-                        <a href="#" data-page="quiz" class="nav-link">
-                            <i class="fas fa-puzzle-piece mr-3"></i>
+                        <a href="#" data-page="quiz" class="nav-link flex items-center p-3 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition duration-200">
+                            <i class="fas fa-puzzle-piece mr-3 w-5 text-center"></i>
                             <span>Take Quiz</span>
                         </a>
                     </li>
                     <li>
-                        <a href="#" data-page="history" class="nav-link">
-                            <i class="fas fa-chart-bar mr-3"></i>
+                        <a href="#" data-page="history" class="nav-link flex items-center p-3 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition duration-200">
+                            <i class="fas fa-chart-bar mr-3 w-5 text-center"></i>
                             <span>Quiz History</span>
                         </a>
                     </li>
                     <li>
-                        <a href="#" data-page="settings" class="nav-link">
-                            <i class="fas fa-cog mr-3"></i>
+                        <a href="#" data-page="settings" class="nav-link flex items-center p-3 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition duration-200">
+                            <i class="fas fa-cog mr-3 w-5 text-center"></i>
                             <span>Settings</span>
                         </a>
                     </li>
@@ -93,7 +103,7 @@
         </div>
         
         <!-- Mobile Header -->
-        <div id="mobile-header" class="md:hidden bg-white dark:bg-gray-800 shadow-md p-4 flex items-center justify-between">
+        <div id="mobile-header" class="md:hidden bg-white dark:bg-gray-800 shadow-md p-4 flex items-center justify-between w-full fixed z-20">
             <div class="flex items-center">
                 <i class="fas fa-graduation-cap text-indigo-600 dark:text-indigo-400 text-xl mr-2"></i>
                 <span class="text-lg font-bold text-gray-800 dark:text-white">Study Helper</span>
@@ -104,7 +114,7 @@
         </div>
         
         <!-- Main Content -->
-        <div id="main-content" class="flex-1 flex flex-col overflow-hidden md:ml-0 sidebar-transition">
+        <div id="main-content" class="flex-1 flex flex-col overflow-hidden md:ml-0 sidebar-transition pt-16 md:pt-0">
             <!-- Page Content -->
             <div class="flex-1 overflow-auto p-4 md:p-6">
                 <!-- Dashboard Page -->
@@ -458,6 +468,16 @@
             elements.importData.addEventListener('click', () => elements.importFile.click());
             elements.importFile.addEventListener('change', importData);
             elements.clearData.addEventListener('click', clearAllData);
+            
+            // Close sidebar when clicking outside on mobile
+            document.addEventListener('click', (e) => {
+                if (window.innerWidth < 768 && 
+                    !elements.sidebar.contains(e.target) && 
+                    !elements.mobileSidebarToggle.contains(e.target) &&
+                    !elements.sidebar.classList.contains('-translate-x-full')) {
+                    elements.sidebar.classList.add('-translate-x-full');
+                }
+            });
         }
 
         // Toggle sidebar visibility
@@ -467,11 +487,17 @@
                 if (elements.sidebar.classList.contains('w-64')) {
                     elements.sidebar.classList.remove('w-64');
                     elements.sidebar.classList.add('w-16');
-                    elements.mainContent.classList.add('md:ml-0');
+                    // Update nav links to show only icons
+                    document.querySelectorAll('.nav-link span').forEach(span => {
+                        span.classList.add('hidden');
+                    });
                 } else {
                     elements.sidebar.classList.remove('w-16');
                     elements.sidebar.classList.add('w-64');
-                    elements.mainContent.classList.remove('md:ml-0');
+                    // Update nav links to show text
+                    document.querySelectorAll('.nav-link span').forEach(span => {
+                        span.classList.remove('hidden');
+                    });
                 }
             } else {
                 // Mobile: toggle translation
