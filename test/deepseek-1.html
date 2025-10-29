@@ -1,1506 +1,1176 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Study Helper Quiz</title>
-    <!-- Tailwind CSS -->
+    <title>Study Helper</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        primary: {
-                            50: '#f0f9ff',
-                            100: '#e0f2fe',
-                            200: '#bae6fd',
-                            300: '#7dd3fc',
-                            400: '#38bdf8',
-                            500: '#0ea5e9',
-                            600: '#0284c7',
-                            700: '#0369a1',
-                            800: '#075985',
-                            900: '#0c4a6e',
-                        }
-                    }
-                }
-            }
-        }
-    </script>
     <style>
-        /* Smooth transitions */
-        .page {
-            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+        .sidebar-transition {
+            transition: all 0.3s ease;
         }
-        .page.hidden {
-            opacity: 0;
-            transform: translateX(20px);
+        .page-transition {
+            transition: opacity 0.3s ease;
         }
-        .page.active {
-            opacity: 1;
-            transform: translateX(0);
+        .toast-transition {
+            transition: all 0.3s ease;
         }
-        
-        /* Custom scrollbar */
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 6px;
+        .fade-in {
+            animation: fadeIn 0.5s;
         }
-        .custom-scrollbar::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 10px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #c5c5c5;
-            border-radius: 10px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: #a8a8a8;
-        }
-        
-        /* Dark mode scrollbar */
-        .dark .custom-scrollbar::-webkit-scrollbar-track {
-            background: #374151;
-        }
-        .dark .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #6b7280;
-        }
-        .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: #9ca3af;
-        }
-        
-        /* Toast notification */
-        .toast {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 12px 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            z-index: 1000;
-            transform: translateX(150%);
-            transition: transform 0.3s ease-in-out;
-        }
-        .toast.show {
-            transform: translateX(0);
-        }
-        
-        /* Progress bar animation */
-        .progress-bar {
-            transition: width 0.3s ease-in-out;
-        }
-        
-        /* Answer animation */
-        .answer-option {
-            transition: all 0.2s ease-in-out;
-        }
-        
-        /* Timer animation */
-        .timer-pulse {
-            animation: pulse 1s infinite;
-        }
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.7; }
-            100% { opacity: 1; }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
     </style>
 </head>
-<body class="h-full bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
-    <!-- Toast Notification -->
-    <div id="toast" class="toast bg-white dark:bg-gray-800 text-gray-800 dark:text-white"></div>
-
-    <!-- App Container -->
-    <div class="min-h-full flex flex-col">
-        <!-- Header -->
-        <header class="bg-white dark:bg-gray-800 shadow-sm py-4 px-6">
-            <div class="container mx-auto flex justify-between items-center">
-                <div class="flex items-center space-x-2">
-                    <i class="fas fa-graduation-cap text-primary-600 dark:text-primary-400 text-2xl"></i>
-                    <h1 class="text-xl font-bold text-gray-800 dark:text-white">Study Helper Quiz</h1>
+<body class="bg-gray-50 dark:bg-gray-900">
+    <!-- Toast Container -->
+    <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
+    
+    <!-- Main Layout -->
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <div id="sidebar" class="sidebar-transition bg-white dark:bg-gray-800 shadow-lg w-64 flex flex-col">
+            <!-- App Header -->
+            <div class="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+                <div class="flex items-center">
+                    <i class="fas fa-graduation-cap text-indigo-600 dark:text-indigo-400 text-xl mr-2"></i>
+                    <span class="text-lg font-bold text-gray-800 dark:text-white">Study Helper</span>
                 </div>
-                <div class="flex items-center space-x-4">
-                    <button id="darkModeToggle" class="p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white">
-                        <i class="fas fa-moon"></i>
-                    </button>
-                    <button id="helpBtn" class="p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white">
-                        <i class="fas fa-question"></i>
-                    </button>
+                <button id="sidebar-toggle" class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <!-- Navigation Links -->
+            <nav class="flex-1 p-4">
+                <ul class="space-y-2">
+                    <li>
+                        <a href="#" data-page="dashboard" class="nav-link active">
+                            <i class="fas fa-home mr-3"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" data-page="manage" class="nav-link">
+                            <i class="fas fa-book mr-3"></i>
+                            <span>Manage Question Bank</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" data-page="quiz" class="nav-link">
+                            <i class="fas fa-puzzle-piece mr-3"></i>
+                            <span>Take Quiz</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" data-page="history" class="nav-link">
+                            <i class="fas fa-chart-bar mr-3"></i>
+                            <span>Quiz History</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" data-page="settings" class="nav-link">
+                            <i class="fas fa-cog mr-3"></i>
+                            <span>Settings</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            
+            <!-- Footer with Theme Toggle -->
+            <div class="p-4 border-t border-gray-200 dark:border-gray-700">
+                <div class="flex items-center justify-between">
+                    <span class="text-sm text-gray-600 dark:text-gray-400">Dark Mode</span>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="theme-toggle" class="sr-only peer">
+                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 dark:peer-focus:ring-indigo-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-indigo-600"></div>
+                    </label>
                 </div>
             </div>
-        </header>
-
+        </div>
+        
+        <!-- Mobile Header -->
+        <div id="mobile-header" class="md:hidden bg-white dark:bg-gray-800 shadow-md p-4 flex items-center justify-between">
+            <div class="flex items-center">
+                <i class="fas fa-graduation-cap text-indigo-600 dark:text-indigo-400 text-xl mr-2"></i>
+                <span class="text-lg font-bold text-gray-800 dark:text-white">Study Helper</span>
+            </div>
+            <button id="mobile-sidebar-toggle" class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        
         <!-- Main Content -->
-        <main class="flex-1 container mx-auto py-6 px-4">
-            <!-- Dashboard Page -->
-            <div id="dashboardPage" class="page active">
-                <div class="mb-8">
-                    <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-2">Dashboard</h2>
-                    <p class="text-gray-600 dark:text-gray-400">Welcome to your Study Helper! Manage your subjects and start quizzing.</p>
-                </div>
-                
-                <!-- Quick Actions -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-                    <button id="startQuizBtn" class="bg-primary-500 hover:bg-primary-600 text-white p-4 rounded-lg shadow-md flex items-center justify-center space-x-2 transition-all duration-200">
-                        <i class="fas fa-play-circle text-xl"></i>
-                        <span class="font-medium">Start Quiz</span>
-                    </button>
-                    <button id="manageQuestionBankBtn" class="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-800 dark:text-white p-4 rounded-lg shadow-md flex items-center justify-center space-x-2 transition-all duration-200 border border-gray-200 dark:border-gray-700">
-                        <i class="fas fa-book text-xl"></i>
-                        <span class="font-medium">Manage Question Bank</span>
-                    </button>
-                    <button id="importExportBtn" class="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-800 dark:text-white p-4 rounded-lg shadow-md flex items-center justify-center space-x-2 transition-all duration-200 border border-gray-200 dark:border-gray-700">
-                        <i class="fas fa-file-export text-xl"></i>
-                        <span class="font-medium">Import/Export Data</span>
-                    </button>
-                </div>
-                
-                <!-- Subject Cards -->
-                <div class="mb-6 flex justify-between items-center">
-                    <h3 class="text-xl font-semibold text-gray-800 dark:text-white">Your Subjects</h3>
-                    <button id="addSubjectBtn" class="bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-all duration-200">
-                        <i class="fas fa-plus"></i>
-                        <span>Add Subject</span>
-                    </button>
-                </div>
-                
-                <div id="subjectCards" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <!-- Subject cards will be dynamically inserted here -->
-                </div>
-                
-                <!-- Empty state -->
-                <div id="emptySubjects" class="text-center py-12 hidden">
-                    <i class="fas fa-book-open text-5xl text-gray-300 dark:text-gray-600 mb-4"></i>
-                    <h3 class="text-xl font-medium text-gray-500 dark:text-gray-400 mb-2">No subjects yet</h3>
-                    <p class="text-gray-400 dark:text-gray-500 mb-4">Get started by adding your first subject!</p>
-                    <button id="emptyAddSubjectBtn" class="bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-all duration-200 mx-auto">
-                        <i class="fas fa-plus"></i>
-                        <span>Add Subject</span>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Quiz Setup Page -->
-            <div id="quizSetupPage" class="page hidden">
-                <div class="mb-6">
-                    <button id="backToDashboardFromQuizSetup" class="text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-200 flex items-center space-x-2 mb-4 transition-colors duration-200">
-                        <i class="fas fa-arrow-left"></i>
-                        <span>Back to Dashboard</span>
-                    </button>
-                    <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Quiz Setup</h2>
-                </div>
-                
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 max-w-2xl mx-auto">
-                    <div class="mb-6">
-                        <label class="block text-gray-700 dark:text-gray-300 font-medium mb-2">Select Subject</label>
-                        <select id="quizSubjectSelect" class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent">
-                            <option value="">Select a subject</option>
-                        </select>
-                    </div>
-                    
-                    <div class="mb-6">
-                        <label class="block text-gray-700 dark:text-gray-300 font-medium mb-2">Time Limit Per Question</label>
-                        <select id="timeLimitSelect" class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent">
-                            <option value="0">Unlimited</option>
-                            <option value="10">10 seconds</option>
-                            <option value="20">20 seconds</option>
-                            <option value="30">30 seconds</option>
-                        </select>
-                    </div>
-                    
-                    <div class="mb-6">
-                        <label class="flex items-center space-x-2">
-                            <input type="checkbox" id="showTimerCheckbox" class="rounded text-primary-600 focus:ring-primary-500">
-                            <span class="text-gray-700 dark:text-gray-300">Show timer during quiz</span>
-                        </label>
-                    </div>
-                    
-                    <div class="flex space-x-4">
-                        <button id="startRandomQuizBtn" class="flex-1 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-800 dark:text-white py-3 rounded-lg transition-all duration-200 flex items-center justify-center space-x-2">
-                            <i class="fas fa-random"></i>
-                            <span>Start Random Quiz</span>
-                        </button>
-                        <button id="startQuizWithSettingsBtn" class="flex-1 bg-primary-500 hover:bg-primary-600 text-white py-3 rounded-lg transition-all duration-200 flex items-center justify-center space-x-2">
-                            <i class="fas fa-play"></i>
-                            <span>Start Quiz</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Quiz Page -->
-            <div id="quizPage" class="page hidden">
-                <div class="mb-6">
-                    <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Quiz</h2>
-                    <div class="flex justify-between items-center mt-2">
-                        <span id="quizSubjectName" class="text-gray-600 dark:text-gray-400"></span>
-                        <span id="quizProgress" class="text-gray-600 dark:text-gray-400"></span>
-                    </div>
-                </div>
-                
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 max-w-3xl mx-auto">
-                    <!-- Progress Bar -->
-                    <div class="mb-6">
-                        <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
-                            <div id="quizProgressBar" class="bg-primary-600 h-2.5 rounded-full progress-bar" style="width: 0%"></div>
+        <div id="main-content" class="flex-1 flex flex-col overflow-hidden md:ml-0 sidebar-transition">
+            <!-- Page Content -->
+            <div class="flex-1 overflow-auto p-4 md:p-6">
+                <!-- Dashboard Page -->
+                <div id="dashboard-page" class="page-content active fade-in">
+                    <h1 class="text-2xl font-bold text-gray-800 dark:text-white mb-6">Dashboard</h1>
+                    <div id="welcome-message" class="hidden bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
+                        <div class="text-center">
+                            <i class="fas fa-book-open text-5xl text-indigo-600 dark:text-indigo-400 mb-4"></i>
+                            <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-2">Welcome to Study Helper!</h2>
+                            <p class="text-gray-600 dark:text-gray-300 mb-4">Get started by adding your first subject and questions.</p>
+                            <button id="get-started-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg transition duration-200">
+                                Get Started
+                            </button>
                         </div>
                     </div>
-                    
-                    <!-- Timer -->
-                    <div id="quizTimerContainer" class="mb-6 text-center hidden">
-                        <div class="inline-flex items-center space-x-2 bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200 px-4 py-2 rounded-full">
-                            <i class="fas fa-clock"></i>
-                            <span id="quizTimer" class="font-bold">30</span>
-                        </div>
-                    </div>
-                    
-                    <!-- Question -->
-                    <div class="mb-8">
-                        <h3 id="quizQuestion" class="text-xl font-medium text-gray-800 dark:text-white mb-6"></h3>
-                        
-                        <div id="quizOptions" class="space-y-3">
-                            <!-- Options will be dynamically inserted here -->
-                        </div>
-                    </div>
-                    
-                    <!-- Navigation -->
-                    <div class="flex justify-between">
-                        <button id="prevQuestionBtn" class="bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-800 dark:text-white px-6 py-3 rounded-lg transition-all duration-200 flex items-center space-x-2">
-                            <i class="fas fa-arrow-left"></i>
-                            <span>Previous</span>
-                        </button>
-                        
-                        <button id="nextQuestionBtn" class="bg-primary-500 hover:bg-primary-600 text-white px-6 py-3 rounded-lg transition-all duration-200 flex items-center space-x-2">
-                            <span>Next</span>
-                            <i class="fas fa-arrow-right"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Quiz Results Page -->
-            <div id="quizResultsPage" class="page hidden">
-                <div class="mb-6">
-                    <button id="backToDashboardFromResults" class="text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-200 flex items-center space-x-2 mb-4 transition-colors duration-200">
-                        <i class="fas fa-arrow-left"></i>
-                        <span>Back to Dashboard</span>
-                    </button>
-                    <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Quiz Results</h2>
-                </div>
-                
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 max-w-2xl mx-auto">
-                    <div class="text-center mb-8">
-                        <div class="inline-flex items-center justify-center w-24 h-24 rounded-full bg-primary-100 dark:bg-primary-900 text-primary-600 dark:text-primary-400 mb-4">
-                            <i class="fas fa-trophy text-4xl"></i>
-                        </div>
-                        <h3 id="resultsTitle" class="text-2xl font-bold text-gray-800 dark:text-white mb-2">Great Job!</h3>
-                        <p id="resultsScore" class="text-gray-600 dark:text-gray-400 text-lg">You scored 8 out of 10</p>
-                    </div>
-                    
-                    <div class="grid grid-cols-2 gap-4 mb-8">
-                        <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg text-center">
-                            <p class="text-gray-500 dark:text-gray-400 text-sm">Correct Answers</p>
-                            <p id="correctAnswersCount" class="text-2xl font-bold text-green-600 dark:text-green-400">8</p>
-                        </div>
-                        <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg text-center">
-                            <p class="text-gray-500 dark:text-gray-400 text-sm">Incorrect Answers</p>
-                            <p id="incorrectAnswersCount" class="text-2xl font-bold text-red-600 dark:text-red-400">2</p>
-                        </div>
-                    </div>
-                    
-                    <div class="flex space-x-4">
-                        <button id="reviewQuizBtn" class="flex-1 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-800 dark:text-white py-3 rounded-lg transition-all duration-200 flex items-center justify-center space-x-2">
-                            <i class="fas fa-list"></i>
-                            <span>Review Answers</span>
-                        </button>
-                        <button id="newQuizBtn" class="flex-1 bg-primary-500 hover:bg-primary-600 text-white py-3 rounded-lg transition-all duration-200 flex items-center justify-center space-x-2">
-                            <i class="fas fa-redo"></i>
-                            <span>New Quiz</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Manage Subjects Page -->
-            <div id="manageSubjectsPage" class="page hidden">
-                <div class="mb-6">
-                    <button id="backToDashboardFromManage" class="text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-200 flex items-center space-x-2 mb-4 transition-colors duration-200">
-                        <i class="fas fa-arrow-left"></i>
-                        <span>Back to Dashboard</span>
-                    </button>
-                    <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Manage Subjects</h2>
-                </div>
-                
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-                    <div class="mb-6 flex justify-between items-center">
-                        <h3 class="text-xl font-semibold text-gray-800 dark:text-white">All Subjects</h3>
-                        <button id="addSubjectFromManageBtn" class="bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-all duration-200">
-                            <i class="fas fa-plus"></i>
-                            <span>Add Subject</span>
-                        </button>
-                    </div>
-                    
-                    <div id="subjectsList" class="space-y-4">
-                        <!-- Subjects list will be dynamically inserted here -->
-                    </div>
-                    
-                    <!-- Empty state -->
-                    <div id="emptyManageSubjects" class="text-center py-12 hidden">
-                        <i class="fas fa-book-open text-5xl text-gray-300 dark:text-gray-600 mb-4"></i>
-                        <h3 class="text-xl font-medium text-gray-500 dark:text-gray-400 mb-2">No subjects yet</h3>
-                        <p class="text-gray-400 dark:text-gray-500 mb-4">Get started by adding your first subject!</p>
-                        <button id="emptyManageAddSubjectBtn" class="bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-all duration-200 mx-auto">
-                            <i class="fas fa-plus"></i>
-                            <span>Add Subject</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Manage Questions Page -->
-            <div id="manageQuestionsPage" class="page hidden">
-                <div class="mb-6">
-                    <button id="backToManageSubjects" class="text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-200 flex items-center space-x-2 mb-4 transition-colors duration-200">
-                        <i class="fas fa-arrow-left"></i>
-                        <span>Back to Subjects</span>
-                    </button>
-                    <h2 id="manageQuestionsTitle" class="text-2xl font-bold text-gray-800 dark:text-white">Manage Questions</h2>
-                </div>
-                
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-                    <div class="mb-6 flex justify-between items-center">
-                        <h3 id="questionsSubjectTitle" class="text-xl font-semibold text-gray-800 dark:text-white">Questions for Subject</h3>
-                        <button id="addQuestionBtn" class="bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-all duration-200">
-                            <i class="fas fa-plus"></i>
-                            <span>Add Question</span>
-                        </button>
-                    </div>
-                    
-                    <div id="questionsList" class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                            <thead class="bg-gray-50 dark:bg-gray-700">
-                                <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Question</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Options</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Correct Answer</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="questionsTableBody" class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                                <!-- Questions will be dynamically inserted here -->
-                            </tbody>
-                        </table>
-                    </div>
-                    
-                    <!-- Empty state -->
-                    <div id="emptyQuestions" class="text-center py-12 hidden">
-                        <i class="fas fa-question-circle text-5xl text-gray-300 dark:text-gray-600 mb-4"></i>
-                        <h3 class="text-xl font-medium text-gray-500 dark:text-gray-400 mb-2">No questions yet</h3>
-                        <p class="text-gray-400 dark:text-gray-500 mb-4">Get started by adding your first question!</p>
-                        <button id="emptyAddQuestionBtn" class="bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-all duration-200 mx-auto">
-                            <i class="fas fa-plus"></i>
-                            <span>Add Question</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Import/Export Page -->
-            <div id="importExportPage" class="page hidden">
-                <div class="mb-6">
-                    <button id="backToDashboardFromImportExport" class="text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-200 flex items-center space-x-2 mb-4 transition-colors duration-200">
-                        <i class="fas fa-arrow-left"></i>
-                        <span>Back to Dashboard</span>
-                    </button>
-                    <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Import/Export Data</h2>
-                </div>
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- Export Section -->
-                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-                        <div class="flex items-center space-x-3 mb-4">
-                            <div class="p-3 bg-green-100 dark:bg-green-900 rounded-full">
-                                <i class="fas fa-file-export text-green-600 dark:text-green-400"></i>
+                    <div id="dashboard-content" class="hidden">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4">
+                                <div class="flex items-center">
+                                    <div class="p-3 rounded-lg bg-indigo-100 dark:bg-indigo-900 text-indigo-600 dark:text-indigo-400 mr-4">
+                                        <i class="fas fa-book text-xl"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-gray-600 dark:text-gray-400">Subjects</p>
+                                        <h3 id="subjects-count" class="text-xl font-bold text-gray-800 dark:text-white">0</h3>
+                                    </div>
+                                </div>
                             </div>
-                            <h3 class="text-xl font-semibold text-gray-800 dark:text-white">Export Data</h3>
-                        </div>
-                        <p class="text-gray-600 dark:text-gray-400 mb-6">Download all your subjects and questions as a JSON file for backup or transfer.</p>
-                        <button id="exportDataBtn" class="w-full bg-green-500 hover:bg-green-600 text-white py-3 rounded-lg transition-all duration-200 flex items-center justify-center space-x-2">
-                            <i class="fas fa-download"></i>
-                            <span>Export Data</span>
-                        </button>
-                    </div>
-                    
-                    <!-- Import Section -->
-                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-                        <div class="flex items-center space-x-3 mb-4">
-                            <div class="p-3 bg-blue-100 dark:bg-blue-900 rounded-full">
-                                <i class="fas fa-file-import text-blue-600 dark:text-blue-400"></i>
+                            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4">
+                                <div class="flex items-center">
+                                    <div class="p-3 rounded-lg bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-400 mr-4">
+                                        <i class="fas fa-question text-xl"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-gray-600 dark:text-gray-400">Questions</p>
+                                        <h3 id="questions-count" class="text-xl font-bold text-gray-800 dark:text-white">0</h3>
+                                    </div>
+                                </div>
                             </div>
-                            <h3 class="text-xl font-semibold text-gray-800 dark:text-white">Import Data</h3>
+                            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4">
+                                <div class="flex items-center">
+                                    <div class="p-3 rounded-lg bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-400 mr-4">
+                                        <i class="fas fa-chart-line text-xl"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-gray-600 dark:text-gray-400">Quizzes Taken</p>
+                                        <h3 id="quizzes-count" class="text-xl font-bold text-gray-800 dark:text-white">0</h3>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <p class="text-gray-600 dark:text-gray-400 mb-6">Upload a JSON file to restore your subjects and questions. This will replace your current data.</p>
-                        <div class="mb-4">
-                            <input type="file" id="importFileInput" class="hidden" accept=".json">
-                            <label for="importFileInput" class="block w-full bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-lg transition-all duration-200 flex items-center justify-center space-x-2 cursor-pointer">
-                                <i class="fas fa-upload"></i>
-                                <span>Choose File</span>
-                            </label>
-                            <p id="importFileName" class="text-sm text-gray-500 dark:text-gray-400 mt-2 text-center"></p>
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+                            <h2 class="text-lg font-semibold text-gray-800 dark:text-white mb-4">Recent Activity</h2>
+                            <div id="recent-activity" class="space-y-4">
+                                <!-- Recent activity will be populated here -->
+                            </div>
                         </div>
-                        <button id="importDataBtn" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-lg transition-all duration-200 flex items-center justify-center space-x-2">
-                            <i class="fas fa-file-import"></i>
-                            <span>Import Data</span>
-                        </button>
                     </div>
-                </div>
-            </div>
-
-            <!-- Quiz History Page -->
-            <div id="quizHistoryPage" class="page hidden">
-                <div class="mb-6">
-                    <button id="backToDashboardFromHistory" class="text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-200 flex items-center space-x-2 mb-4 transition-colors duration-200">
-                        <i class="fas fa-arrow-left"></i>
-                        <span>Back to Dashboard</span>
-                    </button>
-                    <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Quiz History</h2>
                 </div>
                 
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-                    <div class="mb-6 flex justify-between items-center">
-                        <h3 class="text-xl font-semibold text-gray-800 dark:text-white">Past Quiz Attempts</h3>
-                        <div class="flex space-x-2">
-                            <select id="historySortSelect" class="p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent">
-                                <option value="newest">Newest First</option>
-                                <option value="oldest">Oldest First</option>
-                                <option value="highest">Highest Score</option>
-                                <option value="lowest">Lowest Score</option>
-                            </select>
-                            <button id="clearHistoryBtn" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-all duration-200 flex items-center space-x-2">
-                                <i class="fas fa-trash"></i>
-                                <span>Clear History</span>
+                <!-- Manage Question Bank Page -->
+                <div id="manage-page" class="page-content hidden fade-in">
+                    <h1 class="text-2xl font-bold text-gray-800 dark:text-white mb-6">Manage Question Bank</h1>
+                    
+                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
+                        <h2 class="text-lg font-semibold text-gray-800 dark:text-white mb-4">Add New Subject</h2>
+                        <div class="flex flex-col md:flex-row gap-4">
+                            <input type="text" id="new-subject" placeholder="Enter subject name" class="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white">
+                            <button id="add-subject-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg transition duration-200">
+                                Add Subject
                             </button>
                         </div>
                     </div>
                     
-                    <div id="historyList" class="space-y-4">
-                        <!-- History items will be dynamically inserted here -->
+                    <div id="subjects-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- Subjects will be populated here -->
                     </div>
                     
-                    <!-- Empty state -->
-                    <div id="emptyHistory" class="text-center py-12 hidden">
-                        <i class="fas fa-history text-5xl text-gray-300 dark:text-gray-600 mb-4"></i>
-                        <h3 class="text-xl font-medium text-gray-500 dark:text-gray-400 mb-2">No quiz history yet</h3>
-                        <p class="text-gray-400 dark:text-gray-500">Complete your first quiz to see your history here!</p>
+                    <!-- Questions Modal -->
+                    <div id="questions-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-40 hidden">
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-4xl mx-4 max-h-[90vh] overflow-hidden">
+                            <div class="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+                                <h3 id="modal-title" class="text-lg font-semibold text-gray-800 dark:text-white"></h3>
+                                <button id="close-modal" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            <div class="p-4 overflow-auto max-h-[calc(90vh-120px)]">
+                                <div class="mb-4">
+                                    <button id="add-question-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg transition duration-200">
+                                        Add Question
+                                    </button>
+                                </div>
+                                <div id="questions-table-container" class="overflow-x-auto">
+                                    <!-- Questions table will be populated here -->
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
-        </main>
-
-        <!-- Footer -->
-        <footer class="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 py-4 px-6 mt-auto">
-            <div class="container mx-auto text-center text-gray-500 dark:text-gray-400 text-sm">
-                <p>Study Helper Quiz &copy; 2023 - A tool to help you study effectively</p>
-            </div>
-        </footer>
-    </div>
-
-    <!-- Modals -->
-    
-    <!-- Add/Edit Subject Modal -->
-    <div id="subjectModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-md mx-4 p-6">
-            <h3 id="subjectModalTitle" class="text-xl font-bold text-gray-800 dark:text-white mb-4">Add Subject</h3>
-            <form id="subjectForm">
-                <div class="mb-4">
-                    <label for="subjectName" class="block text-gray-700 dark:text-gray-300 font-medium mb-2">Subject Name</label>
-                    <input type="text" id="subjectName" class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent" placeholder="Enter subject name" required>
-                </div>
-                <div class="flex justify-end space-x-3">
-                    <button type="button" id="cancelSubjectBtn" class="px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors duration-200">Cancel</button>
-                    <button type="submit" id="saveSubjectBtn" class="bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-lg transition-all duration-200">Save</button>
-                </div>
-            </form>
-        </div>
-    </div>
-    
-    <!-- Add/Edit Question Modal -->
-    <div id="questionModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-2xl mx-4 p-6 max-h-[90vh] overflow-y-auto custom-scrollbar">
-            <h3 id="questionModalTitle" class="text-xl font-bold text-gray-800 dark:text-white mb-4">Add Question</h3>
-            <form id="questionForm">
-                <div class="mb-4">
-                    <label for="questionText" class="block text-gray-700 dark:text-gray-300 font-medium mb-2">Question</label>
-                    <textarea id="questionText" rows="3" class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent" placeholder="Enter your question" required></textarea>
-                </div>
-                
-                <div class="mb-4">
-                    <label class="block text-gray-700 dark:text-gray-300 font-medium mb-2">Options</label>
-                    <div class="space-y-3">
-                        <div class="flex items-center space-x-3">
-                            <input type="radio" name="correctOption" value="0" class="text-primary-600 focus:ring-primary-500" required>
-                            <input type="text" id="option1" class="flex-1 p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent" placeholder="Option 1" required>
-                        </div>
-                        <div class="flex items-center space-x-3">
-                            <input type="radio" name="correctOption" value="1" class="text-primary-600 focus:ring-primary-500">
-                            <input type="text" id="option2" class="flex-1 p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent" placeholder="Option 2" required>
-                        </div>
-                        <div class="flex items-center space-x-3">
-                            <input type="radio" name="correctOption" value="2" class="text-primary-600 focus:ring-primary-500">
-                            <input type="text" id="option3" class="flex-1 p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent" placeholder="Option 3">
-                        </div>
-                        <div class="flex items-center space-x-3">
-                            <input type="radio" name="correctOption" value="3" class="text-primary-600 focus:ring-primary-500">
-                            <input type="text" id="option4" class="flex-1 p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent" placeholder="Option 4">
+                    
+                    <!-- Question Form Modal -->
+                    <div id="question-form-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-2xl mx-4">
+                            <div class="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+                                <h3 id="question-form-title" class="text-lg font-semibold text-gray-800 dark:text-white"></h3>
+                                <button id="close-question-form" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            <div class="p-4">
+                                <form id="question-form" class="space-y-4">
+                                    <input type="hidden" id="edit-question-id">
+                                    <div>
+                                        <label for="question-text" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Question</label>
+                                        <textarea id="question-text" rows="3" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white"></textarea>
+                                    </div>
+                                    <div>
+                                        <label for="question-answer" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Answer</label>
+                                        <textarea id="question-answer" rows="3" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white"></textarea>
+                                    </div>
+                                    <div class="flex justify-end space-x-2 pt-4">
+                                        <button type="button" id="cancel-question" class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition duration-200">
+                                            Cancel
+                                        </button>
+                                        <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg transition duration-200">
+                                            Save Question
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>
                 
-                <div class="flex justify-end space-x-3">
-                    <button type="button" id="cancelQuestionBtn" class="px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors duration-200">Cancel</button>
-                    <button type="submit" id="saveQuestionBtn" class="bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-lg transition-all duration-200">Save</button>
+                <!-- Take Quiz Page -->
+                <div id="quiz-page" class="page-content hidden fade-in">
+                    <h1 class="text-2xl font-bold text-gray-800 dark:text-white mb-6">Take Quiz</h1>
+                    
+                    <div id="quiz-setup" class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+                        <h2 class="text-lg font-semibold text-gray-800 dark:text-white mb-4">Quiz Setup</h2>
+                        <div class="space-y-4">
+                            <div>
+                                <label for="quiz-subject" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Select Subject</label>
+                                <select id="quiz-subject" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white">
+                                    <option value="">-- Select a subject --</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="quiz-questions" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Number of Questions</label>
+                                <input type="number" id="quiz-questions" min="1" value="5" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white">
+                            </div>
+                            <button id="start-quiz-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg transition duration-200">
+                                Start Quiz
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="quiz-container" class="hidden">
+                        <!-- Quiz questions and answers will be populated here -->
+                    </div>
+                    
+                    <div id="quiz-results" class="hidden bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+                        <!-- Quiz results will be populated here -->
+                    </div>
                 </div>
-            </form>
-        </div>
-    </div>
-    
-    <!-- Confirmation Modal -->
-    <div id="confirmationModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-md mx-4 p-6">
-            <div class="flex items-center space-x-3 mb-4">
-                <div class="p-2 bg-red-100 dark:bg-red-900 rounded-full">
-                    <i class="fas fa-exclamation-triangle text-red-600 dark:text-red-400"></i>
+                
+                <!-- Quiz History Page -->
+                <div id="history-page" class="page-content hidden fade-in">
+                    <h1 class="text-2xl font-bold text-gray-800 dark:text-white mb-6">Quiz History</h1>
+                    
+                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+                        <div id="history-content">
+                            <!-- History content will be populated here -->
+                        </div>
+                    </div>
                 </div>
-                <h3 id="confirmationModalTitle" class="text-xl font-bold text-gray-800 dark:text-white">Confirm Deletion</h3>
-            </div>
-            <p id="confirmationModalMessage" class="text-gray-600 dark:text-gray-400 mb-6">Are you sure you want to delete this item? This action cannot be undone.</p>
-            <div class="flex justify-end space-x-3">
-                <button id="cancelConfirmBtn" class="px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors duration-200">Cancel</button>
-                <button id="confirmDeleteBtn" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-all duration-200">Delete</button>
+                
+                <!-- Settings Page -->
+                <div id="settings-page" class="page-content hidden fade-in">
+                    <h1 class="text-2xl font-bold text-gray-800 dark:text-white mb-6">Settings</h1>
+                    
+                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+                        <h2 class="text-lg font-semibold text-gray-800 dark:text-white mb-4">Data Management</h2>
+                        <div class="space-y-4">
+                            <div class="flex flex-col md:flex-row md:items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+                                <div>
+                                    <h3 class="font-medium text-gray-800 dark:text-white">Export Data</h3>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400">Download your subjects and questions as a JSON file</p>
+                                </div>
+                                <button id="export-data" class="mt-2 md:mt-0 bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg transition duration-200">
+                                    Export Data
+                                </button>
+                            </div>
+                            <div class="flex flex-col md:flex-row md:items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+                                <div>
+                                    <h3 class="font-medium text-gray-800 dark:text-white">Import Data</h3>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400">Upload a JSON file to restore your data</p>
+                                </div>
+                                <div class="mt-2 md:mt-0">
+                                    <input type="file" id="import-file" class="hidden" accept=".json">
+                                    <button id="import-data" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg transition duration-200">
+                                        Import Data
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="flex flex-col md:flex-row md:items-center justify-between p-4 border border-red-200 dark:border-red-800 rounded-lg bg-red-50 dark:bg-red-900/20">
+                                <div>
+                                    <h3 class="font-medium text-red-800 dark:text-red-400">Clear All Data</h3>
+                                    <p class="text-sm text-red-600 dark:text-red-300">This will permanently delete all your subjects, questions, and quiz history</p>
+                                </div>
+                                <button id="clear-data" class="mt-2 md:mt-0 bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-lg transition duration-200">
+                                    Clear All Data
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- JavaScript -->
     <script>
-        // App State
+        // App state
         const state = {
-            subjects: JSON.parse(localStorage.getItem('studyhelper_subjects')) || [],
-            quizHistory: JSON.parse(localStorage.getItem('studyhelper_quizHistory')) || [],
-            settings: JSON.parse(localStorage.getItem('studyhelper_settings')) || {
-                darkMode: false,
-                timerVisible: true,
-                timeLimit: 0
-            },
-            currentSubjectId: null,
-            currentQuestionIndex: 0,
-            currentQuizQuestions: [],
-            userAnswers: [],
-            quizStartTime: null,
-            editingSubjectId: null,
-            editingQuestionId: null,
-            deleteCallback: null
+            subjects: JSON.parse(localStorage.getItem('studyHelperSubjects')) || {},
+            quizHistory: JSON.parse(localStorage.getItem('studyHelperQuizHistory')) || [],
+            currentSubject: null,
+            currentQuiz: null,
+            darkMode: localStorage.getItem('studyHelperDarkMode') === 'true'
         };
 
         // DOM Elements
         const elements = {
-            // Pages
-            pages: document.querySelectorAll('.page'),
+            sidebar: document.getElementById('sidebar'),
+            mobileHeader: document.getElementById('mobile-header'),
+            mainContent: document.getElementById('main-content'),
+            sidebarToggle: document.getElementById('sidebar-toggle'),
+            mobileSidebarToggle: document.getElementById('mobile-sidebar-toggle'),
+            themeToggle: document.getElementById('theme-toggle'),
+            toastContainer: document.getElementById('toast-container'),
+            navLinks: document.querySelectorAll('.nav-link'),
+            pageContents: document.querySelectorAll('.page-content'),
             
             // Dashboard
-            dashboardPage: document.getElementById('dashboardPage'),
-            subjectCards: document.getElementById('subjectCards'),
-            emptySubjects: document.getElementById('emptySubjects'),
-            addSubjectBtn: document.getElementById('addSubjectBtn'),
-            emptyAddSubjectBtn: document.getElementById('emptyAddSubjectBtn'),
-            startQuizBtn: document.getElementById('startQuizBtn'),
-            manageQuestionBankBtn: document.getElementById('manageQuestionBankBtn'),
-            importExportBtn: document.getElementById('importExportBtn'),
+            welcomeMessage: document.getElementById('welcome-message'),
+            dashboardContent: document.getElementById('dashboard-content'),
+            subjectsCount: document.getElementById('subjects-count'),
+            questionsCount: document.getElementById('questions-count'),
+            quizzesCount: document.getElementById('quizzes-count'),
+            recentActivity: document.getElementById('recent-activity'),
+            getStartedBtn: document.getElementById('get-started-btn'),
             
-            // Quiz Setup
-            quizSetupPage: document.getElementById('quizSetupPage'),
-            backToDashboardFromQuizSetup: document.getElementById('backToDashboardFromQuizSetup'),
-            quizSubjectSelect: document.getElementById('quizSubjectSelect'),
-            timeLimitSelect: document.getElementById('timeLimitSelect'),
-            showTimerCheckbox: document.getElementById('showTimerCheckbox'),
-            startRandomQuizBtn: document.getElementById('startRandomQuizBtn'),
-            startQuizWithSettingsBtn: document.getElementById('startQuizWithSettingsBtn'),
+            // Manage Page
+            newSubject: document.getElementById('new-subject'),
+            addSubjectBtn: document.getElementById('add-subject-btn'),
+            subjectsContainer: document.getElementById('subjects-container'),
+            questionsModal: document.getElementById('questions-modal'),
+            modalTitle: document.getElementById('modal-title'),
+            closeModal: document.getElementById('close-modal'),
+            addQuestionBtn: document.getElementById('add-question-btn'),
+            questionsTableContainer: document.getElementById('questions-table-container'),
+            questionFormModal: document.getElementById('question-form-modal'),
+            questionFormTitle: document.getElementById('question-form-title'),
+            closeQuestionForm: document.getElementById('close-question-form'),
+            questionForm: document.getElementById('question-form'),
+            questionText: document.getElementById('question-text'),
+            questionAnswer: document.getElementById('question-answer'),
+            editQuestionId: document.getElementById('edit-question-id'),
+            cancelQuestion: document.getElementById('cancel-question'),
             
-            // Quiz
-            quizPage: document.getElementById('quizPage'),
-            quizSubjectName: document.getElementById('quizSubjectName'),
-            quizProgress: document.getElementById('quizProgress'),
-            quizProgressBar: document.getElementById('quizProgressBar'),
-            quizTimerContainer: document.getElementById('quizTimerContainer'),
-            quizTimer: document.getElementById('quizTimer'),
-            quizQuestion: document.getElementById('quizQuestion'),
-            quizOptions: document.getElementById('quizOptions'),
-            prevQuestionBtn: document.getElementById('prevQuestionBtn'),
-            nextQuestionBtn: document.getElementById('nextQuestionBtn'),
+            // Quiz Page
+            quizSubject: document.getElementById('quiz-subject'),
+            quizQuestions: document.getElementById('quiz-questions'),
+            startQuizBtn: document.getElementById('start-quiz-btn'),
+            quizSetup: document.getElementById('quiz-setup'),
+            quizContainer: document.getElementById('quiz-container'),
+            quizResults: document.getElementById('quiz-results'),
             
-            // Quiz Results
-            quizResultsPage: document.getElementById('quizResultsPage'),
-            backToDashboardFromResults: document.getElementById('backToDashboardFromResults'),
-            resultsTitle: document.getElementById('resultsTitle'),
-            resultsScore: document.getElementById('resultsScore'),
-            correctAnswersCount: document.getElementById('correctAnswersCount'),
-            incorrectAnswersCount: document.getElementById('incorrectAnswersCount'),
-            reviewQuizBtn: document.getElementById('reviewQuizBtn'),
-            newQuizBtn: document.getElementById('newQuizBtn'),
+            // History Page
+            historyContent: document.getElementById('history-content'),
             
-            // Manage Subjects
-            manageSubjectsPage: document.getElementById('manageSubjectsPage'),
-            backToDashboardFromManage: document.getElementById('backToDashboardFromManage'),
-            subjectsList: document.getElementById('subjectsList'),
-            emptyManageSubjects: document.getElementById('emptyManageSubjects'),
-            addSubjectFromManageBtn: document.getElementById('addSubjectFromManageBtn'),
-            emptyManageAddSubjectBtn: document.getElementById('emptyManageAddSubjectBtn'),
-            
-            // Manage Questions
-            manageQuestionsPage: document.getElementById('manageQuestionsPage'),
-            backToManageSubjects: document.getElementById('backToManageSubjects'),
-            manageQuestionsTitle: document.getElementById('manageQuestionsTitle'),
-            questionsSubjectTitle: document.getElementById('questionsSubjectTitle'),
-            questionsTableBody: document.getElementById('questionsTableBody'),
-            emptyQuestions: document.getElementById('emptyQuestions'),
-            addQuestionBtn: document.getElementById('addQuestionBtn'),
-            emptyAddQuestionBtn: document.getElementById('emptyAddQuestionBtn'),
-            
-            // Import/Export
-            importExportPage: document.getElementById('importExportPage'),
-            backToDashboardFromImportExport: document.getElementById('backToDashboardFromImportExport'),
-            exportDataBtn: document.getElementById('exportDataBtn'),
-            importFileInput: document.getElementById('importFileInput'),
-            importFileName: document.getElementById('importFileName'),
-            importDataBtn: document.getElementById('importDataBtn'),
-            
-            // Quiz History
-            quizHistoryPage: document.getElementById('quizHistoryPage'),
-            backToDashboardFromHistory: document.getElementById('backToDashboardFromHistory'),
-            historySortSelect: document.getElementById('historySortSelect'),
-            clearHistoryBtn: document.getElementById('clearHistoryBtn'),
-            historyList: document.getElementById('historyList'),
-            emptyHistory: document.getElementById('emptyHistory'),
-            
-            // Modals
-            subjectModal: document.getElementById('subjectModal'),
-            subjectModalTitle: document.getElementById('subjectModalTitle'),
-            subjectForm: document.getElementById('subjectForm'),
-            subjectName: document.getElementById('subjectName'),
-            cancelSubjectBtn: document.getElementById('cancelSubjectBtn'),
-            saveSubjectBtn: document.getElementById('saveSubjectBtn'),
-            
-            questionModal: document.getElementById('questionModal'),
-            questionModalTitle: document.getElementById('questionModalTitle'),
-            questionForm: document.getElementById('questionForm'),
-            questionText: document.getElementById('questionText'),
-            cancelQuestionBtn: document.getElementById('cancelQuestionBtn'),
-            saveQuestionBtn: document.getElementById('saveQuestionBtn'),
-            
-            confirmationModal: document.getElementById('confirmationModal'),
-            confirmationModalTitle: document.getElementById('confirmationModalTitle'),
-            confirmationModalMessage: document.getElementById('confirmationModalMessage'),
-            cancelConfirmBtn: document.getElementById('cancelConfirmBtn'),
-            confirmDeleteBtn: document.getElementById('confirmDeleteBtn'),
-            
-            // Other
-            darkModeToggle: document.getElementById('darkModeToggle'),
-            helpBtn: document.getElementById('helpBtn'),
-            toast: document.getElementById('toast')
+            // Settings Page
+            exportData: document.getElementById('export-data'),
+            importData: document.getElementById('import-data'),
+            importFile: document.getElementById('import-file'),
+            clearData: document.getElementById('clear-data')
         };
 
         // Initialize the app
-        function initApp() {
-            // Load settings
-            if (state.settings.darkMode) {
-                document.documentElement.classList.add('dark');
-            }
-            
+        function init() {
             // Set up event listeners
             setupEventListeners();
             
-            // Render initial content
-            renderSubjectCards();
-            renderQuizSubjectSelect();
-            renderSubjectsList();
+            // Apply dark mode if enabled
+            if (state.darkMode) {
+                document.documentElement.classList.add('dark');
+                elements.themeToggle.checked = true;
+            }
+            
+            // Update UI based on current data
+            updateDashboard();
+            renderSubjects();
+            updateQuizSubjectOptions();
             renderQuizHistory();
             
-            // Show dashboard
-            showPage('dashboardPage');
+            // Show welcome message if no subjects
+            if (Object.keys(state.subjects).length === 0) {
+                elements.welcomeMessage.classList.remove('hidden');
+            } else {
+                elements.dashboardContent.classList.remove('hidden');
+            }
         }
 
-        // Set up event listeners
+        // Set up all event listeners
         function setupEventListeners() {
+            // Sidebar toggle
+            elements.sidebarToggle.addEventListener('click', toggleSidebar);
+            elements.mobileSidebarToggle.addEventListener('click', toggleSidebar);
+            
             // Navigation
-            elements.startQuizBtn.addEventListener('click', () => showPage('quizSetupPage'));
-            elements.manageQuestionBankBtn.addEventListener('click', () => showPage('manageSubjectsPage'));
-            elements.importExportBtn.addEventListener('click', () => showPage('importExportPage'));
-            
-            // Dashboard
-            elements.addSubjectBtn.addEventListener('click', () => openSubjectModal());
-            elements.emptyAddSubjectBtn.addEventListener('click', () => openSubjectModal());
-            
-            // Quiz Setup
-            elements.backToDashboardFromQuizSetup.addEventListener('click', () => showPage('dashboardPage'));
-            elements.startRandomQuizBtn.addEventListener('click', startRandomQuiz);
-            elements.startQuizWithSettingsBtn.addEventListener('click', startQuizWithSettings);
-            
-            // Quiz
-            elements.prevQuestionBtn.addEventListener('click', showPreviousQuestion);
-            elements.nextQuestionBtn.addEventListener('click', showNextQuestion);
-            
-            // Quiz Results
-            elements.backToDashboardFromResults.addEventListener('click', () => showPage('dashboardPage'));
-            elements.reviewQuizBtn.addEventListener('click', reviewQuiz);
-            elements.newQuizBtn.addEventListener('click', () => showPage('quizSetupPage'));
-            
-            // Manage Subjects
-            elements.backToDashboardFromManage.addEventListener('click', () => showPage('dashboardPage'));
-            elements.addSubjectFromManageBtn.addEventListener('click', () => openSubjectModal());
-            elements.emptyManageAddSubjectBtn.addEventListener('click', () => openSubjectModal());
-            
-            // Manage Questions
-            elements.backToManageSubjects.addEventListener('click', () => showPage('manageSubjectsPage'));
-            elements.addQuestionBtn.addEventListener('click', () => openQuestionModal());
-            elements.emptyAddQuestionBtn.addEventListener('click', () => openQuestionModal());
-            
-            // Import/Export
-            elements.backToDashboardFromImportExport.addEventListener('click', () => showPage('dashboardPage'));
-            elements.exportDataBtn.addEventListener('click', exportData);
-            elements.importFileInput.addEventListener('change', handleFileSelect);
-            elements.importDataBtn.addEventListener('click', importData);
-            
-            // Quiz History
-            elements.backToDashboardFromHistory.addEventListener('click', () => showPage('dashboardPage'));
-            elements.historySortSelect.addEventListener('change', renderQuizHistory);
-            elements.clearHistoryBtn.addEventListener('click', clearQuizHistory);
-            
-            // Modals
-            elements.subjectForm.addEventListener('submit', saveSubject);
-            elements.cancelSubjectBtn.addEventListener('click', closeSubjectModal);
-            elements.questionForm.addEventListener('submit', saveQuestion);
-            elements.cancelQuestionBtn.addEventListener('click', closeQuestionModal);
-            elements.cancelConfirmBtn.addEventListener('click', closeConfirmationModal);
-            elements.confirmDeleteBtn.addEventListener('click', confirmDelete);
-            
-            // Other
-            elements.darkModeToggle.addEventListener('click', toggleDarkMode);
-            elements.helpBtn.addEventListener('click', showHelp);
-        }
-
-        // Page navigation
-        function showPage(pageId) {
-            // Hide all pages
-            elements.pages.forEach(page => {
-                page.classList.remove('active');
-                page.classList.add('hidden');
+            elements.navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    navigateToPage(link.dataset.page);
+                    // Close sidebar on mobile after navigation
+                    if (window.innerWidth < 768) {
+                        elements.sidebar.classList.add('-translate-x-full');
+                    }
+                });
             });
             
-            // Show the selected page
-            const page = document.getElementById(pageId);
-            page.classList.remove('hidden');
-            setTimeout(() => {
-                page.classList.add('active');
-            }, 50);
+            // Theme toggle
+            elements.themeToggle.addEventListener('change', toggleDarkMode);
             
-            // Update specific page content if needed
-            if (pageId === 'dashboardPage') {
-                renderSubjectCards();
-            } else if (pageId === 'quizHistoryPage') {
+            // Dashboard
+            elements.getStartedBtn.addEventListener('click', () => navigateToPage('manage'));
+            
+            // Manage Page
+            elements.addSubjectBtn.addEventListener('click', addSubject);
+            elements.closeModal.addEventListener('click', () => elements.questionsModal.classList.add('hidden'));
+            elements.addQuestionBtn.addEventListener('click', () => openQuestionForm());
+            elements.closeQuestionForm.addEventListener('click', () => elements.questionFormModal.classList.add('hidden'));
+            elements.cancelQuestion.addEventListener('click', () => elements.questionFormModal.classList.add('hidden'));
+            elements.questionForm.addEventListener('submit', saveQuestion);
+            
+            // Quiz Page
+            elements.startQuizBtn.addEventListener('click', startQuiz);
+            
+            // Settings Page
+            elements.exportData.addEventListener('click', exportData);
+            elements.importData.addEventListener('click', () => elements.importFile.click());
+            elements.importFile.addEventListener('change', importData);
+            elements.clearData.addEventListener('click', clearAllData);
+        }
+
+        // Toggle sidebar visibility
+        function toggleSidebar() {
+            if (window.innerWidth >= 768) {
+                // Desktop: toggle width
+                if (elements.sidebar.classList.contains('w-64')) {
+                    elements.sidebar.classList.remove('w-64');
+                    elements.sidebar.classList.add('w-16');
+                    elements.mainContent.classList.add('md:ml-0');
+                } else {
+                    elements.sidebar.classList.remove('w-16');
+                    elements.sidebar.classList.add('w-64');
+                    elements.mainContent.classList.remove('md:ml-0');
+                }
+            } else {
+                // Mobile: toggle translation
+                if (elements.sidebar.classList.contains('-translate-x-full')) {
+                    elements.sidebar.classList.remove('-translate-x-full');
+                } else {
+                    elements.sidebar.classList.add('-translate-x-full');
+                }
+            }
+        }
+
+        // Toggle dark mode
+        function toggleDarkMode() {
+            state.darkMode = elements.themeToggle.checked;
+            localStorage.setItem('studyHelperDarkMode', state.darkMode);
+            
+            if (state.darkMode) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        }
+
+        // Navigate to a specific page
+        function navigateToPage(page) {
+            // Hide all pages
+            elements.pageContents.forEach(content => {
+                content.classList.remove('active');
+                content.classList.add('hidden');
+            });
+            
+            // Remove active class from all nav links
+            elements.navLinks.forEach(link => link.classList.remove('active'));
+            
+            // Show the selected page
+            document.getElementById(`${page}-page`).classList.remove('hidden');
+            document.getElementById(`${page}-page`).classList.add('active');
+            
+            // Add active class to the clicked nav link
+            document.querySelector(`[data-page="${page}"]`).classList.add('active');
+            
+            // Update page-specific content if needed
+            if (page === 'dashboard') {
+                updateDashboard();
+            } else if (page === 'manage') {
+                renderSubjects();
+            } else if (page === 'history') {
                 renderQuizHistory();
             }
         }
 
-        // Subject management
-        function renderSubjectCards() {
-            elements.subjectCards.innerHTML = '';
+        // Update dashboard with current stats
+        function updateDashboard() {
+            const subjectCount = Object.keys(state.subjects).length;
+            let questionCount = 0;
             
-            if (state.subjects.length === 0) {
-                elements.emptySubjects.classList.remove('hidden');
+            // Count total questions
+            for (const subject in state.subjects) {
+                questionCount += state.subjects[subject].length;
+            }
+            
+            // Update counts
+            elements.subjectsCount.textContent = subjectCount;
+            elements.questionsCount.textContent = questionCount;
+            elements.quizzesCount.textContent = state.quizHistory.length;
+            
+            // Update recent activity
+            elements.recentActivity.innerHTML = '';
+            
+            if (state.quizHistory.length > 0) {
+                // Show recent quizzes
+                const recentQuizzes = state.quizHistory.slice(-3).reverse();
+                recentQuizzes.forEach(quiz => {
+                    const quizElement = document.createElement('div');
+                    quizElement.className = 'flex items-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg';
+                    quizElement.innerHTML = `
+                        <div class="p-2 rounded-lg bg-indigo-100 dark:bg-indigo-900 text-indigo-600 dark:text-indigo-400 mr-3">
+                            <i class="fas fa-puzzle-piece"></i>
+                        </div>
+                        <div>
+                            <p class="font-medium text-gray-800 dark:text-white">${quiz.subject} Quiz</p>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Score: ${quiz.score}/${quiz.total} • ${new Date(quiz.date).toLocaleDateString()}</p>
+                        </div>
+                    `;
+                    elements.recentActivity.appendChild(quizElement);
+                });
+            } else {
+                // Show placeholder if no recent activity
+                elements.recentActivity.innerHTML = `
+                    <div class="text-center py-4 text-gray-500 dark:text-gray-400">
+                        <i class="fas fa-history text-3xl mb-2"></i>
+                        <p>No recent activity</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Render subjects in the manage page
+        function renderSubjects() {
+            elements.subjectsContainer.innerHTML = '';
+            
+            if (Object.keys(state.subjects).length === 0) {
+                elements.subjectsContainer.innerHTML = `
+                    <div class="col-span-full text-center py-8 text-gray-500 dark:text-gray-400">
+                        <i class="fas fa-book-open text-4xl mb-4"></i>
+                        <p class="text-lg">No subjects yet</p>
+                        <p class="mt-2">Add your first subject to get started!</p>
+                    </div>
+                `;
                 return;
             }
             
-            elements.emptySubjects.classList.add('hidden');
-            
-            state.subjects.forEach(subject => {
-                const card = document.createElement('div');
-                card.className = 'bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border border-gray-200 dark:border-gray-700';
-                card.innerHTML = `
-                    <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-2">${subject.name}</h3>
-                    <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">${subject.questions.length} questions</p>
-                    <div class="flex space-x-2">
-                        <button class="start-quiz-btn flex-1 bg-primary-500 hover:bg-primary-600 text-white py-2 px-3 rounded text-sm transition-all duration-200" data-id="${subject.id}">
-                            <i class="fas fa-play mr-1"></i> Start Quiz
+            for (const subject in state.subjects) {
+                const subjectCard = document.createElement('div');
+                subjectCard.className = 'bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden';
+                subjectCard.innerHTML = `
+                    <div class="p-4 border-b border-gray-200 dark:border-gray-700">
+                        <h3 class="font-semibold text-lg text-gray-800 dark:text-white">${subject}</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">${state.subjects[subject].length} questions</p>
+                    </div>
+                    <div class="p-4 flex justify-between">
+                        <button class="view-questions-btn text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-200 font-medium" data-subject="${subject}">
+                            View Questions
                         </button>
-                        <button class="manage-subject-btn bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-800 dark:text-white py-2 px-3 rounded text-sm transition-all duration-200" data-id="${subject.id}">
-                            <i class="fas fa-edit mr-1"></i> Manage
-                        </button>
-                        <button class="delete-subject-btn bg-red-500 hover:bg-red-600 text-white py-2 px-3 rounded text-sm transition-all duration-200" data-id="${subject.id}">
-                            <i class="fas fa-trash mr-1"></i>
+                        <button class="delete-subject-btn text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-200" data-subject="${subject}">
+                            <i class="fas fa-trash"></i>
                         </button>
                     </div>
                 `;
-                elements.subjectCards.appendChild(card);
-            });
+                
+                elements.subjectsContainer.appendChild(subjectCard);
+            }
             
             // Add event listeners to the buttons
-            document.querySelectorAll('.start-quiz-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const subjectId = e.target.closest('.start-quiz-btn').dataset.id;
-                    startSubjectQuiz(subjectId);
-                });
-            });
-            
-            document.querySelectorAll('.manage-subject-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const subjectId = e.target.closest('.manage-subject-btn').dataset.id;
-                    openManageQuestions(subjectId);
-                });
+            document.querySelectorAll('.view-questions-btn').forEach(btn => {
+                btn.addEventListener('click', () => viewQuestions(btn.dataset.subject));
             });
             
             document.querySelectorAll('.delete-subject-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const subjectId = e.target.closest('.delete-subject-btn').dataset.id;
-                    const subject = state.subjects.find(s => s.id === subjectId);
-                    openConfirmationModal(
-                        'Delete Subject',
-                        `Are you sure you want to delete "${subject.name}"? This will also delete all its questions.`,
-                        () => deleteSubject(subjectId)
-                    );
-                });
+                btn.addEventListener('click', () => deleteSubject(btn.dataset.subject));
             });
         }
 
-        function renderSubjectsList() {
-            elements.subjectsList.innerHTML = '';
+        // Add a new subject
+        function addSubject() {
+            const subjectName = elements.newSubject.value.trim();
             
-            if (state.subjects.length === 0) {
-                elements.emptyManageSubjects.classList.remove('hidden');
-                return;
-            }
-            
-            elements.emptyManageSubjects.classList.add('hidden');
-            
-            state.subjects.forEach(subject => {
-                const item = document.createElement('div');
-                item.className = 'flex justify-between items-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg';
-                item.innerHTML = `
-                    <div>
-                        <h4 class="font-medium text-gray-800 dark:text-white">${subject.name}</h4>
-                        <p class="text-sm text-gray-600 dark:text-gray-400">${subject.questions.length} questions</p>
-                    </div>
-                    <div class="flex space-x-2">
-                        <button class="edit-subject-btn bg-primary-500 hover:bg-primary-600 text-white py-2 px-3 rounded text-sm transition-all duration-200" data-id="${subject.id}">
-                            <i class="fas fa-edit mr-1"></i> Edit
-                        </button>
-                        <button class="manage-questions-btn bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500 text-gray-800 dark:text-white py-2 px-3 rounded text-sm transition-all duration-200" data-id="${subject.id}">
-                            <i class="fas fa-list mr-1"></i> Questions
-                        </button>
-                        <button class="delete-subject-list-btn bg-red-500 hover:bg-red-600 text-white py-2 px-3 rounded text-sm transition-all duration-200" data-id="${subject.id}">
-                            <i class="fas fa-trash mr-1"></i>
-                        </button>
-                    </div>
-                `;
-                elements.subjectsList.appendChild(item);
-            });
-            
-            // Add event listeners
-            document.querySelectorAll('.edit-subject-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const subjectId = e.target.closest('.edit-subject-btn').dataset.id;
-                    openSubjectModal(subjectId);
-                });
-            });
-            
-            document.querySelectorAll('.manage-questions-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const subjectId = e.target.closest('.manage-questions-btn').dataset.id;
-                    openManageQuestions(subjectId);
-                });
-            });
-            
-            document.querySelectorAll('.delete-subject-list-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const subjectId = e.target.closest('.delete-subject-list-btn').dataset.id;
-                    const subject = state.subjects.find(s => s.id === subjectId);
-                    openConfirmationModal(
-                        'Delete Subject',
-                        `Are you sure you want to delete "${subject.name}"? This will also delete all its questions.`,
-                        () => deleteSubject(subjectId)
-                    );
-                });
-            });
-        }
-
-        function openSubjectModal(subjectId = null) {
-            elements.subjectModal.classList.remove('hidden');
-            
-            if (subjectId) {
-                // Edit mode
-                elements.subjectModalTitle.textContent = 'Edit Subject';
-                const subject = state.subjects.find(s => s.id === subjectId);
-                elements.subjectName.value = subject.name;
-                state.editingSubjectId = subjectId;
-            } else {
-                // Add mode
-                elements.subjectModalTitle.textContent = 'Add Subject';
-                elements.subjectName.value = '';
-                state.editingSubjectId = null;
-            }
-        }
-
-        function closeSubjectModal() {
-            elements.subjectModal.classList.add('hidden');
-            elements.subjectForm.reset();
-            state.editingSubjectId = null;
-        }
-
-        function saveSubject(e) {
-            e.preventDefault();
-            
-            const name = elements.subjectName.value.trim();
-            
-            if (!name) {
+            if (!subjectName) {
                 showToast('Please enter a subject name', 'error');
                 return;
             }
             
-            if (state.editingSubjectId) {
-                // Update existing subject
-                const subject = state.subjects.find(s => s.id === state.editingSubjectId);
-                subject.name = name;
-                showToast('Subject updated successfully', 'success');
-            } else {
-                // Add new subject
-                const newSubject = {
-                    id: generateId(),
-                    name: name,
-                    questions: []
-                };
-                state.subjects.push(newSubject);
-                showToast('Subject added successfully', 'success');
-            }
-            
-            saveData();
-            renderSubjectCards();
-            renderSubjectsList();
-            renderQuizSubjectSelect();
-            closeSubjectModal();
-        }
-
-        function deleteSubject(subjectId) {
-            state.subjects = state.subjects.filter(s => s.id !== subjectId);
-            saveData();
-            renderSubjectCards();
-            renderSubjectsList();
-            renderQuizSubjectSelect();
-            closeConfirmationModal();
-            showToast('Subject deleted successfully', 'success');
-        }
-
-        // Question management
-        function openManageQuestions(subjectId) {
-            state.currentSubjectId = subjectId;
-            const subject = state.subjects.find(s => s.id === subjectId);
-            
-            elements.manageQuestionsTitle.textContent = `Manage Questions - ${subject.name}`;
-            elements.questionsSubjectTitle.textContent = `Questions for ${subject.name}`;
-            
-            renderQuestionsList();
-            showPage('manageQuestionsPage');
-        }
-
-        function renderQuestionsList() {
-            elements.questionsTableBody.innerHTML = '';
-            
-            const subject = state.subjects.find(s => s.id === state.currentSubjectId);
-            
-            if (!subject || subject.questions.length === 0) {
-                elements.emptyQuestions.classList.remove('hidden');
+            if (state.subjects[subjectName]) {
+                showToast('Subject already exists', 'error');
                 return;
             }
             
-            elements.emptyQuestions.classList.add('hidden');
+            state.subjects[subjectName] = [];
+            saveSubjects();
+            elements.newSubject.value = '';
             
-            subject.questions.forEach((question, index) => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td class="px-6 py-4 whitespace-normal text-sm text-gray-800 dark:text-white max-w-xs">
-                        ${question.text}
-                    </td>
-                    <td class="px-6 py-4 whitespace-normal text-sm text-gray-600 dark:text-gray-400 max-w-xs">
-                        ${question.options.map(opt => `<div class="mb-1">• ${opt}</div>`).join('')}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-white">
-                        ${question.options[question.correctIndex]}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <button class="edit-question-btn text-primary-600 hover:text-primary-900 dark:hover:text-primary-400 mr-3" data-index="${index}">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button class="delete-question-btn text-red-600 hover:text-red-900 dark:hover:text-red-400" data-index="${index}">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </td>
+            showToast('Subject added successfully!', 'success');
+            renderSubjects();
+            updateQuizSubjectOptions();
+            updateDashboard();
+            
+            // If welcome message is showing, hide it and show dashboard content
+            if (!elements.welcomeMessage.classList.contains('hidden')) {
+                elements.welcomeMessage.classList.add('hidden');
+                elements.dashboardContent.classList.remove('hidden');
+            }
+        }
+
+        // Delete a subject
+        function deleteSubject(subjectName) {
+            if (confirm(`Are you sure you want to delete "${subjectName}" and all its questions?`)) {
+                delete state.subjects[subjectName];
+                saveSubjects();
+                
+                showToast('Subject deleted successfully!', 'success');
+                renderSubjects();
+                updateQuizSubjectOptions();
+                updateDashboard();
+            }
+        }
+
+        // View questions for a subject
+        function viewQuestions(subjectName) {
+            state.currentSubject = subjectName;
+            elements.modalTitle.textContent = `Questions for ${subjectName}`;
+            renderQuestionsTable();
+            elements.questionsModal.classList.remove('hidden');
+        }
+
+        // Render questions table in the modal
+        function renderQuestionsTable() {
+            const questions = state.subjects[state.currentSubject];
+            
+            if (questions.length === 0) {
+                elements.questionsTableContainer.innerHTML = `
+                    <div class="text-center py-8 text-gray-500 dark:text-gray-400">
+                        <i class="fas fa-question-circle text-3xl mb-2"></i>
+                        <p>No questions yet</p>
+                        <p class="mt-2">Add your first question to get started!</p>
+                    </div>
                 `;
-                elements.questionsTableBody.appendChild(row);
+                return;
+            }
+            
+            let tableHTML = `
+                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                    <thead class="bg-gray-50 dark:bg-gray-700">
+                        <tr>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Question</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Answer</th>
+                            <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+            `;
+            
+            questions.forEach((question, index) => {
+                tableHTML += `
+                    <tr>
+                        <td class="px-4 py-3 text-sm text-gray-800 dark:text-gray-200 max-w-xs truncate">${question.question}</td>
+                        <td class="px-4 py-3 text-sm text-gray-800 dark:text-gray-200 max-w-xs truncate">${question.answer}</td>
+                        <td class="px-4 py-3 text-right text-sm font-medium">
+                            <button class="edit-question-btn text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-200 mr-3" data-index="${index}">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="delete-question-btn text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-200" data-index="${index}">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
             });
             
-            // Add event listeners
+            tableHTML += `</tbody></table>`;
+            elements.questionsTableContainer.innerHTML = tableHTML;
+            
+            // Add event listeners to the buttons
             document.querySelectorAll('.edit-question-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const questionIndex = e.target.closest('.edit-question-btn').dataset.index;
-                    openQuestionModal(questionIndex);
-                });
+                btn.addEventListener('click', () => editQuestion(parseInt(btn.dataset.index)));
             });
             
             document.querySelectorAll('.delete-question-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const questionIndex = e.target.closest('.delete-question-btn').dataset.index;
-                    const subject = state.subjects.find(s => s.id === state.currentSubjectId);
-                    const question = subject.questions[questionIndex];
-                    openConfirmationModal(
-                        'Delete Question',
-                        `Are you sure you want to delete this question?`,
-                        () => deleteQuestion(questionIndex)
-                    );
-                });
+                btn.addEventListener('click', () => deleteQuestion(parseInt(btn.dataset.index)));
             });
         }
 
-        function openQuestionModal(questionIndex = null) {
-            elements.questionModal.classList.remove('hidden');
+        // Open question form for adding or editing
+        function openQuestionForm(questionIndex = null) {
+            elements.questionForm.reset();
             
             if (questionIndex !== null) {
-                // Edit mode
-                elements.questionModalTitle.textContent = 'Edit Question';
-                const subject = state.subjects.find(s => s.id === state.currentSubjectId);
-                const question = subject.questions[questionIndex];
-                
-                elements.questionText.value = question.text;
-                elements.option1.value = question.options[0] || '';
-                elements.option2.value = question.options[1] || '';
-                elements.option3.value = question.options[2] || '';
-                elements.option4.value = question.options[3] || '';
-                
-                // Set the correct option
-                document.querySelector(`input[name="correctOption"][value="${question.correctIndex}"]`).checked = true;
-                
-                state.editingQuestionId = questionIndex;
+                // Editing existing question
+                elements.questionFormTitle.textContent = 'Edit Question';
+                const question = state.subjects[state.currentSubject][questionIndex];
+                elements.questionText.value = question.question;
+                elements.questionAnswer.value = question.answer;
+                elements.editQuestionId.value = questionIndex;
             } else {
-                // Add mode
-                elements.questionModalTitle.textContent = 'Add Question';
-                elements.questionText.value = '';
-                elements.option1.value = '';
-                elements.option2.value = '';
-                elements.option3.value = '';
-                elements.option4.value = '';
-                
-                // Reset radio buttons
-                document.querySelectorAll('input[name="correctOption"]').forEach(radio => {
-                    radio.checked = false;
-                });
-                
-                state.editingQuestionId = null;
+                // Adding new question
+                elements.questionFormTitle.textContent = 'Add New Question';
+                elements.editQuestionId.value = '';
             }
+            
+            elements.questionFormModal.classList.remove('hidden');
         }
 
-        function closeQuestionModal() {
-            elements.questionModal.classList.add('hidden');
-            elements.questionForm.reset();
-            state.editingQuestionId = null;
-        }
-
+        // Save question (add or edit)
         function saveQuestion(e) {
             e.preventDefault();
             
-            const text = elements.questionText.value.trim();
-            const options = [
-                elements.option1.value.trim(),
-                elements.option2.value.trim(),
-                elements.option3.value.trim(),
-                elements.option4.value.trim()
-            ].filter(opt => opt !== ''); // Remove empty options
+            const questionText = elements.questionText.value.trim();
+            const questionAnswer = elements.questionAnswer.value.trim();
+            const questionIndex = elements.editQuestionId.value;
             
-            const correctOption = document.querySelector('input[name="correctOption"]:checked');
-            
-            if (!text) {
-                showToast('Please enter a question', 'error');
+            if (!questionText || !questionAnswer) {
+                showToast('Please fill in both question and answer', 'error');
                 return;
             }
             
-            if (options.length < 2) {
-                showToast('Please provide at least two options', 'error');
-                return;
-            }
-            
-            if (!correctOption) {
-                showToast('Please select the correct answer', 'error');
-                return;
-            }
-            
-            const correctIndex = parseInt(correctOption.value);
-            
-            const subject = state.subjects.find(s => s.id === state.currentSubjectId);
-            
-            if (state.editingQuestionId !== null) {
-                // Update existing question
-                subject.questions[state.editingQuestionId] = {
-                    text: text,
-                    options: options,
-                    correctIndex: correctIndex
-                };
-                showToast('Question updated successfully', 'success');
-            } else {
-                // Add new question
-                subject.questions.push({
-                    text: text,
-                    options: options,
-                    correctIndex: correctIndex
-                });
-                showToast('Question added successfully', 'success');
-            }
-            
-            saveData();
-            renderQuestionsList();
-            renderSubjectCards(); // Update question count on cards
-            closeQuestionModal();
-        }
-
-        function deleteQuestion(questionIndex) {
-            const subject = state.subjects.find(s => s.id === state.currentSubjectId);
-            subject.questions.splice(questionIndex, 1);
-            saveData();
-            renderQuestionsList();
-            renderSubjectCards(); // Update question count on cards
-            closeConfirmationModal();
-            showToast('Question deleted successfully', 'success');
-        }
-
-        // Quiz functionality
-        function renderQuizSubjectSelect() {
-            elements.quizSubjectSelect.innerHTML = '<option value="">Select a subject</option>';
-            
-            state.subjects.forEach(subject => {
-                const option = document.createElement('option');
-                option.value = subject.id;
-                option.textContent = subject.name;
-                elements.quizSubjectSelect.appendChild(option);
-            });
-        }
-
-        function startSubjectQuiz(subjectId) {
-            state.currentSubjectId = subjectId;
-            showPage('quizSetupPage');
-            
-            // Pre-select the subject
-            elements.quizSubjectSelect.value = subjectId;
-        }
-
-        function startRandomQuiz() {
-            state.currentSubjectId = null;
-            startQuiz();
-        }
-
-        function startQuizWithSettings() {
-            // Get settings
-            state.settings.timeLimit = parseInt(elements.timeLimitSelect.value);
-            state.settings.timerVisible = elements.showTimerCheckbox.checked;
-            saveData();
-            
-            startQuiz();
-        }
-
-        function startQuiz() {
-            // Validate subject selection for non-random quiz
-            if (!state.currentSubjectId && elements.quizSubjectSelect.value) {
-                state.currentSubjectId = elements.quizSubjectSelect.value;
-            }
-            
-            // Get questions
-            if (state.currentSubjectId) {
-                // Quiz for specific subject
-                const subject = state.subjects.find(s => s.id === state.currentSubjectId);
-                state.currentQuizQuestions = [...subject.questions];
-                elements.quizSubjectName.textContent = subject.name;
-            } else {
-                // Random quiz - mix questions from all subjects
-                state.currentQuizQuestions = [];
-                state.subjects.forEach(subject => {
-                    state.currentQuizQuestions.push(...subject.questions);
-                });
-                elements.quizSubjectName.textContent = 'Random Quiz';
-            }
-            
-            // Shuffle questions
-            shuffleArray(state.currentQuizQuestions);
-            
-            // Limit to 10 questions for the quiz
-            if (state.currentQuizQuestions.length > 10) {
-                state.currentQuizQuestions = state.currentQuizQuestions.slice(0, 10);
-            }
-            
-            // Reset quiz state
-            state.currentQuestionIndex = 0;
-            state.userAnswers = new Array(state.currentQuizQuestions.length).fill(null);
-            state.quizStartTime = new Date();
-            
-            // Start the quiz
-            showPage('quizPage');
-            showQuestion();
-            
-            // Start timer if enabled
-            if (state.settings.timeLimit > 0) {
-                startTimer();
-            }
-        }
-
-        function showQuestion() {
-            const question = state.currentQuizQuestions[state.currentQuestionIndex];
-            
-            // Update progress
-            elements.quizProgress.textContent = `${state.currentQuestionIndex + 1} / ${state.currentQuizQuestions.length}`;
-            elements.quizProgressBar.style.width = `${((state.currentQuestionIndex + 1) / state.currentQuizQuestions.length) * 100}%`;
-            
-            // Show/hide navigation buttons
-            elements.prevQuestionBtn.style.visibility = state.currentQuestionIndex > 0 ? 'visible' : 'hidden';
-            
-            if (state.currentQuestionIndex === state.currentQuizQuestions.length - 1) {
-                elements.nextQuestionBtn.innerHTML = '<i class="fas fa-flag-checkered mr-2"></i> Finish';
-            } else {
-                elements.nextQuestionBtn.innerHTML = 'Next <i class="fas fa-arrow-right ml-2"></i>';
-            }
-            
-            // Display question
-            elements.quizQuestion.textContent = question.text;
-            
-            // Display options
-            elements.quizOptions.innerHTML = '';
-            question.options.forEach((option, index) => {
-                const optionElement = document.createElement('div');
-                optionElement.className = `answer-option p-4 border border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer transition-all duration-200 ${
-                    state.userAnswers[state.currentQuestionIndex] === index ? 'bg-primary-100 dark:bg-primary-900 border-primary-500' : 'bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700'
-                }`;
-                optionElement.textContent = option;
-                optionElement.addEventListener('click', () => selectAnswer(index));
-                elements.quizOptions.appendChild(optionElement);
-            });
-            
-            // Show/hide timer
-            if (state.settings.timerVisible && state.settings.timeLimit > 0) {
-                elements.quizTimerContainer.classList.remove('hidden');
-                elements.quizTimer.textContent = state.settings.timeLimit;
-            } else {
-                elements.quizTimerContainer.classList.add('hidden');
-            }
-        }
-
-        function selectAnswer(optionIndex) {
-            state.userAnswers[state.currentQuestionIndex] = optionIndex;
-            
-            // Highlight selected option
-            document.querySelectorAll('.answer-option').forEach((option, index) => {
-                if (index === optionIndex) {
-                    option.classList.add('bg-primary-100', 'dark:bg-primary-900', 'border-primary-500');
-                } else {
-                    option.classList.remove('bg-primary-100', 'dark:bg-primary-900', 'border-primary-500');
-                }
-            });
-        }
-
-        function showPreviousQuestion() {
-            if (state.currentQuestionIndex > 0) {
-                state.currentQuestionIndex--;
-                showQuestion();
-            }
-        }
-
-        function showNextQuestion() {
-            if (state.currentQuestionIndex < state.currentQuizQuestions.length - 1) {
-                state.currentQuestionIndex++;
-                showQuestion();
-                
-                // Restart timer if enabled
-                if (state.settings.timeLimit > 0) {
-                    startTimer();
-                }
-            } else {
-                finishQuiz();
-            }
-        }
-
-        function startTimer() {
-            let timeLeft = state.settings.timeLimit;
-            elements.quizTimer.textContent = timeLeft;
-            elements.quizTimer.classList.remove('timer-pulse');
-            
-            const timer = setInterval(() => {
-                timeLeft--;
-                elements.quizTimer.textContent = timeLeft;
-                
-                // Add pulse animation when time is running out
-                if (timeLeft <= 5) {
-                    elements.quizTimer.classList.add('timer-pulse');
-                }
-                
-                if (timeLeft <= 0) {
-                    clearInterval(timer);
-                    
-                    // Auto-advance to next question or finish quiz
-                    if (state.currentQuestionIndex < state.currentQuizQuestions.length - 1) {
-                        state.currentQuestionIndex++;
-                        showQuestion();
-                        startTimer();
-                    } else {
-                        finishQuiz();
-                    }
-                }
-            }, 1000);
-            
-            // Store timer ID to clear it if needed
-            state.currentTimer = timer;
-        }
-
-        function finishQuiz() {
-            if (state.currentTimer) {
-                clearInterval(state.currentTimer);
-            }
-            
-            // Calculate score
-            let correctCount = 0;
-            state.currentQuizQuestions.forEach((question, index) => {
-                if (state.userAnswers[index] === question.correctIndex) {
-                    correctCount++;
-                }
-            });
-            
-            const score = (correctCount / state.currentQuizQuestions.length) * 100;
-            const endTime = new Date();
-            const timeTaken = Math.round((endTime - state.quizStartTime) / 1000); // in seconds
-            
-            // Save to history
-            const quizResult = {
-                id: generateId(),
-                subject: state.currentSubjectId ? 
-                    state.subjects.find(s => s.id === state.currentSubjectId).name : 'Random Quiz',
-                score: score,
-                correctAnswers: correctCount,
-                totalQuestions: state.currentQuizQuestions.length,
-                date: new Date().toISOString(),
-                timeTaken: timeTaken
+            const question = {
+                question: questionText,
+                answer: questionAnswer
             };
             
-            state.quizHistory.unshift(quizResult);
-            saveData();
+            if (questionIndex === '') {
+                // Add new question
+                state.subjects[state.currentSubject].push(question);
+                showToast('Question added successfully!', 'success');
+            } else {
+                // Edit existing question
+                state.subjects[state.currentSubject][questionIndex] = question;
+                showToast('Question updated successfully!', 'success');
+            }
+            
+            saveSubjects();
+            renderQuestionsTable();
+            elements.questionFormModal.classList.add('hidden');
+            updateDashboard();
+        }
+
+        // Edit a question
+        function editQuestion(questionIndex) {
+            openQuestionForm(questionIndex);
+        }
+
+        // Delete a question
+        function deleteQuestion(questionIndex) {
+            if (confirm('Are you sure you want to delete this question?')) {
+                state.subjects[state.currentSubject].splice(questionIndex, 1);
+                saveSubjects();
+                
+                showToast('Question deleted successfully!', 'success');
+                renderQuestionsTable();
+                updateDashboard();
+            }
+        }
+
+        // Update quiz subject dropdown
+        function updateQuizSubjectOptions() {
+            elements.quizSubject.innerHTML = '<option value="">-- Select a subject --</option>';
+            
+            for (const subject in state.subjects) {
+                if (state.subjects[subject].length > 0) {
+                    const option = document.createElement('option');
+                    option.value = subject;
+                    option.textContent = subject;
+                    elements.quizSubject.appendChild(option);
+                }
+            }
+        }
+
+        // Start a quiz
+        function startQuiz() {
+            const subject = elements.quizSubject.value;
+            const numQuestions = parseInt(elements.quizQuestions.value);
+            
+            if (!subject) {
+                showToast('Please select a subject', 'error');
+                return;
+            }
+            
+            if (numQuestions < 1 || numQuestions > state.subjects[subject].length) {
+                showToast(`Please enter a number between 1 and ${state.subjects[subject].length}`, 'error');
+                return;
+            }
+            
+            // Get random questions
+            const allQuestions = [...state.subjects[subject]];
+            const selectedQuestions = [];
+            
+            for (let i = 0; i < numQuestions; i++) {
+                const randomIndex = Math.floor(Math.random() * allQuestions.length);
+                selectedQuestions.push(allQuestions[randomIndex]);
+                allQuestions.splice(randomIndex, 1);
+            }
+            
+            state.currentQuiz = {
+                subject: subject,
+                questions: selectedQuestions,
+                currentQuestion: 0,
+                score: 0,
+                userAnswers: new Array(selectedQuestions.length).fill('')
+            };
+            
+            // Show quiz container and hide setup
+            elements.quizSetup.classList.add('hidden');
+            elements.quizContainer.classList.remove('hidden');
+            elements.quizResults.classList.add('hidden');
+            
+            // Display first question
+            displayQuestion(0);
+        }
+
+        // Display a quiz question
+        function displayQuestion(index) {
+            const question = state.currentQuiz.questions[index];
+            
+            elements.quizContainer.innerHTML = `
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-lg font-semibold text-gray-800 dark:text-white">Question ${index + 1} of ${state.currentQuiz.questions.length}</h2>
+                        <span class="text-sm text-gray-600 dark:text-gray-400">Subject: ${state.currentQuiz.subject}</span>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <p class="text-gray-800 dark:text-white text-lg mb-4">${question.question}</p>
+                        <textarea 
+                            id="quiz-answer" 
+                            rows="4" 
+                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white"
+                            placeholder="Type your answer here..."
+                        >${state.currentQuiz.userAnswers[index]}</textarea>
+                    </div>
+                    
+                    <div class="flex justify-between">
+                        <button 
+                            id="prev-question" 
+                            class="bg-gray-300 dark:bg-gray-700 hover:bg-gray-400 dark:hover:bg-gray-600 text-gray-800 dark:text-white font-medium py-2 px-4 rounded-lg transition duration-200 ${index === 0 ? 'opacity-50 cursor-not-allowed' : ''}"
+                            ${index === 0 ? 'disabled' : ''}
+                        >
+                            Previous
+                        </button>
+                        
+                        ${index < state.currentQuiz.questions.length - 1 ? 
+                            `<button id="next-question" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg transition duration-200">
+                                Next
+                            </button>` : 
+                            `<button id="finish-quiz" class="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition duration-200">
+                                Finish Quiz
+                            </button>`
+                        }
+                    </div>
+                </div>
+            `;
+            
+            // Add event listeners
+            const answerInput = document.getElementById('quiz-answer');
+            answerInput.addEventListener('input', () => {
+                state.currentQuiz.userAnswers[index] = answerInput.value;
+            });
+            
+            if (index > 0) {
+                document.getElementById('prev-question').addEventListener('click', () => {
+                    displayQuestion(index - 1);
+                });
+            }
+            
+            if (index < state.currentQuiz.questions.length - 1) {
+                document.getElementById('next-question').addEventListener('click', () => {
+                    displayQuestion(index + 1);
+                });
+            } else {
+                document.getElementById('finish-quiz').addEventListener('click', finishQuiz);
+            }
+        }
+
+        // Finish the quiz and show results
+        function finishQuiz() {
+            // Calculate score
+            let score = 0;
+            const results = [];
+            
+            state.currentQuiz.questions.forEach((question, index) => {
+                const userAnswer = state.currentQuiz.userAnswers[index].trim().toLowerCase();
+                const correctAnswer = question.answer.trim().toLowerCase();
+                
+                // Simple comparison - in a real app you might want more sophisticated checking
+                const isCorrect = userAnswer === correctAnswer;
+                
+                if (isCorrect) {
+                    score++;
+                }
+                
+                results.push({
+                    question: question.question,
+                    userAnswer: state.currentQuiz.userAnswers[index],
+                    correctAnswer: question.answer,
+                    isCorrect: isCorrect
+                });
+            });
+            
+            // Save quiz history
+            const quizResult = {
+                subject: state.currentQuiz.subject,
+                score: score,
+                total: state.currentQuiz.questions.length,
+                date: new Date().toISOString(),
+                results: results
+            };
+            
+            state.quizHistory.push(quizResult);
+            localStorage.setItem('studyHelperQuizHistory', JSON.stringify(state.quizHistory));
             
             // Display results
             displayQuizResults(quizResult);
-            showPage('quizResultsPage');
         }
 
+        // Display quiz results
         function displayQuizResults(result) {
-            // Set result title based on score
-            if (result.score >= 90) {
-                elements.resultsTitle.textContent = 'Excellent!';
-            } else if (result.score >= 70) {
-                elements.resultsTitle.textContent = 'Good Job!';
-            } else if (result.score >= 50) {
-                elements.resultsTitle.textContent = 'Not Bad!';
-            } else {
-                elements.resultsTitle.textContent = 'Keep Practicing!';
-            }
+            elements.quizContainer.classList.add('hidden');
+            elements.quizResults.classList.remove('hidden');
             
-            elements.resultsScore.textContent = `You scored ${result.correctAnswers} out of ${result.totalQuestions}`;
-            elements.correctAnswersCount.textContent = result.correctAnswers;
-            elements.incorrectAnswersCount.textContent = result.totalQuestions - result.correctAnswers;
+            let resultsHTML = `
+                <h2 class="text-xl font-bold text-gray-800 dark:text-white mb-4">Quiz Results</h2>
+                <div class="bg-${result.score === result.total ? 'green' : result.score >= result.total/2 ? 'yellow' : 'red'}-50 dark:bg-${result.score === result.total ? 'green' : result.score >= result.total/2 ? 'yellow' : 'red'}-900/20 border border-${result.score === result.total ? 'green' : result.score >= result.total/2 ? 'yellow' : 'red'}-200 dark:border-${result.score === result.total ? 'green' : result.score >= result.total/2 ? 'yellow' : 'red'}-800 rounded-lg p-4 mb-6">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-lg bg-${result.score === result.total ? 'green' : result.score >= result.total/2 ? 'yellow' : 'red'}-100 dark:bg-${result.score === result.total ? 'green' : result.score >= result.total/2 ? 'yellow' : 'red'}-900 text-${result.score === result.total ? 'green' : result.score >= result.total/2 ? 'yellow' : 'red'}-600 dark:text-${result.score === result.total ? 'green' : result.score >= result.total/2 ? 'yellow' : 'red'}-400 mr-4">
+                            <i class="fas fa-${result.score === result.total ? 'trophy' : result.score >= result.total/2 ? 'star' : 'exclamation-triangle'} text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-${result.score === result.total ? 'green' : result.score >= result.total/2 ? 'yellow' : 'red'}-800 dark:text-${result.score === result.total ? 'green' : result.score >= result.total/2 ? 'yellow' : 'red'}-400">${result.subject} Quiz</h3>
+                            <p class="text-${result.score === result.total ? 'green' : result.score >= result.total/2 ? 'yellow' : 'red'}-700 dark:text-${result.score === result.total ? 'green' : result.score >= result.total/2 ? 'yellow' : 'red'}-300">Score: ${result.score}/${result.total} (${Math.round((result.score/result.total)*100)}%)</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="space-y-4">
+                    <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Question Review</h3>
+            `;
+            
+            result.results.forEach((item, index) => {
+                resultsHTML += `
+                    <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 ${item.isCorrect ? 'bg-green-50 dark:bg-green-900/20' : 'bg-red-50 dark:bg-red-900/20'}">
+                        <div class="flex items-start mb-2">
+                            <span class="flex-shrink-0 w-6 h-6 flex items-center justify-center rounded-full ${item.isCorrect ? 'bg-green-100 text-green-600 dark:bg-green-800 dark:text-green-400' : 'bg-red-100 text-red-600 dark:bg-red-800 dark:text-red-400'} mr-2 mt-1">
+                                <i class="fas fa-${item.isCorrect ? 'check' : 'times'} text-xs"></i>
+                            </span>
+                            <p class="font-medium text-gray-800 dark:text-white">${index + 1}. ${item.question}</p>
+                        </div>
+                        <div class="ml-8">
+                            <p class="text-sm ${item.isCorrect ? 'text-green-700 dark:text-green-300' : 'text-red-700 dark:text-red-300'}">
+                                <span class="font-medium">Your answer:</span> ${item.userAnswer || 'No answer provided'}
+                            </p>
+                            ${!item.isCorrect ? `
+                                <p class="text-sm text-green-700 dark:text-green-300 mt-1">
+                                    <span class="font-medium">Correct answer:</span> ${item.correctAnswer}
+                                </p>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            resultsHTML += `
+                </div>
+                <div class="mt-6 flex justify-between">
+                    <button id="retake-quiz" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg transition duration-200">
+                        Retake Quiz
+                    </button>
+                    <button id="new-quiz" class="bg-gray-300 dark:bg-gray-700 hover:bg-gray-400 dark:hover:bg-gray-600 text-gray-800 dark:text-white font-medium py-2 px-4 rounded-lg transition duration-200">
+                        New Quiz
+                    </button>
+                </div>
+            `;
+            
+            elements.quizResults.innerHTML = resultsHTML;
+            
+            // Add event listeners
+            document.getElementById('retake-quiz').addEventListener('click', () => {
+                // Reset user answers and start from first question
+                state.currentQuiz.userAnswers = new Array(state.currentQuiz.questions.length).fill('');
+                state.currentQuiz.currentQuestion = 0;
+                state.currentQuiz.score = 0;
+                
+                elements.quizResults.classList.add('hidden');
+                elements.quizContainer.classList.remove('hidden');
+                displayQuestion(0);
+            });
+            
+            document.getElementById('new-quiz').addEventListener('click', () => {
+                // Go back to quiz setup
+                elements.quizResults.classList.add('hidden');
+                elements.quizSetup.classList.remove('hidden');
+            });
+            
+            // Update dashboard
+            updateDashboard();
         }
 
-        function reviewQuiz() {
-            // This would show a review of all questions with correct/incorrect indicators
-            // For now, just go back to the dashboard
-            showPage('dashboardPage');
-        }
-
-        // Quiz History
+        // Render quiz history
         function renderQuizHistory() {
-            elements.historyList.innerHTML = '';
+            elements.historyContent.innerHTML = '';
             
             if (state.quizHistory.length === 0) {
-                elements.emptyHistory.classList.remove('hidden');
+                elements.historyContent.innerHTML = `
+                    <div class="text-center py-8 text-gray-500 dark:text-gray-400">
+                        <i class="fas fa-history text-4xl mb-4"></i>
+                        <p class="text-lg">No quiz history yet</p>
+                        <p class="mt-2">Take your first quiz to see your results here!</p>
+                    </div>
+                `;
                 return;
             }
             
-            elements.emptyHistory.classList.add('hidden');
+            // Sort by date (newest first)
+            const sortedHistory = [...state.quizHistory].sort((a, b) => new Date(b.date) - new Date(a.date));
             
-            // Sort history based on selection
-            let sortedHistory = [...state.quizHistory];
-            const sortBy = elements.historySortSelect.value;
+            let historyHTML = `
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                        <thead class="bg-gray-50 dark:bg-gray-700">
+                            <tr>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Date</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Subject</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Score</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Percentage</th>
+                                <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+            `;
             
-            switch (sortBy) {
-                case 'newest':
-                    // Already sorted by newest (unshift adds to beginning)
-                    break;
-                case 'oldest':
-                    sortedHistory.reverse();
-                    break;
-                case 'highest':
-                    sortedHistory.sort((a, b) => b.score - a.score);
-                    break;
-                case 'lowest':
-                    sortedHistory.sort((a, b) => a.score - b.score);
-                    break;
-            }
-            
-            sortedHistory.forEach(attempt => {
-                const item = document.createElement('div');
-                item.className = 'flex justify-between items-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg';
-                
-                const date = new Date(attempt.date);
-                const formattedDate = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-                
-                // Determine score color
-                let scoreColor = 'text-red-600 dark:text-red-400';
-                if (attempt.score >= 70) scoreColor = 'text-green-600 dark:text-green-400';
-                else if (attempt.score >= 50) scoreColor = 'text-yellow-600 dark:text-yellow-400';
-                
-                item.innerHTML = `
-                    <div>
-                        <h4 class="font-medium text-gray-800 dark:text-white">${attempt.subject}</h4>
-                        <p class="text-sm text-gray-600 dark:text-gray-400">${formattedDate} • ${attempt.timeTaken}s</p>
-                    </div>
-                    <div class="text-right">
-                        <p class="font-bold ${scoreColor}">${attempt.score.toFixed(1)}%</p>
-                        <p class="text-sm text-gray-600 dark:text-gray-400">${attempt.correctAnswers}/${attempt.totalQuestions} correct</p>
-                    </div>
+            sortedHistory.forEach((quiz, index) => {
+                const percentage = Math.round((quiz.score/quiz.total)*100);
+                historyHTML += `
+                    <tr>
+                        <td class="px-4 py-3 text-sm text-gray-800 dark:text-gray-200">${new Date(quiz.date).toLocaleDateString()}</td>
+                        <td class="px-4 py-3 text-sm text-gray-800 dark:text-gray-200">${quiz.subject}</td>
+                        <td class="px-4 py-3 text-sm text-gray-800 dark:text-gray-200">${quiz.score}/${quiz.total}</td>
+                        <td class="px-4 py-3 text-sm">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${percentage >= 80 ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : percentage >= 60 ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'}">
+                                ${percentage}%
+                            </span>
+                        </td>
+                        <td class="px-4 py-3 text-right text-sm font-medium">
+                            <button class="view-quiz-details text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-200" data-index="${index}">
+                                View Details
+                            </button>
+                        </td>
+                    </tr>
                 `;
-                elements.historyList.appendChild(item);
+            });
+            
+            historyHTML += `</tbody></table></div>`;
+            elements.historyContent.innerHTML = historyHTML;
+            
+            // Add event listeners to view details buttons
+            document.querySelectorAll('.view-quiz-details').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const quizIndex = parseInt(btn.dataset.index);
+                    viewQuizDetails(quizIndex);
+                });
             });
         }
 
-        function clearQuizHistory() {
-            openConfirmationModal(
-                'Clear History',
-                'Are you sure you want to clear all quiz history? This action cannot be undone.',
-                () => {
-                    state.quizHistory = [];
-                    saveData();
-                    renderQuizHistory();
-                    closeConfirmationModal();
-                    showToast('Quiz history cleared', 'success');
-                }
-            );
+        // View detailed quiz results
+        function viewQuizDetails(quizIndex) {
+            const quiz = state.quizHistory[quizIndex];
+            
+            // Create a modal to show detailed results
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-40';
+            modal.innerHTML = `
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-4xl mx-4 max-h-[90vh] overflow-hidden">
+                    <div class="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+                        <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Quiz Details - ${quiz.subject}</h3>
+                        <button class="close-modal text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="p-4 overflow-auto max-h-[calc(90vh-120px)]">
+                        <div class="mb-4 p-4 bg-${quiz.score === quiz.total ? 'green' : quiz.score >= quiz.total/2 ? 'yellow' : 'red'}-50 dark:bg-${quiz.score === quiz.total ? 'green' : quiz.score >= quiz.total/2 ? 'yellow' : 'red'}-900/20 border border-${quiz.score === quiz.total ? 'green' : quiz.score >= quiz.total/2 ? 'yellow' : 'red'}-200 dark:border-${quiz.score === quiz.total ? 'green' : quiz.score >= quiz.total/2 ? 'yellow' : 'red'}-800 rounded-lg">
+                            <div class="flex items-center">
+                                <div class="p-3 rounded-lg bg-${quiz.score === quiz.total ? 'green' : quiz.score >= quiz.total/2 ? 'yellow' : 'red'}-100 dark:bg-${quiz.score === quiz.total ? 'green' : quiz.score >= quiz.total/2 ? 'yellow' : 'red'}-900 text-${quiz.score === quiz.total ? 'green' : quiz.score >= quiz.total/2 ? 'yellow' : 'red'}-600 dark:text-${quiz.score === quiz.total ? 'green' : quiz.score >= quiz.total/2 ? 'yellow' : 'red'}-400 mr-4">
+                                    <i class="fas fa-${quiz.score === quiz.total ? 'trophy' : quiz.score >= quiz.total/2 ? 'star' : 'exclamation-triangle'} text-xl"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-semibold text-${quiz.score === quiz.total ? 'green' : quiz.score >= quiz.total/2 ? 'yellow' : 'red'}-800 dark:text-${quiz.score === quiz.total ? 'green' : quiz.score >= quiz.total/2 ? 'yellow' : 'red'}-400">${quiz.subject} Quiz</h3>
+                                    <p class="text-${quiz.score === quiz.total ? 'green' : quiz.score >= quiz.total/2 ? 'yellow' : 'red'}-700 dark:text-${quiz.score === quiz.total ? 'green' : quiz.score >= quiz.total/2 ? 'yellow' : 'red'}-300">Score: ${quiz.score}/${quiz.total} (${Math.round((quiz.score/quiz.total)*100)}%)</p>
+                                    <p class="text-${quiz.score === quiz.total ? 'green' : quiz.score >= quiz.total/2 ? 'yellow' : 'red'}-700 dark:text-${quiz.score === quiz.total ? 'green' : quiz.score >= quiz.total/2 ? 'yellow' : 'red'}-300 text-sm mt-1">Date: ${new Date(quiz.date).toLocaleString()}</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-4">
+                            <h4 class="text-lg font-semibold text-gray-800 dark:text-white">Question Review</h4>
+                            ${quiz.results.map((item, index) => `
+                                <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 ${item.isCorrect ? 'bg-green-50 dark:bg-green-900/20' : 'bg-red-50 dark:bg-red-900/20'}">
+                                    <div class="flex items-start mb-2">
+                                        <span class="flex-shrink-0 w-6 h-6 flex items-center justify-center rounded-full ${item.isCorrect ? 'bg-green-100 text-green-600 dark:bg-green-800 dark:text-green-400' : 'bg-red-100 text-red-600 dark:bg-red-800 dark:text-red-400'} mr-2 mt-1">
+                                            <i class="fas fa-${item.isCorrect ? 'check' : 'times'} text-xs"></i>
+                                        </span>
+                                        <p class="font-medium text-gray-800 dark:text-white">${index + 1}. ${item.question}</p>
+                                    </div>
+                                    <div class="ml-8">
+                                        <p class="text-sm ${item.isCorrect ? 'text-green-700 dark:text-green-300' : 'text-red-700 dark:text-red-300'}">
+                                            <span class="font-medium">Your answer:</span> ${item.userAnswer || 'No answer provided'}
+                                        </p>
+                                        ${!item.isCorrect ? `
+                                            <p class="text-sm text-green-700 dark:text-green-300 mt-1">
+                                                <span class="font-medium">Correct answer:</span> ${item.correctAnswer}
+                                            </p>
+                                        ` : ''}
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            // Add event listener to close button
+            modal.querySelector('.close-modal').addEventListener('click', () => {
+                document.body.removeChild(modal);
+            });
         }
 
-        // Import/Export
+        // Export data as JSON file
         function exportData() {
             const data = {
                 subjects: state.subjects,
-                quizHistory: state.quizHistory,
-                settings: state.settings,
-                exportDate: new Date().toISOString()
+                quizHistory: state.quizHistory
             };
             
             const dataStr = JSON.stringify(data, null, 2);
@@ -1509,152 +1179,116 @@
             const url = URL.createObjectURL(dataBlob);
             const link = document.createElement('a');
             link.href = url;
-            link.download = `studyhelper_backup_${new Date().toISOString().split('T')[0]}.json`;
+            link.download = 'study-helper-data.json';
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
             URL.revokeObjectURL(url);
             
-            showToast('Data exported successfully', 'success');
+            showToast('Data exported successfully!', 'success');
         }
 
-        function handleFileSelect(e) {
-            const file = e.target.files[0];
-            if (file) {
-                elements.importFileName.textContent = `Selected: ${file.name}`;
-            }
-        }
-
+        // Import data from JSON file
         function importData() {
-            const file = elements.importFileInput.files[0];
-            
-            if (!file) {
-                showToast('Please select a file to import', 'error');
-                return;
-            }
+            const file = elements.importFile.files[0];
+            if (!file) return;
             
             const reader = new FileReader();
-            
             reader.onload = function(e) {
                 try {
                     const data = JSON.parse(e.target.result);
                     
-                    // Validate data structure
-                    if (!data.subjects || !Array.isArray(data.subjects)) {
-                        throw new Error('Invalid data format: subjects array missing');
-                    }
-                    
-                    // Confirm import
-                    openConfirmationModal(
-                        'Import Data',
-                        'This will replace all your current subjects and quiz history. Are you sure you want to continue?',
-                        () => {
+                    if (data.subjects && data.quizHistory) {
+                        if (confirm('This will replace all your current data. Are you sure?')) {
                             state.subjects = data.subjects;
-                            state.quizHistory = data.quizHistory || [];
-                            state.settings = data.settings || state.settings;
+                            state.quizHistory = data.quizHistory;
                             
-                            saveData();
-                            renderSubjectCards();
-                            renderSubjectsList();
-                            renderQuizSubjectSelect();
+                            saveSubjects();
+                            localStorage.setItem('studyHelperQuizHistory', JSON.stringify(state.quizHistory));
+                            
+                            // Update UI
+                            updateDashboard();
+                            renderSubjects();
+                            updateQuizSubjectOptions();
                             renderQuizHistory();
                             
-                            closeConfirmationModal();
-                            showToast('Data imported successfully', 'success');
-                            
-                            // Reset file input
-                            elements.importFileInput.value = '';
-                            elements.importFileName.textContent = '';
+                            showToast('Data imported successfully!', 'success');
                         }
-                    );
+                    } else {
+                        showToast('Invalid data file', 'error');
+                    }
                 } catch (error) {
-                    showToast('Error importing data: ' + error.message, 'error');
+                    showToast('Error reading file', 'error');
+                    console.error(error);
                 }
             };
-            
             reader.readAsText(file);
+            
+            // Reset file input
+            elements.importFile.value = '';
         }
 
-        // Modals
-        function openConfirmationModal(title, message, callback) {
-            elements.confirmationModalTitle.textContent = title;
-            elements.confirmationModalMessage.textContent = message;
-            elements.confirmationModal.classList.remove('hidden');
-            state.deleteCallback = callback;
-        }
-
-        function closeConfirmationModal() {
-            elements.confirmationModal.classList.add('hidden');
-            state.deleteCallback = null;
-        }
-
-        function confirmDelete() {
-            if (state.deleteCallback) {
-                state.deleteCallback();
+        // Clear all data
+        function clearAllData() {
+            if (confirm('Are you sure you want to clear all data? This action cannot be undone.')) {
+                state.subjects = {};
+                state.quizHistory = [];
+                
+                localStorage.removeItem('studyHelperSubjects');
+                localStorage.removeItem('studyHelperQuizHistory');
+                
+                // Update UI
+                updateDashboard();
+                renderSubjects();
+                updateQuizSubjectOptions();
+                renderQuizHistory();
+                
+                // Show welcome message
+                elements.welcomeMessage.classList.remove('hidden');
+                elements.dashboardContent.classList.add('hidden');
+                
+                showToast('All data cleared successfully!', 'success');
             }
         }
 
-        // Utilities
-        function generateId() {
-            return Date.now().toString(36) + Math.random().toString(36).substr(2);
+        // Save subjects to localStorage
+        function saveSubjects() {
+            localStorage.setItem('studyHelperSubjects', JSON.stringify(state.subjects));
         }
 
-        function shuffleArray(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-            return array;
-        }
-
-        function saveData() {
-            localStorage.setItem('studyhelper_subjects', JSON.stringify(state.subjects));
-            localStorage.setItem('studyhelper_quizHistory', JSON.stringify(state.quizHistory));
-            localStorage.setItem('studyhelper_settings', JSON.stringify(state.settings));
-        }
-
+        // Show toast notification
         function showToast(message, type = 'info') {
-            const toast = elements.toast;
-            toast.textContent = message;
+            const toast = document.createElement('div');
+            toast.className = `toast-transition p-4 rounded-lg shadow-lg max-w-sm flex items-start ${type === 'success' ? 'bg-green-500 text-white' : type === 'error' ? 'bg-red-500 text-white' : 'bg-indigo-500 text-white'}`;
+            toast.innerHTML = `
+                <div class="flex-shrink-0">
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-triangle' : 'info-circle'}"></i>
+                </div>
+                <div class="ml-3 flex-1">
+                    <p class="text-sm">${message}</p>
+                </div>
+                <button class="ml-4 flex-shrink-0 text-white hover:text-gray-200">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
             
-            // Set background color based on type
-            toast.className = 'toast'; // Reset classes
-            if (type === 'success') {
-                toast.classList.add('bg-green-100', 'dark:bg-green-900', 'text-green-800', 'dark:text-green-200');
-            } else if (type === 'error') {
-                toast.classList.add('bg-red-100', 'dark:bg-red-900', 'text-red-800', 'dark:text-red-200');
-            } else {
-                toast.classList.add('bg-blue-100', 'dark:bg-blue-900', 'text-blue-800', 'dark:text-blue-200');
-            }
+            elements.toastContainer.appendChild(toast);
             
-            toast.classList.add('show');
+            // Add event listener to close button
+            toast.querySelector('button').addEventListener('click', () => {
+                toast.remove();
+            });
             
-            // Hide after 3 seconds
+            // Auto remove after 5 seconds
             setTimeout(() => {
-                toast.classList.remove('show');
-            }, 3000);
-        }
-
-        function toggleDarkMode() {
-            document.documentElement.classList.toggle('dark');
-            state.settings.darkMode = document.documentElement.classList.contains('dark');
-            saveData();
-            
-            // Update icon
-            const icon = elements.darkModeToggle.querySelector('i');
-            if (state.settings.darkMode) {
-                icon.className = 'fas fa-sun';
-            } else {
-                icon.className = 'fas fa-moon';
-            }
-        }
-
-        function showHelp() {
-            showToast('Check the GitHub repository for documentation', 'info');
+                if (toast.parentNode) {
+                    toast.remove();
+                }
+            }, 5000);
         }
 
         // Initialize the app when DOM is loaded
-        document.addEventListener('DOMContentLoaded', initApp);
+        document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
 </html>
