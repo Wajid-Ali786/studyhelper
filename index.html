@@ -3,9 +3,893 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
+    <title>Study Helper Quiz</title>
+    <!-- 1. Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
     
+    <!-- 2. Load Inter font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- 3. Custom Styles -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Custom transition for screens */
+        .screen {
+            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+        }
+
+        .screen.hidden {
+            opacity: 0;
+            transform: scale(0.98);
+            /* We use 'display: none' (from Tailwind's 'hidden' class) to remove it from layout */
+        }
+
+        /* Custom styles for answer buttons */
+        .option-btn.correct {
+            @apply bg-green-100 border-green-500 text-green-800 font-semibold;
+        }
+        .option-btn.incorrect {
+            @apply bg-red-100 border-red-500 text-red-800 font-semibold;
+        }
+
+        /* Style for the progress bar transition */
+        #progress-bar-inner {
+            transition: width 0.5s ease-out;
+        }
+
+        /* A subtle animation for elements fading in */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="bg-slate-100 min-h-screen flex items-center justify-center p-4">
+
+    <!-- Main Quiz Container Card -->
+    <div class="w-full max-w-2xl bg-white rounded-xl shadow-2xl p-6 sm:p-10">
+
+        <!-- ===== SCREEN 1: Start Screen ===== -->
+        <div id="start-screen" class="screen">
+            <h1 class="text-3xl font-bold text-center text-slate-800 mb-2">Study Helper Quiz</h1>
+            <p class="text-center text-slate-500 mb-8">Select your topic and start practicing!</p>
+            
+            <div class="space-y-6">
+                <!-- Subject Selection -->
+                <div>
+                    <label for="subject-select" class="block text-sm font-medium text-slate-700 mb-1">1. Choose a Subject</label>
+                    <select id="subject-select" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <!-- Options will be populated by JavaScript -->
+                    </select>
+                </div>
+                
+                <!-- Number of Questions Selection -->
+                <div>
+                    <label for="question-count-select" class="block text-sm font-medium text-slate-700 mb-1">2. Select Number of Questions</label>
+                    <select id="question-count-select" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <option value="5">5 Questions</option>
+                        <option value="10">10 Questions</option>
+                        <option value="all">All Questions</option>
+                    </select>
+                </div>
+
+                <!-- Start Button -->
+                <button id="start-btn" class="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold text-lg shadow-md hover:bg-blue-700 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-blue-300">
+                    Start Quiz
+                </button>
+            </div>
+
+            <!-- Question Bank Manager Button -->
+            <div class="text-center mt-6">
+                <button id="manage-bank-btn" class="w-full bg-slate-600 text-white py-3 px-6 rounded-lg font-semibold shadow-md hover:bg-slate-700 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-slate-300">
+                    Manage Question Bank
+                </button>
+            </div>
+            
+            <!-- Last Score Display -->
+            <div class="text-center mt-8">
+                <p class="text-slate-500">Your last score: <span id="last-score" class="font-bold text-slate-700">N/A</span></p>
+            </div>
+        </div>
+
+        <!-- ===== SCREEN 2: Quiz Screen ===== -->
+        <div id="quiz-screen" class="screen hidden">
+            <!-- Header: Timer & Score -->
+            <div class="flex justify-between items-center mb-4">
+                <div id="timer" class="text-lg font-bold text-blue-600">Time: 00:00</div>
+                <div id="score" class="text-lg font-bold text-green-600">Score: 0</div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="w-full bg-slate-200 rounded-full h-2.5 mb-6">
+                <div id="progress-bar-inner" class="bg-blue-600 h-2.5 rounded-full" style="width: 0%"></div>
+            </div>
+
+            <!-- Question Container -->
+            <div id="question-container" class="mb-6">
+                <h2 id="question-text" class="text-2xl font-semibold text-slate-800 mb-6 min-h-[70px]">
+                    <!-- Question text goes here -->
+                </h2>
+                <div id="options-container" class="space-y-3">
+                    <!-- Option buttons go here -->
+                </div>
+            </div>
+
+            <!-- Feedback Message -->
+            <p id="feedback-message" class="text-center font-medium min-h-[2em] mb-4"></p>
+
+            <!-- Next Button -->
+            <button id="next-btn" class="w-full bg-slate-700 text-white py-3 px-6 rounded-lg font-semibold text-lg shadow-md hover:bg-slate-800 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-slate-300 hidden">
+                Next Question
+            </button>
+        </div>
+
+        <!-- ===== SCREEN 3: Results Screen ===== -->
+        <div id="results-screen" class="screen hidden">
+            <h1 class="text-3xl font-bold text-center text-slate-800 mb-4">Quiz Complete!</h1>
+            
+            <div class="bg-slate-100 rounded-lg p-6 text-center mb-6">
+                <p class="text-lg text-slate-600">Your final score is:</p>
+                <h2 id="final-score" class="text-5xl font-bold text-blue-600 my-2">0 / 0</h2>
+                <p id="percentage" class="text-2xl font-semibold text-green-600">0%</p>
+            </div>
+
+            <!-- Show Correct Answers Section -->
+            <div id="results-summary-container" class="mb-6">
+                <h3 class="text-xl font-semibold text-slate-800 mb-3">Review Your Answers:</h3>
+                <div id="results-summary" class="space-y-4 max-h-60 overflow-y-auto pr-2">
+                    <!-- Results summary goes here -->
+                </div>
+            </div>
+
+            <!-- Restart Button -->
+            <button id="restart-btn" class="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold text-lg shadow-md hover:bg-blue-700 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-blue-300">
+                Practice Again
+            </button>
+        </div>
+
+        <!-- ===== SCREEN 4: Admin Panel Screen ===== -->
+        <div id="admin-screen" class="screen hidden">
+            <div class="flex justify-between items-center mb-6">
+                <h1 class="text-3xl font-bold text-slate-800">Question Bank</h1>
+                <button id="admin-back-btn" class="bg-slate-200 text-slate-800 py-2 px-4 rounded-lg font-semibold hover:bg-slate-300 transition-all">
+                    Back to Quiz
+                </button>
+            </div>
+
+            <p id="admin-feedback" class="text-center font-medium min-h-[2em] mb-4"></p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                
+                <!-- Left Column: Add/View Subjects -->
+                <div class="space-y-6">
+                    <!-- Add Subject -->
+                    <div class="bg-slate-50 p-4 rounded-lg border">
+                        <h3 class="text-lg font-semibold mb-3 text-slate-700">1. Add New Subject</h3>
+                        <div class="flex gap-2">
+                            <input type="text" id="new-subject-name" placeholder="Enter new subject name" class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                            <button id="add-subject-btn" class="bg-blue-600 text-white py-2 px-4 rounded-lg font-semibold hover:bg-blue-700">Add</button>
+                        </div>
+                    </div>
+
+                    <!-- View Subjects -->
+                    <div class="bg-slate-50 p-4 rounded-lg border">
+                        <h3 class="text-lg font-semibold mb-3 text-slate-700">All Subjects</h3>
+                        <ul id="admin-subject-list" class="list-disc list-inside text-slate-600 space-y-1 max-h-40 overflow-y-auto">
+                            <!-- Subject list will be populated by JavaScript -->
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Right Column: Add Question -->
+                <div class="bg-slate-50 p-4 rounded-lg border space-y-4">
+                    <h3 class="text-lg font-semibold text-slate-700">2. Add New Question</h3>
+                    
+                    <div>
+                        <label for="admin-subject-select" class="block text-sm font-medium text-slate-700 mb-1">Select Subject</label>
+                        <select id="admin-subject-select" class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                            <!-- Options will be populated by JavaScript -->
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="admin-question-text" class="block text-sm font-medium text-slate-700 mb-1">Question</label>
+                        <textarea id="admin-question-text" rows="2" placeholder="What is...?" class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500"></textarea>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label for="admin-option-1" class="block text-sm font-medium text-slate-700 mb-1">Option 1</label>
+                            <input type="text" id="admin-option-1" placeholder="Answer 1" class="w-full p-2 border border-slate-300 rounded-lg">
+                        </div>
+                        <div>
+                            <label for="admin-option-2" class="block text-sm font-medium text-slate-700 mb-1">Option 2</label>
+                            <input type="text" id="admin-option-2" placeholder="Answer 2" class="w-full p-2 border border-slate-300 rounded-lg">
+                        </div>
+                        <div>
+                            <label for="admin-option-3" class="block text-sm font-medium text-slate-700 mb-1">Option 3</label>
+                            <input type="text" id="admin-option-3" placeholder="Answer 3" class="w-full p-2 border border-slate-300 rounded-lg">
+                        </div>
+                        <div>
+                            <label for="admin-option-4" class="block text-sm font-medium text-slate-700 mb-1">Option 4</label>
+                            <input type="text" id="admin-option-4" placeholder="Answer 4" class="w-full p-2 border border-slate-300 rounded-lg">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="admin-correct-answer" class="block text-sm font-medium text-slate-700 mb-1">Correct Answer</label>
+                        <select id="admin-correct-answer" class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                            <option value="1">Option 1</option>
+                            <option value="2">Option 2</option>
+                            <option value="3">Option 3</option>
+                            <option value="4">Option 4</option>
+                        </select>
+                    </div>
+
+                    <button id="add-question-btn" class="w-full bg-green-600 text-white py-3 rounded-lg font-semibold shadow-md hover:bg-green-700">
+                        Save Question
+                    </button>
+                </div>
+            </div>
+
+            <!-- Import/Export Section -->
+            <div class="mt-8 border-t pt-6">
+                <h3 class="text-xl font-semibold text-slate-700 mb-4">Import / Export Data</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="import-export-data" class="block text-sm font-medium text-slate-700 mb-1">Data (JSON format)</label>
+                        <textarea id="import-export-data" rows="5" class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="Paste data to import, or click Export to see data here..."></textarea>
+                    </div>
+                    <div class="flex flex-col space-y-3">
+                        <button id="export-btn" class="w-full bg-blue-500 text-white py-2 px-4 rounded-lg font-semibold hover:bg-blue-600">Export My Question Bank</button>
+                        <button id="import-btn" class="w-full bg-orange-500 text-white py-2 px-4 rounded-lg font-semibold hover:bg-orange-600">Import This Data</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ===== JavaScript ===== -->
+    <script type="module">
+        // --- 1. QUIZ DATA ---
+        // This is now the DEFAULT data, used only if localStorage is empty.
+        const defaultQuizData = {
+            "subjects": [
+                {
+                    "name": "JavaScript Basics",
+                    "questions": [
+                        {
+                            "question": "What does 'DOM' stand for?",
+                            "options": ["Document Object Model", "Data Object Model", "Document-oriented-Model", "Desktop Object Management"],
+                            "answer": "Document Object Model"
+                        },
+                        {
+                            "question": "Which keyword is used to declare a variable that cannot be reassigned?",
+                            "options": ["var", "let", "const", "static"],
+                            "answer": "const"
+                        },
+                        {
+                            "question": "What is 'NaN' in JavaScript?",
+                            "options": ["Not a Number", "No and No", "Not a Noun", "Null available Now"],
+                            "answer": "Not a Number"
+                        },
+                        {
+                            "question": "How do you write a single-line comment in JavaScript?",
+                            "options": ["// This is a comment", "<!-- This is a comment -->", "/* This is a comment */", "# This is a comment"],
+                            "answer": "// This is a comment"
+                        },
+                        {
+                            "question": "Which method adds a new item to the end of an array?",
+                            "options": ["arr.pop()", "arr.push()", "arr.shift()", "arr.unshift()"],
+                            "answer": "arr.push()"
+                        },
+                        {
+                            "question": "What does '==' operator compare?",
+                            "options": ["Value and Type", "Value only", "Type only", "Reference only"],
+                            "answer": "Value only"
+                        },
+                        {
+                            "question": "What does '===' operator compare?",
+                            "options": ["Value and Type", "Value only", "Type only", "Reference only"],
+                            "answer": "Value and Type"
+                        }
+                    ]
+                },
+                {
+                    "name": "World Capitals",
+                    "questions": [
+                        {
+                            "question": "What is the capital of Canada?",
+                            "options": ["Toronto", "Vancouver", "Ottawa", "Montreal"],
+                            "answer": "Ottawa"
+                        },
+                        {
+                            "question": "What is the capital of Australia?",
+                            "options": ["Sydney", "Melbourne", "Canberra", "Brisbane"],
+                            "answer": "Canberra"
+                        },
+                        {
+                            "question": "What is the capital of Japan?",
+                            "options": ["Kyoto", "Osaka", "Tokyo", "Hiroshima"],
+                            "answer": "Tokyo"
+                        },
+                        {
+                            "question": "What is the capital of Brazil?",
+                            "options": ["Rio de Janeiro", "São Paulo", "Salvador", "Brasília"],
+                            "answer": "Brasília"
+                        },
+                        {
+                            "question": "What is the capital of Egypt?",
+                            "options": ["Alexandria", "Cairo", "Giza", "Luxor"],
+                            "answer": "Cairo"
+                        }
+                    ]
+                }
+            ]
+        };
+
+        // --- 2. DOM Element References ---
+        const startScreen = document.getElementById('start-screen');
+        const quizScreen = document.getElementById('quiz-screen');
+        const resultsScreen = document.getElementById('results-screen');
+        const adminScreen = document.getElementById('admin-screen');
+
+        const subjectSelect = document.getElementById('subject-select');
+        const questionCountSelect = document.getElementById('question-count-select');
+        const startBtn = document.getElementById('start-btn');
+        const lastScoreDisplay = document.getElementById('last-score');
+        const manageBankBtn = document.getElementById('manage-bank-btn');
+
+        const timerDisplay = document.getElementById('timer');
+        const scoreDisplay = document.getElementById('score');
+        const progressBarInner = document.getElementById('progress-bar-inner');
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const feedbackMessage = document.getElementById('feedback-message');
+        const nextBtn = document.getElementById('next-btn');
+
+        const finalScore = document.getElementById('final-score');
+        const percentageDisplay = document.getElementById('percentage');
+        const resultsSummary = document.getElementById('results-summary');
+        const restartBtn = document.getElementById('restart-btn');
+
+        // Admin Screen Elements
+        const adminBackBtn = document.getElementById('admin-back-btn');
+        const adminFeedback = document.getElementById('admin-feedback');
+        const newSubjectName = document.getElementById('new-subject-name');
+        const addSubjectBtn = document.getElementById('add-subject-btn');
+        const adminSubjectList = document.getElementById('admin-subject-list');
+        const adminSubjectSelect = document.getElementById('admin-subject-select');
+        const adminQuestionText = document.getElementById('admin-question-text');
+        const adminOption1 = document.getElementById('admin-option-1');
+        const adminOption2 = document.getElementById('admin-option-2');
+        const adminOption3 = document.getElementById('admin-option-3');
+        const adminOption4 = document.getElementById('admin-option-4');
+        const adminCorrectAnswer = document.getElementById('admin-correct-answer');
+        const addQuestionBtn = document.getElementById('add-question-btn');
+        const importExportData = document.getElementById('import-export-data');
+        const exportBtn = document.getElementById('export-btn');
+        const importBtn = document.getElementById('import-btn');
+
+
+        // --- 3. State Variables ---
+        let quizData; // Will be loaded from localStorage or set to default
+        let currentQuestions = [];
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let timerInterval;
+        let timeLeft = 0;
+        let userAnswers = []; // To store { question, chosen, correct }
+
+        // --- 4. Core Functions ---
+        
+        /**
+         * Initializes the quiz application on page load
+         */
+        function init() {
+            // Load data from localStorage or use default
+            loadData();
+
+            // Populate subject dropdown on start screen
+            populateStartSubjectSelect();
+
+            // Load and display last score from localStorage
+            const lastScore = localStorage.getItem('lastQuizScore');
+            if (lastScore) {
+                lastScoreDisplay.textContent = lastScore;
+            }
+
+            // Add event listeners
+            startBtn.addEventListener('click', startQuiz);
+            nextBtn.addEventListener('click', nextQuestion);
+            restartBtn.addEventListener('click', restartQuiz);
+
+            // Admin listeners
+            manageBankBtn.addEventListener('click', showAdminPanel);
+            adminBackBtn.addEventListener('click', showStartScreen);
+            addSubjectBtn.addEventListener('click', addSubject);
+            addQuestionBtn.addEventListener('click', addQuestion);
+            exportBtn.addEventListener('click', exportData);
+            importBtn.addEventListener('click', importData);
+        }
+
+        // --- Data Management Functions ---
+        
+        /**
+         * Loads quiz data from localStorage or sets default data
+         */
+        function loadData() {
+            const savedData = localStorage.getItem('quizDataBank');
+            if (savedData) {
+                quizData = JSON.parse(savedData);
+            } else {
+                quizData = defaultQuizData;
+                saveData(); // Save the default data to localStorage
+            }
+        }
+
+        /**
+         * Saves the current quizData object to localStorage
+         */
+        function saveData() {
+            localStorage.setItem('quizDataBank', JSON.stringify(quizData));
+        }
+
+        /**
+         * Populates the subject dropdown on the start screen
+         */
+        function populateStartSubjectSelect() {
+            subjectSelect.innerHTML = ''; // Clear existing options
+            if (quizData.subjects.length === 0) {
+                subjectSelect.innerHTML = '<option disabled>No subjects found. Add some!</option>';
+                return;
+            }
+            quizData.subjects.forEach(subject => {
+                const option = document.createElement('option');
+                option.value = subject.name;
+                option.textContent = subject.name;
+                subjectSelect.appendChild(option);
+            });
+        }
+
+        /**
+         * Populates the subject list and dropdown on the admin screen
+         */
+        function populateAdminControls() {
+            adminSubjectList.innerHTML = ''; // Clear list
+            adminSubjectSelect.innerHTML = ''; // Clear dropdown
+
+            if (quizData.subjects.length === 0) {
+                adminSubjectList.innerHTML = '<li>No subjects yet.</li>';
+                adminSubjectSelect.innerHTML = '<option disabled>Please add a subject first.</option>';
+                return;
+            }
+
+            quizData.subjects.forEach(subject => {
+                // Add to list
+                const li = document.createElement('li');
+                li.textContent = `${subject.name} (${subject.questions.length}Q)`;
+                adminSubjectList.appendChild(li);
+
+                // Add to dropdown
+                const option = document.createElement('option');
+                option.value = subject.name;
+                option.textContent = subject.name;
+                adminSubjectSelect.appendChild(option);
+            });
+        }
+
+
+        // --- Screen Switching Functions ---
+
+        /**
+         * Shows the admin panel
+         */
+        function showAdminPanel() {
+            startScreen.classList.add('hidden');
+            adminScreen.classList.remove('hidden');
+            adminFeedback.textContent = '';
+            populateAdminControls();
+        }
+
+        /**
+         * Shows the start screen (from admin panel)
+         */
+        function showStartScreen() {
+            adminScreen.classList.add('hidden');
+            startScreen.classList.remove('hidden');
+            // Repopulate start screen select, in case subjects were added/changed
+            populateStartSubjectSelect();
+        }
+
+        // --- Admin Panel Functions ---
+
+        /**
+         * Adds a new subject to the quizData
+         */
+        function addSubject() {
+            const name = newSubjectName.value.trim();
+            if (!name) {
+                showAdminFeedback("Subject name cannot be empty.", "error");
+                return;
+            }
+            if (quizData.subjects.find(s => s.name.toLowerCase() === name.toLowerCase())) {
+                showAdminFeedback("Subject with this name already exists.", "error");
+                return;
+            }
+
+            quizData.subjects.push({ name: name, questions: [] });
+            saveData();
+            populateAdminControls(); // Refresh lists
+            newSubjectName.value = ''; // Clear input
+            showAdminFeedback(`Subject '${name}' added successfully.`, "success");
+        }
+
+        /**
+         * Adds a new question to the selected subject
+         */
+        function addQuestion() {
+            const subjectName = adminSubjectSelect.value;
+            const question = adminQuestionText.value.trim();
+            const options = [
+                adminOption1.value.trim(),
+                adminOption2.value.trim(),
+                adminOption3.value.trim(),
+                adminOption4.value.trim()
+            ];
+            const correctIndex = parseInt(adminCorrectAnswer.value) - 1;
+
+            // Validation
+            if (!subjectName) {
+                showAdminFeedback("Please select a subject.", "error");
+                return;
+            }
+            if (!question || options.some(opt => !opt)) {
+                showAdminFeedback("Please fill in the question and all four options.", "error");
+                return;
+            }
+
+            const subject = quizData.subjects.find(s => s.name === subjectName);
+            if (!subject) {
+                showAdminFeedback("Selected subject not found.", "error");
+                return;
+            }
+
+            const newQuestion = {
+                question: question,
+                options: options,
+                answer: options[correctIndex]
+            };
+
+            subject.questions.push(newQuestion);
+            saveData();
+            populateAdminControls(); // Refresh subject list (to update question count)
+            showAdminFeedback(`Question added to '${subjectName}'.`, "success");
+
+            // Clear form
+            adminQuestionText.value = '';
+            adminOption1.value = '';
+            adminOption2.value = '';
+            adminOption3.value = '';
+            adminOption4.value = '';
+            adminCorrectAnswer.value = '1';
+        }
+
+        /**
+         * Exports the current quizData to the textarea
+         */
+        function exportData() {
+            const dataStr = JSON.stringify(quizData, null, 2); // Pretty-print JSON
+            importExportData.value = dataStr;
+            showAdminFeedback("Current data bank exported to text area.", "success");
+        }
+
+        /**
+         * Imports new data from the textarea
+         */
+        function importData() {
+            const dataStr = importExportData.value.trim();
+            if (!dataStr) {
+                showAdminFeedback("Paste data into the text area to import.", "error");
+                return;
+            }
+
+            try {
+                const newData = JSON.parse(dataStr);
+                // Basic validation
+                if (!newData || !Array.isArray(newData.subjects)) {
+                    throw new Error("Invalid data format. Must be an object with a 'subjects' array.");
+                }
+
+                quizData = newData; // Overwrite current data
+                saveData();
+                populateAdminControls();
+                populateStartSubjectSelect(); // Update start screen too
+                importExportData.value = ''; // Clear textarea
+                showAdminFeedback("Data imported successfully!", "success");
+
+            } catch (error) {
+                showAdminFeedback(`Import failed: ${error.message}`, "error");
+            }
+        }
+
+        /**
+         * Shows feedback on the admin panel
+         */
+        function showAdminFeedback(message, type) {
+            adminFeedback.textContent = message;
+            if (type === "success") {
+                adminFeedback.classList.add('text-green-600');
+                adminFeedback.classList.remove('text-red-600');
+            } else { // error
+                adminFeedback.classList.add('text-red-600');
+                adminFeedback.classList.remove('text-green-600');
+            }
+        }
+
+
+        // --- Original Quiz Functions ---
+
+        /**
+         * Starts the quiz
+         */
+        function startQuiz() {
+            // Get selected subject and question count
+            const subjectName = subjectSelect.value;
+            const questionCountValue = questionCountSelect.value;
+            const subject = quizData.subjects.find(s => s.name === subjectName);
+            
+            if (!subject) return;
+
+            // Shuffle and select questions
+            let allSubjectQuestions = [...subject.questions];
+            shuffleArray(allSubjectQuestions); // Shuffle the array
+            
+            if (questionCountValue === 'all') {
+                currentQuestions = allSubjectQuestions;
+            } else {
+                currentQuestions = allSubjectQuestions.slice(0, parseInt(questionCountValue));
+            }
+
+            // Check if there are any questions
+            if (currentQuestions.length === 0) {
+                // Use a custom modal/alert here later, for now, browser alert is fine for this check.
+                alert("This subject has no questions yet. Please add some in the 'Manage Question Bank' panel.");
+                return; // Stop quiz from starting
+            }
+
+            // Reset state
+            currentQuestionIndex = 0;
+            score = 0;
+            userAnswers = [];
+            scoreDisplay.textContent = `Score: 0`;
+            feedbackMessage.textContent = '';
+            
+            // Start timer (e.g., 20 seconds per question)
+            timeLeft = currentQuestions.length * 20;
+            startTimer();
+
+            // Switch screens
+            startScreen.classList.add('hidden');
+            resultsScreen.classList.add('hidden');
+            quizScreen.classList.remove('hidden');
+
+            // Show the first question
+            showQuestion();
+            updateProgressBar();
+        }
+
+        /**
+         * Displays the current question and options
+         */
+        function showQuestion() {
+            // Clear previous options and feedback
+            optionsContainer.innerHTML = '';
+            feedbackMessage.textContent = '';
+            nextBtn.classList.add('hidden');
+
+            // Get current question
+            const question = currentQuestions[currentQuestionIndex];
+            questionText.textContent = question.question;
+
+            // Create and display option buttons
+            // Shuffle options so the correct answer isn't always in the same place
+            const shuffledOptions = [...question.options];
+            shuffleArray(shuffledOptions);
+            
+            shuffledOptions.forEach(option => {
+                const button = document.createElement('button');
+                button.textContent = option;
+                button.classList.add('option-btn', 'w-full', 'text-left', 'p-4', 'rounded-lg', 'bg-slate-100', 'hover:bg-slate-200', 'border', 'border-slate-200', 'transition-all', 'duration-200', 'fade-in');
+                button.dataset.answer = option;
+                button.addEventListener('click', handleOptionClick);
+                optionsContainer.appendChild(button);
+            });
+        }
+
+        /**
+         * Handles the click of an answer option
+         */
+        function handleOptionClick(event) {
+            const selectedButton = event.target;
+            const selectedAnswer = selectedButton.dataset.answer;
+            const correctAnswer = currentQuestions[currentQuestionIndex].answer;
+
+            // Disable all option buttons
+            Array.from(optionsContainer.children).forEach(btn => {
+                btn.disabled = true;
+                // Highlight the correct answer
+                if (btn.dataset.answer === correctAnswer) {
+                    btn.classList.add('correct');
+                }
+            });
+
+            // Check if the selected answer is correct
+            if (selectedAnswer === correctAnswer) {
+                score++;
+                feedbackMessage.textContent = "Correct! Well done.";
+                feedbackMessage.classList.add('text-green-600');
+                feedbackMessage.classList.remove('text-red-600');
+            } else {
+                selectedButton.classList.add('incorrect');
+                feedbackMessage.textContent = `Sorry, the correct answer was: ${correctAnswer}`;
+                feedbackMessage.classList.add('text-red-600');
+                feedbackMessage.classList.remove('text-green-600');
+            }
+
+            // Store the user's answer
+            userAnswers.push({
+                question: currentQuestions[currentQuestionIndex].question,
+                chosen: selectedAnswer,
+                correct: correctAnswer
+            });
+
+            // Update score display
+            scoreDisplay.textContent = `Score: ${score}`;
+            
+            // Show the 'Next' button
+            nextBtn.classList.remove('hidden');
+        }
+
+        /**
+         * Moves to the next question or ends the quiz
+         */
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < currentQuestions.length) {
+                showQuestion();
+                updateProgressBar();
+            } else {
+                endQuiz();
+            }
+        }
+
+        /**
+         * Ends the quiz and displays the results
+         */
+        function endQuiz() {
+            clearInterval(timerInterval); // Stop the timer
+
+            // Switch to results screen
+            quizScreen.classList.add('hidden');
+            resultsScreen.classList.remove('hidden');
+
+            // Calculate and display final score and percentage
+            const total = currentQuestions.length;
+            const percent = total > 0 ? (score / total * 100).toFixed(1) : 0;
+            
+            finalScore.textContent = `${score} / ${total}`;
+            percentageDisplay.textContent = `${percent}%`;
+
+            // Save score to localStorage
+            localStorage.setItem('lastQuizScore', `${score} / ${total}`);
+
+            // Show the results summary
+            showResultsSummary();
+        }
+
+        /**
+         * Populates the results summary section
+         */
+        function showResultsSummary() {
+            resultsSummary.innerHTML = ''; // Clear previous summary
+            userAnswers.forEach((answer, index) => {
+                const resultDiv = document.createElement('div');
+                resultDiv.classList.add('p-3', 'bg-slate-50', 'rounded-lg', 'border', 'border-slate-200');
+                
+                const isCorrect = answer.chosen === answer.correct;
+                
+                resultDiv.innerHTML = `
+                    <p class="font-semibold text-slate-700 mb-1">Q${index + 1}: ${answer.question}</p>
+                    <p class="text-sm ${isCorrect ? 'text-green-600' : 'text-red-600'}">
+                        Your answer: ${answer.chosen}
+                    </p>
+                    ${!isCorrect ? `<p class="text-sm text-green-600">Correct answer: ${answer.correct}</p>` : ''}
+                `;
+                resultsSummary.appendChild(resultDiv);
+            });
+        }
+
+        /**
+         * Resets the quiz to go back to the start screen
+         */
+        function restartQuiz() {
+            // Reset progress bar
+            progressBarInner.style.width = '0%';
+
+            // Update last score on start screen
+            const lastScore = localStorage.getItem('lastQuizScore');
+            if (lastScore) {
+                lastScoreDisplay.textContent = lastScore;
+            }
+
+            // Switch screens
+            resultsScreen.classList.add('hidden');
+            quizScreen.classList.add('hidden');
+            startScreen.classList.remove('hidden');
+        }
+
+        /**
+         * Starts and updates the timer
+         */
+        function startTimer() {
+            clearInterval(timerInterval); // Clear any existing timer
+            timerDisplay.textContent = `Time: ${formatTime(timeLeft)}`;
+
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                timerDisplay.textContent = `Time: ${formatTime(timeLeft)}`;
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    endQuiz();
+                }
+            }, 1000);
+        }
+
+        /**
+         * Formats seconds into MM:SS format
+         */
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        /**
+         * Updates the visual progress bar
+         */
+        function updateProgressBar() {
+            const progress = (currentQuestionIndex / currentQuestions.length) * 100;
+            progressBarInner.style.width = `${progress}%`;
+        }
+
+        /**
+         * Shuffles an array in place (Fisher-Yates shuffle)
+         */
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        // --- 5. Initial Run ---
+        // Start the application when the DOM is fully loaded
+        document.addEventListener('DOMContentLoaded', init);
+
+    </script>
 </body>
 </html>
+
