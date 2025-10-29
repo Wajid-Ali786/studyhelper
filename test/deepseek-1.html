@@ -844,8 +844,9 @@
                 return;
             }
             
-            if (numQuestions < 1 || numQuestions > state.subjects[subject].length) {
-                showToast(`Please enter a number between 1 and ${state.subjects[subject].length}`, 'error');
+            const availableQuestions = state.subjects[subject].length;
+            if (numQuestions < 1 || numQuestions > availableQuestions) {
+                showToast(`Please enter a number between 1 and ${availableQuestions}`, 'error');
                 return;
             }
             
@@ -854,6 +855,8 @@
             const selectedQuestions = [];
             
             for (let i = 0; i < numQuestions; i++) {
+                if (allQuestions.length === 0) break;
+                
                 const randomIndex = Math.floor(Math.random() * allQuestions.length);
                 selectedQuestions.push(allQuestions[randomIndex]);
                 allQuestions.splice(randomIndex, 1);
@@ -864,7 +867,8 @@
                 questions: selectedQuestions,
                 currentQuestion: 0,
                 score: 0,
-                userAnswers: new Array(selectedQuestions.length).fill('')
+                userAnswers: new Array(selectedQuestions.length).fill(''),
+                startTime: new Date()
             };
             
             // Show quiz container and hide setup
@@ -964,12 +968,17 @@
                 });
             });
             
+            // Calculate time taken
+            const endTime = new Date();
+            const timeTaken = Math.round((endTime - state.currentQuiz.startTime) / 1000); // in seconds
+            
             // Save quiz history
             const quizResult = {
                 subject: state.currentQuiz.subject,
                 score: score,
                 total: state.currentQuiz.questions.length,
                 date: new Date().toISOString(),
+                timeTaken: timeTaken,
                 results: results
             };
             
@@ -985,6 +994,11 @@
             elements.quizContainer.classList.add('hidden');
             elements.quizResults.classList.remove('hidden');
             
+            // Format time
+            const minutes = Math.floor(result.timeTaken / 60);
+            const seconds = result.timeTaken % 60;
+            const timeString = `${minutes > 0 ? `${minutes}m ` : ''}${seconds}s`;
+            
             let resultsHTML = `
                 <h2 class="text-xl font-bold text-gray-800 dark:text-white mb-4">Quiz Results</h2>
                 <div class="bg-${result.score === result.total ? 'green' : result.score >= result.total/2 ? 'yellow' : 'red'}-50 dark:bg-${result.score === result.total ? 'green' : result.score >= result.total/2 ? 'yellow' : 'red'}-900/20 border border-${result.score === result.total ? 'green' : result.score >= result.total/2 ? 'yellow' : 'red'}-200 dark:border-${result.score === result.total ? 'green' : result.score >= result.total/2 ? 'yellow' : 'red'}-800 rounded-lg p-4 mb-6">
@@ -995,6 +1009,7 @@
                         <div>
                             <h3 class="font-semibold text-${result.score === result.total ? 'green' : result.score >= result.total/2 ? 'yellow' : 'red'}-800 dark:text-${result.score === result.total ? 'green' : result.score >= result.total/2 ? 'yellow' : 'red'}-400">${result.subject} Quiz</h3>
                             <p class="text-${result.score === result.total ? 'green' : result.score >= result.total/2 ? 'yellow' : 'red'}-700 dark:text-${result.score === result.total ? 'green' : result.score >= result.total/2 ? 'yellow' : 'red'}-300">Score: ${result.score}/${result.total} (${Math.round((result.score/result.total)*100)}%)</p>
+                            <p class="text-${result.score === result.total ? 'green' : result.score >= result.total/2 ? 'yellow' : 'red'}-700 dark:text-${result.score === result.total ? 'green' : result.score >= result.total/2 ? 'yellow' : 'red'}-300 text-sm">Time: ${timeString}</p>
                         </div>
                     </div>
                 </div>
@@ -1046,6 +1061,7 @@
                 state.currentQuiz.userAnswers = new Array(state.currentQuiz.questions.length).fill('');
                 state.currentQuiz.currentQuestion = 0;
                 state.currentQuiz.score = 0;
+                state.currentQuiz.startTime = new Date();
                 
                 elements.quizResults.classList.add('hidden');
                 elements.quizContainer.classList.remove('hidden');
