@@ -74,7 +74,7 @@ onAuthStateChanged(auth, async (user) => {
             // Path: from /pages/login.html to /index.html
             window.location.href = '../index.html'; 
         } else {
-            // User is on a content page (index.html, html-quiz.html, etc.)
+            // User is on a content page (index.html etc.)
             // Fire a 'user-ready' event so the page knows it can load data.
             console.log('User is ready:', user.uid);
             window.dispatchEvent(new CustomEvent('user-ready', { detail: { user } }));

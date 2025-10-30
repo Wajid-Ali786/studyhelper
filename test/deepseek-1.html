@@ -3,1061 +3,484 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Study Helper - Learn Smarter</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/firebase@9.22.0/firebase-app-compat.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/firebase@9.22.0/firebase-auth-compat.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/firebase@9.22.0/firebase-firestore-compat.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>StudyHelper - Your Quiz Companion</title>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    
+    <!-- 
+      *******************************************************************
+      * 🔴🔴🔴 ERROR FIX: You MUST run this file on a local web server. 🔴🔴🔴
+      *
+      * Opening this file directly (file:///...) WILL cause the error:
+      * "Failed to resolve module specifier"
+      *
+      * HOW TO FIX:
+      * 1. Open your terminal in your MAIN `studyhelper` project folder.
+      * 2. Run this command: `python -m http.server`
+      * 3. Open this URL in your browser: `http://localhost:8000`
+      *
+      * This is required for JavaScript modules (`import`) to work.
+      *******************************************************************
+    -->
+    
     <style>
-        .toast {
+        /* Your original styles from style.css and main.css */
+        :root {
+            --primary-color: #007bff;
+            --secondary-color: #6c757d;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+            --light-color: #f8f9fa;
+            --dark-color: #343a40;
+            --body-bg: #f0f2f5;
+            --card-bg: #ffffff;
+            --text-color: #333;
+            --text-color-light: #666;
+            --border-color: #dee2e6;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--body-bg);
+            color: var(--text-color);
+            margin: 0;
+            padding-top: 60px; /* Space for fixed navbar */
+        }
+
+        .navbar {
+            background-color: var(--card-bg);
+            box-shadow: var(--shadow);
+            padding: 0 1rem;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
             position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 12px 20px;
-            border-radius: 8px;
-            color: white;
-            font-weight: 500;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            top: 0;
+            width: 100%;
             z-index: 1000;
-            transform: translateX(150%);
-            transition: transform 0.3s ease;
+            box-sizing: border-box;
         }
-        .toast.show {
-            transform: translateX(0);
+
+        .logo {
+            text-decoration: none;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary-color);
         }
-        .toast.success {
-            background-color: #10b981;
+
+        .main-container {
+            max-width: 960px;
+            margin: 2rem auto;
+            padding: 0 1rem;
         }
-        .toast.error {
-            background-color: #ef4444;
+
+        .welcome-header {
+            text-align: center;
+            margin-bottom: 2rem;
         }
-        .modal {
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
+
+        .welcome-header h1 {
+            font-size: 2.5rem;
+            color: var(--dark-color);
+            margin-bottom: 0.5rem;
         }
-        .modal.active {
-            opacity: 1;
-            visibility: visible;
+
+        .welcome-header p {
+            font-size: 1.1rem;
+            color: var(--text-color-light);
         }
-        .loading-spinner {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255,255,255,.3);
-            border-radius: 50%;
-            border-top-color: #fff;
-            animation: spin 1s ease-in-out infinite;
+
+        .quiz-cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
         }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
-        .fade-in {
-            animation: fadeIn 0.5s ease-in-out;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        .btn-disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-        .subject-card {
-            transition: all 0.3s ease;
-        }
-        .subject-card:hover {
+
+        .card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .card-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .card-header h2 {
+            margin: 0;
+            color: var(--dark-color);
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        .progress-container {
+            margin-bottom: 1.5rem;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-color-light);
+            margin-bottom: 0.5rem;
+        }
+
+        .progress-bar-background {
+            background-color: #e9ecef;
+            height: 10px;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%; /* Default */
+            background-color: var(--primary-color);
+            border-radius: 5px;
+            transition: width 0.5s ease-in-out;
+        }
+
+        .score-container {
+            text-align: center;
+            font-size: 1rem;
+            color: var(--text-color-light);
+            margin-bottom: 1.5rem;
+        }
+
+        .score-container span {
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--success-color);
+        }
+
+        .btn {
+            display: inline-block;
+            text-decoration: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            text-align: center;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+        }
+        
+        /* --- NEW STYLES for Auth in Navbar --- */
+        .nav-auth {
+            margin-left: auto; /* Pushes to the right */
+            position: relative;
+        }
+
+        .nav-btn {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            font-size: 0.9rem;
+        }
+        
+        .nav-btn:hover {
+            background-color: #0056b3;
+        }
+
+        #profile-icon {
+            font-size: 1.8rem;
+            color: var(--secondary-color);
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        #profile-icon:hover {
+            color: var(--primary-color);
+        }
+
+        .dropdown-content {
+            display: none; /* Hidden by default */
+            position: absolute;
+            right: 0;
+            top: 45px;
+            background-color: var(--card-bg);
+            min-width: 160px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .dropdown-content a {
+            color: var(--text-color);
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            font-size: 0.95rem;
+            transition: background-color 0.3s ease;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #f1f1f1;
+        }
+
+        /* Class to show the dropdown with JS */
+        .dropdown-content.show {
+            display: block;
         }
     </style>
 </head>
-<body class="bg-gray-50 min-h-screen">
-    <!-- Toast Notifications -->
-    <div id="toast-container"></div>
+<body>
 
-    <!-- Auth Modal -->
-    <div id="auth-modal" class="modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-        <div class="bg-white rounded-xl shadow-lg p-6 w-full max-w-md mx-4 fade-in">
-            <div class="flex justify-between items-center mb-6">
-                <h2 id="auth-modal-title" class="text-2xl font-bold text-gray-800">Welcome to Study Helper</h2>
-                <button id="close-auth-modal" class="text-gray-500 hover:text-gray-700">
-                    <i class="fas fa-times text-xl"></i>
+    <nav class="navbar">
+        <a href="index.html" class="logo">StudyHelper</a>
+        
+        <!-- Auth Section -->
+        <div class="nav-auth">
+            <!-- Logged Out State (Default) -->
+            <div id="login-nav-item" style="display: block;">
+                <button id="login-btn" class="nav-btn">
+                    <i class="fa-solid fa-right-to-bracket"></i> Login
                 </button>
             </div>
-            
-            <!-- Login Form -->
-            <div id="login-form">
-                <div class="mb-4">
-                    <label for="login-email" class="block text-gray-700 mb-2">Email</label>
-                    <input type="email" id="login-email" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="your@email.com">
-                </div>
-                <div class="mb-6">
-                    <label for="login-password" class="block text-gray-700 mb-2">Password</label>
-                    <input type="password" id="login-password" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Your password">
-                </div>
-                <button id="login-btn" class="w-full bg-blue-600 text-white py-2 rounded-lg font-medium hover:bg-blue-700 transition mb-4 flex items-center justify-center">
-                    <span id="login-btn-text">Sign In</span>
-                    <span id="login-spinner" class="loading-spinner hidden ml-2"></span>
-                </button>
-                
-                <div class="text-center mb-4">
-                    <button id="google-signin-btn" class="w-full bg-white text-gray-700 py-2 rounded-lg font-medium border border-gray-300 hover:bg-gray-50 transition flex items-center justify-center">
-                        <img src="https://developers.google.com/identity/images/g-logo.png" class="w-5 h-5 mr-2" alt="Google">
-                        Sign in with Google
-                    </button>
-                </div>
-                
-                <div class="text-center">
-                    <button id="forgot-password-btn" class="text-blue-600 hover:underline text-sm">Forgot Password?</button>
-                    <p class="mt-4 text-gray-600">Don't have an account? 
-                        <button id="show-signup" class="text-blue-600 hover:underline font-medium">Sign Up</button>
-                    </p>
-                </div>
-            </div>
-            
-            <!-- Signup Form -->
-            <div id="signup-form" class="hidden">
-                <div class="mb-4">
-                    <label for="signup-name" class="block text-gray-700 mb-2">Full Name</label>
-                    <input type="text" id="signup-name" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Your full name">
-                </div>
-                <div class="mb-4">
-                    <label for="signup-email" class="block text-gray-700 mb-2">Email</label>
-                    <input type="email" id="signup-email" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="your@email.com">
-                </div>
-                <div class="mb-6">
-                    <label for="signup-password" class="block text-gray-700 mb-2">Password</label>
-                    <input type="password" id="signup-password" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="At least 6 characters">
-                    <p class="text-xs text-gray-500 mt-1">Password must be at least 6 characters</p>
-                </div>
-                <button id="signup-btn" class="w-full bg-green-600 text-white py-2 rounded-lg font-medium hover:bg-green-700 transition mb-4 flex items-center justify-center">
-                    <span id="signup-btn-text">Create Account</span>
-                    <span id="signup-spinner" class="loading-spinner hidden ml-2"></span>
-                </button>
-                
-                <div class="text-center">
-                    <p class="text-gray-600">Already have an account? 
-                        <button id="show-login" class="text-blue-600 hover:underline font-medium">Sign In</button>
-                    </p>
-                </div>
-            </div>
-            
-            <!-- Forgot Password Form -->
-            <div id="forgot-password-form" class="hidden">
-                <p class="text-gray-600 mb-4">Enter your email address and we'll send you a link to reset your password.</p>
-                <div class="mb-6">
-                    <label for="reset-email" class="block text-gray-700 mb-2">Email</label>
-                    <input type="email" id="reset-email" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="your@email.com">
-                </div>
-                <button id="reset-password-btn" class="w-full bg-blue-600 text-white py-2 rounded-lg font-medium hover:bg-blue-700 transition mb-4 flex items-center justify-center">
-                    <span id="reset-btn-text">Send Reset Link</span>
-                    <span id="reset-spinner" class="loading-spinner hidden ml-2"></span>
-                </button>
-                
-                <div class="text-center">
-                    <button id="back-to-login" class="text-blue-600 hover:underline font-medium">Back to Sign In</button>
+
+            <!-- Logged In State (Hidden by default) -->
+            <div id="profile-nav-item" style="display: none;">
+                <i id="profile-icon" class="fa-solid fa-circle-user"></i>
+                <div id="profile-dropdown" class="dropdown-content">
+                    <a href="#"><i class="fa-solid fa-user-pen"></i> View Account</a>
+                    <a id="logout-btn" href="#"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
                 </div>
             </div>
         </div>
-    </div>
+    </nav>
 
-    <!-- Main App Container -->
-    <div id="app-container" class="hidden">
-        <!-- Header -->
-        <header class="bg-white shadow-sm border-b">
-            <div class="container mx-auto px-4 py-3 flex justify-between items-center">
-                <div class="flex items-center">
-                    <h1 class="text-xl font-bold text-blue-700">Study Helper</h1>
-                    <span class="ml-4 text-gray-500">|</span>
-                    <nav class="ml-4">
-                        <ul class="flex space-x-6">
-                            <li><a href="#" class="text-gray-700 hover:text-blue-600 font-medium">Dashboard</a></li>
-                            <li><a href="#" class="text-gray-700 hover:text-blue-600 font-medium">Subjects</a></li>
-                            <li><a href="#" class="text-gray-700 hover:text-blue-600 font-medium">Quizzes</a></li>
-                            <li><a href="#" class="text-gray-700 hover:text-blue-600 font-medium">Progress</a></li>
-                        </ul>
-                    </nav>
-                </div>
-                <div class="flex items-center space-x-4">
-                    <div class="flex items-center text-gray-700">
-                        <i class="fas fa-user-circle text-xl mr-2"></i>
-                        <span id="user-display-name">User Name</span>
-                    </div>
-                    <button id="logout-btn" class="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition flex items-center">
-                        <i class="fas fa-sign-out-alt mr-2"></i>
-                        Logout
-                    </button>
-                </div>
-            </div>
+    <div class="main-container">
+        <header class="welcome-header">
+            <h1>Welcome to StudyHelper</h1>
+            <p>Choose a quiz to start practicing and save your progress.</p>
         </header>
 
-        <!-- Main Content -->
-        <main class="container mx-auto px-4 py-8">
-            <div class="mb-8">
-                <h2 class="text-3xl font-bold text-gray-800 mb-2">Welcome back to Study Helper!</h2>
-                <p class="text-gray-600">Continue your learning journey with personalized quizzes and progress tracking.</p>
-            </div>
-
-            <!-- Dashboard Stats -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div class="bg-white rounded-xl shadow p-6 subject-card">
-                    <div class="flex items-center">
-                        <div class="bg-blue-100 p-3 rounded-lg mr-4">
-                            <i class="fas fa-book text-blue-600 text-xl"></i>
-                        </div>
-                        <div>
-                            <h3 class="text-lg font-semibold text-gray-800">Subjects</h3>
-                            <p class="text-2xl font-bold text-gray-900" id="subjects-count">0</p>
-                        </div>
-                    </div>
+        <div class="quiz-cards-container">
+            <!-- HTML Quiz Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h2>HTML Quiz</h2>
                 </div>
-                <div class="bg-white rounded-xl shadow p-6 subject-card">
-                    <div class="flex items-center">
-                        <div class="bg-green-100 p-3 rounded-lg mr-4">
-                            <i class="fas fa-question-circle text-green-600 text-xl"></i>
+                <div class="card-body">
+                    <div class="progress-container">
+                        <div class="progress-label">
+                            <span>Progress</span>
+                            <span id="html-progress-percent">0%</span>
                         </div>
-                        <div>
-                            <h3 class="text-lg font-semibold text-gray-800">Questions</h3>
-                            <p class="text-2xl font-bold text-gray-900" id="questions-count">0</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="bg-white rounded-xl shadow p-6 subject-card">
-                    <div class="flex items-center">
-                        <div class="bg-purple-100 p-3 rounded-lg mr-4">
-                            <i class="fas fa-chart-line text-purple-600 text-xl"></i>
-                        </div>
-                        <div>
-                            <h3 class="text-lg font-semibold text-gray-800">Quizzes Taken</h3>
-                            <p class="text-2xl font-bold text-gray-900" id="quizzes-count">0</p>
+                        <div class="progress-bar-background">
+                            <div class="progress-bar" id="html-progress-bar"></div>
                         </div>
                     </div>
+                    <div class="score-container">
+                        Last Score: <span id="html-score">0</span>
+                    </div>
+                    <a href="pages/html-quiz.html" class="btn btn-primary">Start HTML Quiz</a>
                 </div>
             </div>
 
-            <!-- Quick Actions -->
-            <div class="bg-white rounded-xl shadow p-6 mb-8">
-                <h3 class="text-xl font-bold text-gray-800 mb-4">Quick Actions</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <button id="create-subject-btn" class="bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition flex items-center justify-center">
-                        <i class="fas fa-plus mr-2"></i>
-                        Create New Subject
-                    </button>
-                    <button id="random-quiz-btn" class="bg-green-600 text-white py-3 rounded-lg font-medium hover:bg-green-700 transition flex items-center justify-center">
-                        <i class="fas fa-random mr-2"></i>
-                        Start Random Quiz
-                    </button>
+            <!-- CSS Quiz Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h2>CSS Quiz</h2>
                 </div>
-            </div>
-
-            <!-- Your Subjects -->
-            <div class="bg-white rounded-xl shadow p-6">
-                <div class="flex justify-between items-center mb-6">
-                    <h3 class="text-xl font-bold text-gray-800">Your Subjects</h3>
-                    <button id="manage-subjects-btn" class="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition">
-                        Manage Subjects
-                    </button>
-                </div>
-                
-                <div id="subjects-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <!-- Subjects will be populated here -->
-                    <div id="no-subjects-message" class="col-span-full text-center py-8">
-                        <i class="fas fa-folder-open text-gray-400 text-5xl mb-4"></i>
-                        <h4 class="text-lg font-semibold text-gray-600">No subjects yet</h4>
-                        <p class="text-gray-500 mb-4">Create your first subject to get started</p>
-                        <button id="create-first-subject-btn" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
-                            Create Your First Subject
-                        </button>
+                <div class="card-body">
+                    <div class="progress-container">
+                        <div class="progress-label">
+                            <span>Progress</span>
+                            <span id="css-progress-percent">0%</span>
+                        </div>
+                        <div class="progress-bar-background">
+                            <div class="progress-bar" id="css-progress-bar"></div>
+                        </div>
                     </div>
+                    <div class="score-container">
+                        Last Score: <span id="css-score">0</span>
+                    </div>
+                    <a href="pages/css-quiz.html" class="btn btn-primary">Start CSS Quiz</a>
                 </div>
             </div>
-        </main>
-    </div>
 
-    <!-- Login Screen (shown when not authenticated) -->
-    <div id="login-screen" class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
-        <div class="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md">
-            <div class="text-center mb-8">
-                <h1 class="text-3xl font-bold text-blue-700 mb-2">Study Helper</h1>
-                <p class="text-gray-600">Your personalized learning companion</p>
-            </div>
-            
-            <div class="mb-6">
-                <h2 class="text-xl font-semibold text-gray-800 mb-4 text-center">Sign in to continue</h2>
-                <button id="open-auth-modal" class="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition mb-4">
-                    Sign In with Email
-                </button>
-                <button id="open-google-signin" class="w-full bg-white text-gray-700 py-3 rounded-lg font-medium border border-gray-300 hover:bg-gray-50 transition flex items-center justify-center">
-                    <img src="https://developers.google.com/identity/images/g-logo.png" class="w-5 h-5 mr-2" alt="Google">
-                    Sign in with Google
-                </button>
-            </div>
-            
-            <div class="text-center text-gray-500 text-sm">
-                <p>By continuing, you agree to our Terms of Service and Privacy Policy</p>
+            <!-- JavaScript Quiz Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h2>JavaScript Quiz</h2>
+                </div>
+                <div class="card-body">
+                    <div class="progress-container">
+                        <div class="progress-label">
+                            <span>Progress</span>
+                            <span id="js-progress-percent">0%</span>
+                        </div>
+                        <div class="progress-bar-background">
+                            <div class="progress-bar" id="js-progress-bar"></div>
+                        </div>
+                    </div>
+                    <div class="score-container">
+                        Last Score: <span id="js-score">0</span>
+                    </div>
+                    <a href="pages/js-quiz.html" class="btn btn-primary">Start JavaScript Quiz</a>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Subject Management Modal -->
-    <div id="subject-modal" class="modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-        <div class="bg-white rounded-xl shadow-lg p-6 w-full max-w-md mx-4 fade-in">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-2xl font-bold text-gray-800" id="subject-modal-title">Create New Subject</h2>
-                <button id="close-subject-modal" class="text-gray-500 hover:text-gray-700">
-                    <i class="fas fa-times text-xl"></i>
-                </button>
-            </div>
-            
-            <div class="mb-4">
-                <label for="subject-name" class="block text-gray-700 mb-2">Subject Name</label>
-                <input type="text" id="subject-name" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g., Mathematics, Science">
-            </div>
-            
-            <div class="flex gap-3">
-                <button id="save-subject-btn" class="w-full bg-blue-600 text-white py-2 rounded-lg font-medium hover:bg-blue-700 transition flex items-center justify-center">
-                    <span id="save-subject-btn-text">Create Subject</span>
-                    <span id="save-subject-spinner" class="loading-spinner hidden ml-2"></span>
-                </button>
-                <button id="cancel-subject-btn" class="w-full bg-gray-200 text-gray-700 py-2 rounded-lg font-medium hover:bg-gray-300 transition">
-                    Cancel
-                </button>
-            </div>
-        </div>
-    </div>
+    <!-- Firebase SDKs -->
+    <script type="module" src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"></script>
+    <script type="module" src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js"></script>
+    <script type="module" src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js"></script>
 
-    <script>
-        // Firebase Configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyDXZZVwU6Q8l5GtK8ngxfIkQLEVkbihNhM",
-            authDomain: "studyhelper-quizzes.firebaseapp.com",
-            projectId: "studyhelper-quizzes",
-            storageBucket: "studyhelper-quizzes.firebasestorage.app",
-            messagingSenderId: "217416839389",
-            appId: "1:217416839389:web:060ca955eaa8befce12b34",
-            measurementId: "G-4XVEYVNL7L"
-        };
+    <!-- Your app's central auth logic -->
+    <!-- This MUST be loaded as a module -->
+    <!-- 
+      FIX: Changed path to be relative from this file (index.html).
+      This assumes 'js/firebase-auth.js' is in a 'js' folder
+      at the same level as index.html.
+    -->
+    <script type="module" src="./js/firebase-auth.js"></script>
 
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
+    <!-- This page's main script -->
+    <script type="module">
+        // 1. Import functions from your central auth file
+        // FIX: Changed path to be relative.
+        import { handleLogout, loadUserData } from './js/firebase-auth.js';
 
-        // DOM Elements
-        const authModal = document.getElementById('auth-modal');
-        const loginScreen = document.getElementById('login-screen');
-        const appContainer = document.getElementById('app-container');
-        const loginForm = document.getElementById('login-form');
-        const signupForm = document.getElementById('signup-form');
-        const forgotPasswordForm = document.getElementById('forgot-password-form');
-        const authModalTitle = document.getElementById('auth-modal-title');
-        const userDisplayName = document.getElementById('user-display-name');
-        const toastContainer = document.getElementById('toast-container');
-        const subjectModal = document.getElementById('subject-modal');
-        const subjectsContainer = document.getElementById('subjects-container');
-        const noSubjectsMessage = document.getElementById('no-subjects-message');
-
-        // Buttons
-        const openAuthModalBtn = document.getElementById('open-auth-modal');
-        const openGoogleSigninBtn = document.getElementById('open-google-signin');
-        const closeAuthModalBtn = document.getElementById('close-auth-modal');
-        const loginBtn = document.getElementById('login-btn');
-        const signupBtn = document.getElementById('signup-btn');
-        const googleSigninBtn = document.getElementById('google-signin-btn');
-        const showSignupBtn = document.getElementById('show-signup');
-        const showLoginBtn = document.getElementById('show-login');
-        const forgotPasswordBtn = document.getElementById('forgot-password-btn');
-        const resetPasswordBtn = document.getElementById('reset-password-btn');
-        const backToLoginBtn = document.getElementById('back-to-login');
+        // 2. Get DOM elements for auth UI
+        const loginNavItem = document.getElementById('login-nav-item');
+        const profileNavItem = document.getElementById('profile-nav-item');
+        const profileIcon = document.getElementById('profile-icon');
+        const profileDropdown = document.getElementById('profile-dropdown');
         const logoutBtn = document.getElementById('logout-btn');
-        const createSubjectBtn = document.getElementById('create-subject-btn');
-        const createFirstSubjectBtn = document.getElementById('create-first-subject-btn');
-        const manageSubjectsBtn = document.getElementById('manage-subjects-btn');
-        const randomQuizBtn = document.getElementById('random-quiz-btn');
-        const closeSubjectModalBtn = document.getElementById('close-subject-modal');
-        const saveSubjectBtn = document.getElementById('save-subject-btn');
-        const cancelSubjectBtn = document.getElementById('cancel-subject-btn');
+        const loginBtn = document.getElementById('login-btn');
 
-        // Form Inputs
-        const loginEmail = document.getElementById('login-email');
-        const loginPassword = document.getElementById('login-password');
-        const signupName = document.getElementById('signup-name');
-        const signupEmail = document.getElementById('signup-email');
-        const signupPassword = document.getElementById('signup-password');
-        const resetEmail = document.getElementById('reset-email');
-        const subjectName = document.getElementById('subject-name');
-
-        // App State
-        let currentUser = null;
-        let userSubjects = [];
-
-        // Event Listeners
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('Study Helper App Initialized');
+        // 3. Your original functions from js/main.js
+        function updateAllProgressBars(progress) {
+            if (!progress) progress = {};
             
-            openAuthModalBtn.addEventListener('click', () => {
-                showAuthModal('login');
-            });
+            // HTML Quiz
+            const htmlProgressBar = document.getElementById('html-progress-bar');
+            const htmlProgressPercent = document.getElementById('html-progress-percent');
+            // Assuming 10 questions per quiz
+            const htmlProgress = progress.html ? Math.round((progress.html.progress / 10) * 100) : 0; 
+            if (htmlProgressBar) htmlProgressBar.style.width = htmlProgress + '%';
+            if (htmlProgressPercent) htmlProgressPercent.textContent = htmlProgress + '%';
 
-            openGoogleSigninBtn.addEventListener('click', () => {
-                signInWithGoogle();
-            });
+            // CSS Quiz
+            const cssProgressBar = document.getElementById('css-progress-bar');
+            const cssProgressPercent = document.getElementById('css-progress-percent');
+            const cssProgress = progress.css ? Math.round((progress.css.progress / 10) * 100) : 0;
+            if (cssProgressBar) cssProgressBar.style.width = cssProgress + '%';
+            if (cssProgressPercent) cssProgressPercent.textContent = cssProgress + '%';
 
-            closeAuthModalBtn.addEventListener('click', closeAuthModal);
+            // JS Quiz
+            const jsProgressBar = document.getElementById('js-progress-bar');
+            const jsProgressPercent = document.getElementById('js-progress-percent');
+            const jsProgress = progress.js ? Math.round((progress.js.progress / 10) * 100) : 0;
+            if (jsProgressBar) jsProgressBar.style.width = jsProgress + '%';
+            if (jsProgressPercent) jsProgressPercent.textContent = jsProgress + '%';
+        }
 
-            loginBtn.addEventListener('click', signInWithEmail);
-
-            signupBtn.addEventListener('click', signUpWithEmail);
-
-            googleSigninBtn.addEventListener('click', signInWithGoogle);
-
-            showSignupBtn.addEventListener('click', () => {
-                showAuthModal('signup');
-            });
-
-            showLoginBtn.addEventListener('click', () => {
-                showAuthModal('login');
-            });
-
-            forgotPasswordBtn.addEventListener('click', () => {
-                showAuthModal('forgot-password');
-            });
-
-            resetPasswordBtn.addEventListener('click', resetPassword);
-
-            backToLoginBtn.addEventListener('click', () => {
-                showAuthModal('login');
-            });
-
-            logoutBtn.addEventListener('click', signOut);
-
-            createSubjectBtn.addEventListener('click', () => {
-                openSubjectModal();
-            });
-
-            createFirstSubjectBtn.addEventListener('click', () => {
-                openSubjectModal();
-            });
-
-            manageSubjectsBtn.addEventListener('click', () => {
-                // In a full implementation, this would open a subject management screen
-                showToast("Subject management feature coming soon!", "success");
-            });
-
-            randomQuizBtn.addEventListener('click', () => {
-                // In a full implementation, this would start a random quiz
-                showToast("Random quiz feature coming soon!", "success");
-            });
-
-            closeSubjectModalBtn.addEventListener('click', closeSubjectModal);
-            cancelSubjectBtn.addEventListener('click', closeSubjectModal);
-            saveSubjectBtn.addEventListener('click', saveSubject);
-
-            // Close modals when clicking outside
-            authModal.addEventListener('click', (e) => {
-                if (e.target === authModal) {
-                    closeAuthModal();
-                }
-            });
-
-            subjectModal.addEventListener('click', (e) => {
-                if (e.target === subjectModal) {
-                    closeSubjectModal();
-                }
-            });
-
-            // Enter key support for forms
-            loginEmail.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') signInWithEmail();
-            });
+        function updateAllScores(scores) {
+            if (!scores) scores = {};
             
-            loginPassword.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') signInWithEmail();
-            });
-            
-            signupName.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') signUpWithEmail();
-            });
-            
-            signupEmail.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') signUpWithEmail();
-            });
-            
-            signupPassword.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') signUpWithEmail();
-            });
-            
-            resetEmail.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') resetPassword();
-            });
+            // HTML Score
+            const htmlScoreElement = document.getElementById('html-score');
+            if (htmlScoreElement) htmlScoreElement.textContent = scores.html || 0;
 
-            subjectName.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') saveSubject();
-            });
+            // CSS Score
+            const cssScoreElement = document.getElementById('css-score');
+            if (cssScoreElement) cssScoreElement.textContent = scores.css || 0;
 
-            // Initialize app state
-            updateUIForGuest();
-        });
+            // JS Score
+            const jsScoreElement = document.getElementById('js-score');
+            if (jsScoreElement) jsScoreElement.textContent = scores.js || 0;
+        }
+        // --- End of original functions ---
 
-        // Firebase Auth State Observer
-        auth.onAuthStateChanged((user) => {
-            console.log('Auth state changed:', user);
-            if (user) {
-                // User is signed in
-                currentUser = user;
-                updateUIForUser(user);
-                loadUserData(user.uid);
+
+        // 4. Listen for the 'user-ready' event from firebase-auth.js
+        window.addEventListener('user-ready', async (event) => {
+            const user = event.detail.user;
+            console.log('User is ready, loading data for index.html:', user.uid);
+
+            // Update UI to "Logged In" state
+            loginNavItem.style.display = 'none';
+            profileNavItem.style.display = 'block';
+
+            // Load user data from Firestore
+            const userData = await loadUserData();
+            if (userData) {
+                // Update progress and scores from Firestore data
+                updateAllProgressBars(userData.quizProgress);
+                updateAllScores(userData.scores);
             } else {
-                // User is signed out
-                currentUser = null;
-                updateUIForGuest();
+                // No data found, update with empty data
+                console.log("No user data found in Firestore, displaying defaults.");
+                updateAllProgressBars({});
+                updateAllScores({});
             }
         });
 
-        // Functions
-        function showAuthModal(type) {
-            authModal.classList.add('active');
-            
-            // Reset forms
-            loginForm.classList.add('hidden');
-            signupForm.classList.add('hidden');
-            forgotPasswordForm.classList.add('hidden');
-            
-            // Clear inputs
-            loginEmail.value = '';
-            loginPassword.value = '';
-            signupName.value = '';
-            signupEmail.value = '';
-            signupPassword.value = '';
-            resetEmail.value = '';
-            
-            // Show appropriate form
-            if (type === 'login') {
-                loginForm.classList.remove('hidden');
-                authModalTitle.textContent = 'Sign In to Study Helper';
-            } else if (type === 'signup') {
-                signupForm.classList.remove('hidden');
-                authModalTitle.textContent = 'Create Your Account';
-            } else if (type === 'forgot-password') {
-                forgotPasswordForm.classList.remove('hidden');
-                authModalTitle.textContent = 'Reset Your Password';
+        // 5. Add event listeners for auth buttons
+        
+        // Show/hide dropdown
+        profileIcon.addEventListener('click', () => {
+            profileDropdown.classList.toggle('show');
+        });
+
+        // Logout button
+        logoutBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            profileDropdown.classList.remove('show');
+            handleLogout();
+            // onAuthStateChanged in firebase-auth.js will handle the redirect
+        });
+
+        // Login button
+        loginBtn.addEventListener('click', () => {
+            // firebase-auth.js will redirect non-authed users,
+            // but this is a manual failsafe.
+            window.location.href = 'pages/login.html';
+        });
+
+        // Close dropdown if clicking outside
+        window.addEventListener('click', (event) => {
+            // Check if the click is outside the profile icon AND outside the dropdown
+            if (!profileIcon.contains(event.target) && !profileDropdown.contains(event.target)) {
+                profileDropdown.classList.remove('show');
             }
-        }
+        });
 
-        function closeAuthModal() {
-            authModal.classList.remove('active');
-        }
-
-        function signInWithEmail() {
-            const email = loginEmail.value;
-            const password = loginPassword.value;
-            
-            if (!email || !password) {
-                showToast('Please enter both email and password', 'error');
-                return;
-            }
-            
-            // Show loading state
-            const loginBtnText = document.getElementById('login-btn-text');
-            const loginSpinner = document.getElementById('login-spinner');
-            loginBtnText.textContent = 'Signing In...';
-            loginSpinner.classList.remove('hidden');
-            loginBtn.disabled = true;
-            loginBtn.classList.add('btn-disabled');
-            
-            auth.signInWithEmailAndPassword(email, password)
-                .then((userCredential) => {
-                    // Signed in
-                    showToast('Successfully signed in!', 'success');
-                    closeAuthModal();
-                })
-                .catch((error) => {
-                    const errorCode = error.code;
-                    let errorMessage = 'An error occurred during sign in';
-                    
-                    if (errorCode === 'auth/invalid-email') {
-                        errorMessage = 'Invalid email address';
-                    } else if (errorCode === 'auth/user-disabled') {
-                        errorMessage = 'This account has been disabled';
-                    } else if (errorCode === 'auth/user-not-found') {
-                        errorMessage = 'No account found with this email';
-                    } else if (errorCode === 'auth/wrong-password') {
-                        errorMessage = 'Incorrect password';
-                    }
-                    
-                    showToast(errorMessage, 'error');
-                })
-                .finally(() => {
-                    // Reset button state
-                    loginBtnText.textContent = 'Sign In';
-                    loginSpinner.classList.add('hidden');
-                    loginBtn.disabled = false;
-                    loginBtn.classList.remove('btn-disabled');
-                });
-        }
-
-        function signUpWithEmail() {
-            const name = signupName.value;
-            const email = signupEmail.value;
-            const password = signupPassword.value;
-            
-            if (!name || !email || !password) {
-                showToast('Please fill in all fields', 'error');
-                return;
-            }
-            
-            if (password.length < 6) {
-                showToast('Password must be at least 6 characters', 'error');
-                return;
-            }
-            
-            // Show loading state
-            const signupBtnText = document.getElementById('signup-btn-text');
-            const signupSpinner = document.getElementById('signup-spinner');
-            signupBtnText.textContent = 'Creating Account...';
-            signupSpinner.classList.remove('hidden');
-            signupBtn.disabled = true;
-            signupBtn.classList.add('btn-disabled');
-            
-            auth.createUserWithEmailAndPassword(email, password)
-                .then((userCredential) => {
-                    // Signed up
-                    const user = userCredential.user;
-                    
-                    // Update profile with display name
-                    return user.updateProfile({
-                        displayName: name
-                    });
-                })
-                .then(() => {
-                    showToast('Account created successfully!', 'success');
-                    closeAuthModal();
-                    
-                    // Initialize user data in Firestore
-                    initializeUserData(auth.currentUser.uid, name);
-                })
-                .catch((error) => {
-                    const errorCode = error.code;
-                    let errorMessage = 'An error occurred during sign up';
-                    
-                    if (errorCode === 'auth/email-already-in-use') {
-                        errorMessage = 'An account with this email already exists';
-                    } else if (errorCode === 'auth/invalid-email') {
-                        errorMessage = 'Invalid email address';
-                    } else if (errorCode === 'auth/weak-password') {
-                        errorMessage = 'Password is too weak';
-                    }
-                    
-                    showToast(errorMessage, 'error');
-                })
-                .finally(() => {
-                    // Reset button state
-                    signupBtnText.textContent = 'Create Account';
-                    signupSpinner.classList.add('hidden');
-                    signupBtn.disabled = false;
-                    signupBtn.classList.remove('btn-disabled');
-                });
-        }
-
-        function signInWithGoogle() {
-            const provider = new firebase.auth.GoogleAuthProvider();
-            
-            // Show loading state on appropriate button
-            if (authModal.classList.contains('active')) {
-                const googleBtn = document.getElementById('google-signin-btn');
-                const originalText = googleBtn.innerHTML;
-                googleBtn.innerHTML = '<div class="loading-spinner"></div> Signing in...';
-                googleBtn.disabled = true;
-                googleBtn.classList.add('btn-disabled');
-                
-                auth.signInWithPopup(provider)
-                    .then((result) => {
-                        showToast('Successfully signed in with Google!', 'success');
-                        closeAuthModal();
-                        
-                        // Initialize user data if it's a new user
-                        const user = result.user;
-                        initializeUserData(user.uid, user.displayName);
-                    })
-                    .catch((error) => {
-                        console.error('Google sign in error:', error);
-                        showToast('Failed to sign in with Google', 'error');
-                    })
-                    .finally(() => {
-                        googleBtn.innerHTML = originalText;
-                        googleBtn.disabled = false;
-                        googleBtn.classList.remove('btn-disabled');
-                    });
-            } else {
-                // From login screen
-                const googleBtn = document.getElementById('open-google-signin');
-                const originalText = googleBtn.innerHTML;
-                googleBtn.innerHTML = '<div class="loading-spinner"></div> Signing in...';
-                googleBtn.disabled = true;
-                googleBtn.classList.add('btn-disabled');
-                
-                auth.signInWithPopup(provider)
-                    .then((result) => {
-                        showToast('Successfully signed in with Google!', 'success');
-                        
-                        // Initialize user data if it's a new user
-                        const user = result.user;
-                        initializeUserData(user.uid, user.displayName);
-                    })
-                    .catch((error) => {
-                        console.error('Google sign in error:', error);
-                        showToast('Failed to sign in with Google', 'error');
-                    })
-                    .finally(() => {
-                        googleBtn.innerHTML = originalText;
-                        googleBtn.disabled = false;
-                        googleBtn.classList.remove('btn-disabled');
-                    });
-            }
-        }
-
-        function resetPassword() {
-            const email = resetEmail.value;
-            
-            if (!email) {
-                showToast('Please enter your email address', 'error');
-                return;
-            }
-            
-            // Show loading state
-            const resetBtnText = document.getElementById('reset-btn-text');
-            const resetSpinner = document.getElementById('reset-spinner');
-            resetBtnText.textContent = 'Sending...';
-            resetSpinner.classList.remove('hidden');
-            resetPasswordBtn.disabled = true;
-            resetPasswordBtn.classList.add('btn-disabled');
-            
-            auth.sendPasswordResetEmail(email)
-                .then(() => {
-                    showToast('Password reset email sent! Check your inbox.', 'success');
-                    showAuthModal('login');
-                })
-                .catch((error) => {
-                    const errorCode = error.code;
-                    let errorMessage = 'Failed to send reset email';
-                    
-                    if (errorCode === 'auth/invalid-email') {
-                        errorMessage = 'Invalid email address';
-                    } else if (errorCode === 'auth/user-not-found') {
-                        errorMessage = 'No account found with this email';
-                    }
-                    
-                    showToast(errorMessage, 'error');
-                })
-                .finally(() => {
-                    // Reset button state
-                    resetBtnText.textContent = 'Send Reset Link';
-                    resetSpinner.classList.add('hidden');
-                    resetPasswordBtn.disabled = false;
-                    resetPasswordBtn.classList.remove('btn-disabled');
-                });
-        }
-
-        function signOut() {
-            auth.signOut()
-                .then(() => {
-                    showToast('Successfully signed out', 'success');
-                })
-                .catch((error) => {
-                    console.error('Sign out error:', error);
-                    showToast('Failed to sign out', 'error');
-                });
-        }
-
-        function updateUIForUser(user) {
-            loginScreen.classList.add('hidden');
-            appContainer.classList.remove('hidden');
-            
-            // Update user info
-            userDisplayName.textContent = user.displayName || user.email;
-        }
-
-        function updateUIForGuest() {
-            loginScreen.classList.remove('hidden');
-            appContainer.classList.add('hidden');
-        }
-
-        function showToast(message, type) {
-            const toast = document.createElement('div');
-            toast.className = `toast ${type}`;
-            toast.textContent = message;
-            
-            toastContainer.appendChild(toast);
-            
-            // Show toast
-            setTimeout(() => {
-                toast.classList.add('show');
-            }, 10);
-            
-            // Hide and remove toast after 5 seconds
-            setTimeout(() => {
-                toast.classList.remove('show');
-                setTimeout(() => {
-                    if (toastContainer.contains(toast)) {
-                        toastContainer.removeChild(toast);
-                    }
-                }, 300);
-            }, 5000);
-        }
-
-        // Firestore Functions
-        function initializeUserData(uid, displayName) {
-            // Check if user data already exists
-            db.collection('users').doc(uid).get()
-                .then((doc) => {
-                    if (!doc.exists) {
-                        // Initialize user data
-                        return db.collection('users').doc(uid).set({
-                            displayName: displayName,
-                            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                            subjects: [],
-                            questions: [],
-                            quizHistory: []
-                        });
-                    }
-                })
-                .catch((error) => {
-                    console.error('Error initializing user data:', error);
-                    // Fallback to localStorage if Firestore fails
-                    initializeLocalStorageData(uid, displayName);
-                });
-        }
-
-        function loadUserData(uid) {
-            // Try to load from Firestore first
-            db.collection('users').doc(uid).get()
-                .then((doc) => {
-                    if (doc.exists) {
-                        const userData = doc.data();
-                        updateDashboard(userData);
-                        loadUserSubjects(uid);
-                    } else {
-                        // Fallback to localStorage
-                        loadLocalStorageData(uid);
-                    }
-                })
-                .catch((error) => {
-                    console.error('Error loading user data:', error);
-                    // Fallback to localStorage
-                    loadLocalStorageData(uid);
-                });
-        }
-
-        function loadUserSubjects(uid) {
-            // Load user subjects from Firestore
-            db.collection('users').doc(uid).collection('subjects').get()
-                .then((querySnapshot) => {
-                    userSubjects = [];
-                    querySnapshot.forEach((doc) => {
-                        userSubjects.push({
-                            id: doc.id,
-                            ...doc.data()
-                        });
-                    });
-                    updateSubjectsUI();
-                })
-                .catch((error) => {
-                    console.error('Error loading subjects:', error);
-                });
-        }
-
-        function updateDashboard(userData) {
-            // Update dashboard with user data
-            const subjectsCount = document.getElementById('subjects-count');
-            const questionsCount = document.getElementById('questions-count');
-            const quizzesCount = document.getElementById('quizzes-count');
-            
-            subjectsCount.textContent = userData.subjects ? userData.subjects.length : 0;
-            
-            // Calculate total questions
-            let totalQuestions = 0;
-            if (userData.subjects) {
-                userData.subjects.forEach(subject => {
-                    totalQuestions += subject.questions ? subject.questions.length : 0;
-                });
-            }
-            questionsCount.textContent = totalQuestions;
-            
-            quizzesCount.textContent = userData.quizHistory ? userData.quizHistory.length : 0;
-        }
-
-        function updateSubjectsUI() {
-            subjectsContainer.innerHTML = '';
-            
-            if (userSubjects.length === 0) {
-                noSubjectsMessage.classList.remove('hidden');
-                return;
-            }
-            
-            noSubjectsMessage.classList.add('hidden');
-            
-            userSubjects.forEach(subject => {
-                const subjectCard = document.createElement('div');
-                subjectCard.className = 'bg-white border border-gray-200 rounded-lg p-4 subject-card';
-                subjectCard.innerHTML = `
-                    <div class="flex justify-between items-start mb-2">
-                        <h4 class="font-bold text-lg text-blue-700">${subject.name}</h4>
-                        <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded">${subject.questions ? subject.questions.length : 0} Qs</span>
-                    </div>
-                    <p class="text-gray-600 text-sm mb-4">${subject.description || 'No description'}</p>
-                    <div class="flex gap-2">
-                        <button class="start-quiz-btn flex-1 bg-blue-600 text-white py-2 rounded text-sm font-medium hover:bg-blue-700 transition" data-id="${subject.id}">
-                            Start Quiz
-                        </button>
-                        <button class="edit-subject-btn bg-gray-200 text-gray-700 p-2 rounded text-sm hover:bg-gray-300 transition" data-id="${subject.id}">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                    </div>
-                `;
-                subjectsContainer.appendChild(subjectCard);
-            });
-            
-            // Add event listeners to the new buttons
-            document.querySelectorAll('.start-quiz-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const subjectId = e.target.dataset.id;
-                    startQuiz(subjectId);
-                });
-            });
-            
-            document.querySelectorAll('.edit-subject-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const subjectId = e.target.dataset.id;
-                    editSubject(subjectId);
-                });
-            });
-        }
-
-        function openSubjectModal(subjectId = null) {
-            subjectModal.classList.add('active');
-            const subjectModalTitle = document.getElementById('subject-modal-title');
-            const saveSubjectBtnText = document.getElementById('save-subject-btn-text');
-            
-            if (subjectId) {
-                // Editing existing subject
-                const subject = userSubjects.find(s => s.id === subjectId);
-                if (subject) {
-                    subjectName.value = subject.name;
-                    subjectModalTitle.textContent = 'Edit Subject';
-                    saveSubjectBtnText.textContent = 'Update Subject';
-                    saveSubjectBtn.dataset.subjectId = subjectId;
-                }
-            } else {
-                // Creating new subject
-                subjectName.value = '';
-                subjectModalTitle.textContent = 'Create New Subject';
-                saveSubjectBtnText.textContent = 'Create Subject';
-                delete saveSubjectBtn.dataset.subjectId;
-            }
-        }
-
-        function closeSubjectModal() {
-            subjectModal.classList.remove('active');
-        }
-
-        function saveSubject() {
-            const name = subjectName.value.trim();
-            const subjectId = saveSubjectBtn.dataset.subjectId;
-            
-            if (!name) {
-                showToast('Subject name cannot be empty', 'error');
-                return;
-            }
-            
-            // Show loading state
-            const saveSubjectBtnText = document.getElementById('save-subject-btn-text');
-            const saveSubjectSpinner = document.getElementById('save-subject-spinner');
-            saveSubjectBtnText.textContent = subjectId ? 'Updating...' : 'Creating...';
-            saveSubjectSpinner.classList.remove('hidden');
-            saveSubjectBtn.disabled = true;
-            saveSubjectBtn.classList.add('btn-disabled');
-            
-            if (subjectId) {
-                // Update existing subject
-                db.collection('users').doc(currentUser.uid).collection('subjects').doc(subjectId).update({
-                    name: name,
-                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                })
-                .then(() => {
-                    showToast('Subject updated successfully!', 'success');
-                    closeSubjectModal();
-                    loadUserSubjects(currentUser.uid);
-                })
-                .catch((error) => {
-                    console.error('Error updating subject:', error);
-                    showToast('Failed to update subject', 'error');
-                })
-                .finally(() => {
-                    // Reset button state
-                    saveSubjectBtnText.textContent = 'Update Subject';
-                    saveSubjectSpinner.classList.add('hidden');
-                    saveSubjectBtn.disabled = false;
-                    saveSubjectBtn.classList.remove('btn-disabled');
-                });
-            } else {
-                // Create new subject
-                db.collection('users').doc(currentUser.uid).collection('subjects').add({
-                    name: name,
-                    description: '',
-                    questions: [],
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                })
-                .then(() => {
-                    showToast('Subject created successfully!', 'success');
-                    closeSubjectModal();
-                    loadUserSubjects(currentUser.uid);
-                })
-                .catch((error) => {
-                    console.error('Error creating subject:', error);
-                    showToast('Failed to create subject', 'error');
-                })
-                .finally(() => {
-                    // Reset button state
-                    saveSubjectBtnText.textContent = 'Create Subject';
-                    saveSubjectSpinner.classList.add('hidden');
-                    saveSubjectBtn.disabled = false;
-                    saveSubjectBtn.classList.remove('btn-disabled');
-                });
-            }
-        }
-
-        function startQuiz(subjectId) {
-            // In a full implementation, this would start a quiz
-            showToast(`Starting quiz for subject ${subjectId} - feature coming soon!`, 'success');
-        }
-
-        function editSubject(subjectId) {
-            openSubjectModal(subjectId);
-        }
-
-        // LocalStorage Fallback Functions
-        function initializeLocalStorageData(uid, displayName) {
-            const userData = {
-                displayName: displayName,
-                createdAt: new Date().toISOString(),
-                subjects: [],
-                questions: [],
-                quizHistory: []
-            };
-            
-            localStorage.setItem(`studyhelper_${uid}`, JSON.stringify(userData));
-        }
-
-        function loadLocalStorageData(uid) {
-            const userDataStr = localStorage.getItem(`studyhelper_${uid}`);
-            if (userDataStr) {
-                const userData = JSON.parse(userDataStr);
-                updateDashboard(userData);
-            }
-        }
     </script>
+
 </body>
 </html>
