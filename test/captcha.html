@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StudyHelper Login</title>
+
+  <!-- Load reCAPTCHA Enterprise -->
+  <script src="https://www.google.com/recaptcha/enterprise.js?render=6LfKMfwrAAAAAJ7u5ade2Io6-0BhA2DP5-h7Rlm2"></script>
+
+  <script>
+    function onSubmit(token) {
+      // This runs after the user passes reCAPTCHA
+      document.getElementById("login-form").submit();
+    }
+  </script>
+</head>
+
+<body>
+  <h2>Login to StudyHelper</h2>
+  <form id="login-form" action="#" method="POST">
+    <input type="email" placeholder="Email" required><br>
+    <input type="password" placeholder="Password" required><br>
+
+    <!-- reCAPTCHA button -->
+    <button class="g-recaptcha"
+      data-sitekey="6LfKMfwrAAAAAJ7u5ade2Io6-0BhA2DP5-h7Rlm2"
+      data-callback='onSubmit'
+      data-action='submit'>
+      Login
+    </button>
+  </form>
+</body>
+</html>

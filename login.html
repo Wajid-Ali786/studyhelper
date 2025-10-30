@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- 
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      !                                                                 !
+      !  [ACTION REQUIRED] TO FIX: (auth/configuration-not-found)       !
+      !                                                                 !
+      !  This error is NOT a code bug. It means you must enable         !
+      !  sign-in methods in your Firebase project settings.             !
+      !  NO CODE CHANGE CAN FIX THIS.                                   !
+      !                                                                 !
+      !  HOW TO FIX:                                                    !
+      !  1. Go to your Firebase project console:                        !
+      !     https://console.firebase.google.com/project/studyhelper-quizzes/
+      !  2. Go to: Build -> Authentication -> Sign-in method            !
+      !  3. Click "Get started" if you see it.                          !
+      !  4. ENABLE "Email/Password"                                     !
+      !  5. ENABLE "Google"                                             !
+      !                                                                 !
+      !  The error will go away once you do this.                       !
+      !                                                                 !
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    -->
+    <!-- 
+      *******************************************************************
+      * IMPORTANT: You MUST run this file on a local web server.       *
+      * *
+      * 1. Open your terminal.                                        *
+      * 2. `cd` into your MAIN `studyhelper` project folder           *
+      * (the one that contains `pages` and `js` folders).          *
+      * 3. Run this command: `python -m http.server`                  *
+      * 4. Open this URL in your browser:                             *
+      * http://localhost:8000/pages/login.html                     *
+      * *
+      * This page *might* load without a server now, but the rest     *
+      * of your site (index.html, etc.) WILL NOT. Please use a server. *
+      *******************************************************************
+    -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | StudyHelper</title>
+    <!-- We'll use inline styles to keep this self-contained and match your site's feel -->
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .login-container {
+            background-color: #ffffff;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+        .login-container h1 {
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+        .login-container p {
+            color: #666;
+            margin-bottom: 1.5rem;
+        }
+        .tab-buttons {
+            display: flex;
+            border-bottom: 2px solid #eee;
+            margin-bottom: 1.5rem;
+        }
+        .tab-button {
+            flex: 1;
+            padding: 0.75rem;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #999;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+        .tab-button.active {
+            color: #007bff;
+            border-bottom-color: #007bff;
+        }
+        .form-content {
+            display: none;
+        }
+        .form-content.active {
+            display: block;
+        }
+        .form-group {
+            margin-bottom: 1rem;
+            text-align: left;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #444;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-sizing: border-box; /* Important for padding to work */
+            font-size: 1rem;
+        }
+        .btn {
+            width: 100%;
+            padding: 0.85rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            color: white;
+            margin-bottom: 1rem;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+        .btn-google {
+            background-color: #fff;
+            color: #444;
+            border: 1px solid #ddd;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .btn-google:hover {
+            background-color: #f9f9f9;
+        }
+        .btn-google img {
+            width: 18px;
+            height: 18px;
+        }
+        .divider {
+            font-size: 0.9rem;
+            color: #999;
+            margin: 1.5rem 0;
+            position: relative;
+        }
+        .divider::before,
+        .divider::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 40%;
+            height: 1px;
+            background-color: #eee;
+        }
+        .divider::before {
+            left: 0;
+        }
+        .divider::after {
+            right: 0;
+        }
+        #error-message {
+            color: #d93025;
+            background-color: #fbeae9;
+            border: 1px solid #f6c6c4;
+            border-radius: 8px;
+            padding: 0.75rem;
+            margin-top: 1rem;
+            display: none; /* Hidden by default */
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      !                                                                 !
+      !  [ACTION REQUIRED] TO FIX: (auth/configuration-not-found)       !
+      !                                                                 !
+      !  This error is NOT a code bug. It means you must enable         !
+      !  sign-in methods in your Firebase project settings.             !
+      !  NO CODE CHANGE CAN FIX THIS.                                   !
+      !                                                                 !
+      !  HOW TO FIX:                                                    !
+      !  1. Go to your Firebase project console:                        !
+      !     https://console.firebase.google.com/project/studyhelper-quizzes/
+      !  2. Go to: Build -> Authentication -> Sign-in method            !
+      !  3. Click "Get started" if you see it.                          !
+      !  4. ENABLE "Email/Password"                                     !
+      !  5. ENABLE "Google"                                             !
+      !                                                                 !
+      !  The error will go away once you do this.                       !
+      !                                                                 !
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    -->
+
+    <div class="login-container">
+        <h1>StudyHelper</h1>
+        <p>Sign in or create an account to save your progress</p>
+
+        <div class="tab-buttons">
+            <button class="tab-button active" data-tab="login">Login</button>
+            <button class="tab-button" data-tab="signup">Sign Up</button>
+        </div>
+
+        <!-- Login Form -->
+        <div id="login-form" class="form-content active">
+            <div class="form-group">
+                <label for="login-email">Email</label>
+                <input type="email" id="login-email" placeholder="you@example.com" required>
+            </div>
+            <div class="form-group">
+                <label for="login-password">Password</label>
+                <input type="password" id="login-password" placeholder="••••••••" required>
+            </div>
+            <button id="login-btn" class="btn btn-primary">Login</button>
+        </div>
+
+        <!-- Sign Up Form -->
+        <div id="signup-form" class="form-content">
+            <div class="form-group">
+                <label for="signup-name">Name</label>
+                <input type="text" id="signup-name" placeholder="Your Name" required>
+            </div>
+            <div class="form-group">
+                <label for="signup-email">Email</label>
+                <input type="email" id="signup-email" placeholder="you@example.com" required>
+            </div>
+            <div class="form-group">
+                <label for="signup-password">Password</label>
+                <input type="password" id="signup-password" placeholder="At least 6 characters" required>
+            </div>
+            <button id="signup-btn" class="btn btn-primary">Create Account</button>
+        </div>
+        
+        <div class="divider">OR</div>
+
+        <!-- Google Sign-in -->
+        <button id="google-btn" class="btn btn-google">
+            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google icon">
+            Sign in with Google
+        </button>
+
+        <p id="error-message"></p>
+
+    </div>
+
+    
+    <!-- 
+      ALL FIREBASE LOGIC IS NOW INCLUDED IN THIS FILE.
+      This resolves the module import error.
+      Your *other* pages (index.html, etc.) will still need
+      to import from 'firebase-auth.js' (which you still need to create).
+    -->
+    <script type="module">
+        // === 1. FIREBASE SDK IMPORTS ===
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { 
+            getAuth, 
+            onAuthStateChanged, 
+            signInWithEmailAndPassword, 
+            createUserWithEmailAndPassword, 
+            updateProfile, 
+            GoogleAuthProvider, 
+            signInWithPopup 
+        } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { 
+            getFirestore, 
+            doc, 
+            setDoc, 
+            serverTimestamp
+        } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        // === 2. FIREBASE INITIALIZATION ===
+
+        /*
+          !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+          !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+          !                                                                 !
+          !  [ACTION REQUIRED] ERROR: (auth/configuration-not-found)        !
+          !                                                                 !
+          !  This error is NOT a code bug. It means you must enable         !
+          !  sign-in methods in your Firebase project settings.             !
+          !  NO CODE CHANGE CAN FIX THIS.                                   !
+          !                                                                 !
+          !  HOW TO FIX:                                                    !
+          !  1. Go to your Firebase project console:                        !
+          !     https://console.firebase.google.com/project/studyhelper-quizzes/
+          !  2. Go to: Build -> Authentication -> Sign-in method            !
+          !  3. Click "Get started" if you see it.                          !
+          !  4. ENABLE "Email/Password"                                     !
+          !  5. ENABLE "Google"                                             !
+          !                                                                 !
+          !  After you do this, the error will go away.                     !
+          !  You must do this in your Firebase project.                     !
+          !                                                                 !
+          !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+          !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        */
+        const firebaseConfig = {
+            apiKey: "AIzaSyDXZZVwU6Q8l5GtK8ngxfIkQLEVkbihNhM",
+            authDomain: "studyhelper-quizzes.firebaseapp.com",
+            projectId: "studyhelper-quizzes",
+            storageBucket: "studyhelper-quizzes.firebasestorage.app",
+            messagingSenderId: "217416839389",
+            appId: "1:217416839389:web:060ca955eaa8befce12b34",
+            measurementId: "G-4XVEYVNL7L"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const provider = new GoogleAuthProvider();
+
+        // === 3. AUTH STATE LISTENER (Redirects if logged in) ===
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // User is logged in, and they are on the login page.
+                // Send them to index.html (which we assume is in the same /pages/ directory)
+                console.log('User logged in, redirecting to index.html');
+                window.location.href = 'index.html'; 
+            } else {
+                // User is logged out, show the login page.
+                console.log('User logged out, showing login page.');
+            }
+        });
+
+        // === 4. AUTH FUNCTIONS (now defined locally) ===
+
+        /**
+         * Handles Email & Password Signup
+         */
+        async function handleEmailSignup(email, password, name) {
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            await updateProfile(userCredential.user, { displayName: name });
+            
+            const userDocRef = doc(db, 'users', userCredential.user.uid);
+            await setDoc(userDocRef, {
+                uid: userCredential.user.uid,
+                email: email,
+                displayName: name,
+                createdAt: serverTimestamp(),
+                quizProgress: {},
+                scores: {}
+            }, { merge: true });
+            
+            return userCredential;
+        }
+
+        /**
+         * Handles Email & Password Login
+         */
+        async function handleEmailLogin(email, password) {
+            return await signInWithEmailAndPassword(auth, email, password);
+        }
+
+        /**
+         * Handles Google Sign-in
+         */
+        async function handleGoogleLogin() {
+            const result = await signInWithPopup(auth, provider);
+            const user = result.user;
+            
+            const userDocRef = doc(db, 'users', user.uid);
+            await setDoc(userDocRef, {
+                uid: user.uid,
+                email: user.email,
+                displayName: user.displayName,
+                createdAt: serverTimestamp(),
+            }, { merge: true });
+            
+            return result;
+        }
+
+        // === 5. PAGE LOGIC (Event Listeners) ===
+
+        // Tab switching
+        const tabs = document.querySelectorAll('.tab-button');
+        const contents = document.querySelectorAll('.form-content');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                contents.forEach(c => c.classList.remove('active'));
+
+                tab.classList.add('active');
+                document.getElementById(tab.dataset.tab + '-form').classList.add('active');
+                errorMessage.style.display = 'none'; // Hide error on tab switch
+            });
+        });
+
+        // Get elements
+        const loginBtn = document.getElementById('login-btn');
+        const signupBtn = document.getElementById('signup-btn');
+        const googleBtn = document.getElementById('google-btn');
+        const errorMessage = document.getElementById('error-message');
+
+        const loginEmail = document.getElementById('login-email');
+        const loginPass = document.getElementById('login-password');
+
+        const signupName = document.getElementById('signup-name');
+        const signupEmail = document.getElementById('signup-email');
+        const signupPass = document.getElementById('signup-password');
+
+        // Show a user-friendly error
+        function showError(message) {
+            console.error(message); // Log the full error
+
+            // UPDATED: Added a specific check for the configuration error
+            if (message.includes('auth/configuration-not-found')) {
+                errorMessage.innerHTML = '<strong>ACTION REQUIRED:</strong> Sign-in method is not enabled. <br>Please go to your Firebase project &gt; Authentication &gt; Sign-in method, and enable "Email/Password" and "Google".';
+            } else if (message.includes('auth/invalid-email')) {
+                errorMessage.textContent = 'Please enter a valid email address.';
+            } else if (message.includes('auth/user-not-found') || message.includes('auth/wrong-password') || message.includes('auth/invalid-credential')) {
+                errorMessage.textContent = 'Invalid email or password.';
+            } else if (message.includes('auth/email-already-in-use')) {
+                errorMessage.textContent = 'This email is already in use. Please log in.';
+            } else if (message.includes('auth/weak-password')) {
+                errorMessage.textContent = 'Password must be at least 6 characters long.';
+            } else if (message.includes('auth/popup-closed-by-user')) {
+                errorMessage.textContent = 'Google Sign-in was cancelled.';
+            } else {
+                errorMessage.textContent = 'An error occurred. Please try again.';
+            }
+            errorMessage.style.display = 'block';
+        }
+
+        // Login button
+        loginBtn.addEventListener('click', async () => {
+            errorMessage.style.display = 'none';
+            if (!loginEmail.value || !loginPass.value) {
+                showError('Please fill in all fields.');
+                return;
+            }
+            try {
+                await handleEmailLogin(loginEmail.value, loginPass.value);
+                // onAuthStateChanged will handle redirect
+            } catch (error) {
+                showError(error.message);
+            }
+        });
+
+        // Signup button
+        signupBtn.addEventListener('click', async () => {
+            errorMessage.style.display = 'none';
+            if (!signupName.value || !signupEmail.value || !signupPass.value) {
+                showError('Please fill in all fields.');
+                return;
+            }
+            try {
+                await handleEmailSignup(signupEmail.value, signupPass.value, signupName.value);
+                // onAuthStateChanged will handle redirect
+            } catch (error) {
+                showError(error.message);
+            }
+        });
+
+        // Google button
+        googleBtn.addEventListener('click', async () => {
+            errorMessage.style.display = 'none';
+            try {
+                await handleGoogleLogin();
+                // onAuthStateChanged will handle redirect
+            } catch (error) {
+                showError(error.message);
+            }
+        });
+    </script>
+</body>
+</html>
