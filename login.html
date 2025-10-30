@@ -1,42 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <!-- 
-      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-      !                                                                 !
-      !  [ACTION REQUIRED] TO FIX: (auth/configuration-not-found)       !
-      !                                                                 !
-      !  This error is NOT a code bug. It means you must enable         !
-      !  sign-in methods in your Firebase project settings.             !
-      !  NO CODE CHANGE CAN FIX THIS.                                   !
-      !                                                                 !
-      !  HOW TO FIX:                                                    !
-      !  1. Go to your Firebase project console:                        !
-      !     https://console.firebase.google.com/project/studyhelper-quizzes/
-      !  2. Go to: Build -> Authentication -> Sign-in method            !
-      !  3. Click "Get started" if you see it.                          !
-      !  4. ENABLE "Email/Password"                                     !
-      !  5. ENABLE "Google"                                             !
-      !                                                                 !
-      !  The error will go away once you do this.                       !
-      !                                                                 !
-      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    -->
-    <!-- 
-      *******************************************************************
-      * IMPORTANT: You MUST run this file on a local web server.       *
-      * *
-      * 1. Open your terminal.                                        *
-      * 2. `cd` into your MAIN `studyhelper` project folder           *
-      * (the one that contains `pages` and `js` folders).          *
-      * 3. Run this command: `python -m http.server`                  *
-      * 4. Open this URL in your browser:                             *
-      * http://localhost:8000/pages/login.html                     *
-      * *
-      * This page *might* load without a server now, but the rest     *
-      * of your site (index.html, etc.) WILL NOT. Please use a server. *
-      *******************************************************************
-    -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login | StudyHelper</title>
@@ -51,6 +16,7 @@
             min-height: 100vh;
             margin: 0;
         }
+
         .login-container {
             background-color: #ffffff;
             padding: 2rem;
@@ -60,19 +26,23 @@
             max-width: 400px;
             text-align: center;
         }
+
         .login-container h1 {
             color: #333;
             margin-bottom: 0.5rem;
         }
+
         .login-container p {
             color: #666;
             margin-bottom: 1.5rem;
         }
+
         .tab-buttons {
             display: flex;
             border-bottom: 2px solid #eee;
             margin-bottom: 1.5rem;
         }
+
         .tab-button {
             flex: 1;
             padding: 0.75rem;
@@ -85,34 +55,41 @@
             border-bottom: 3px solid transparent;
             transition: all 0.3s ease;
         }
+
         .tab-button.active {
             color: #007bff;
             border-bottom-color: #007bff;
         }
+
         .form-content {
             display: none;
         }
+
         .form-content.active {
             display: block;
         }
+
         .form-group {
             margin-bottom: 1rem;
             text-align: left;
         }
+
         .form-group label {
             display: block;
             margin-bottom: 0.5rem;
             font-weight: 600;
             color: #444;
         }
+
         .form-group input {
             width: 100%;
             padding: 0.75rem;
             border: 1px solid #ddd;
             border-radius: 8px;
-            box-sizing: border-box; /* Important for padding to work */
+            box-sizing: border-box;
             font-size: 1rem;
         }
+
         .btn {
             width: 100%;
             padding: 0.85rem;
@@ -123,14 +100,17 @@
             cursor: pointer;
             transition: background-color 0.3s ease;
         }
+
         .btn-primary {
             background-color: #007bff;
             color: white;
             margin-bottom: 1rem;
         }
+
         .btn-primary:hover {
             background-color: #0056b3;
         }
+
         .btn-google {
             background-color: #fff;
             color: #444;
@@ -140,19 +120,23 @@
             align-items: center;
             gap: 0.5rem;
         }
+
         .btn-google:hover {
             background-color: #f9f9f9;
         }
+
         .btn-google img {
             width: 18px;
             height: 18px;
         }
+
         .divider {
             font-size: 0.9rem;
             color: #999;
             margin: 1.5rem 0;
             position: relative;
         }
+
         .divider::before,
         .divider::after {
             content: '';
@@ -162,12 +146,15 @@
             height: 1px;
             background-color: #eee;
         }
+
         .divider::before {
             left: 0;
         }
+
         .divider::after {
             right: 0;
         }
+
         #error-message {
             color: #d93025;
             background-color: #fbeae9;
@@ -175,33 +162,12 @@
             border-radius: 8px;
             padding: 0.75rem;
             margin-top: 1rem;
-            display: none; /* Hidden by default */
+            display: none;
         }
     </style>
 </head>
-<body>
 
-    <!-- 
-      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-      !                                                                 !
-      !  [ACTION REQUIRED] TO FIX: (auth/configuration-not-found)       !
-      !                                                                 !
-      !  This error is NOT a code bug. It means you must enable         !
-      !  sign-in methods in your Firebase project settings.             !
-      !  NO CODE CHANGE CAN FIX THIS.                                   !
-      !                                                                 !
-      !  HOW TO FIX:                                                    !
-      !  1. Go to your Firebase project console:                        !
-      !     https://console.firebase.google.com/project/studyhelper-quizzes/
-      !  2. Go to: Build -> Authentication -> Sign-in method            !
-      !  3. Click "Get started" if you see it.                          !
-      !  4. ENABLE "Email/Password"                                     !
-      !  5. ENABLE "Google"                                             !
-      !                                                                 !
-      !  The error will go away once you do this.                       !
-      !                                                                 !
-      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    -->
+<body>
 
     <div class="login-container">
         <h1>StudyHelper</h1>
@@ -241,7 +207,7 @@
             </div>
             <button id="signup-btn" class="btn btn-primary">Create Account</button>
         </div>
-        
+
         <div class="divider">OR</div>
 
         <!-- Google Sign-in -->
@@ -254,58 +220,34 @@
 
     </div>
 
-    
+
     <!-- 
       ALL FIREBASE LOGIC IS NOW INCLUDED IN THIS FILE.
       This resolves the module import error.
-      Your *other* pages (index.html, etc.) will still need
+      Your *other* pages (index.html) will still need
       to import from 'firebase-auth.js' (which you still need to create).
     -->
     <script type="module">
         // === 1. FIREBASE SDK IMPORTS ===
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { 
-            getAuth, 
-            onAuthStateChanged, 
-            signInWithEmailAndPassword, 
-            createUserWithEmailAndPassword, 
-            updateProfile, 
-            GoogleAuthProvider, 
-            signInWithPopup 
+        import {
+            getAuth,
+            onAuthStateChanged,
+            signInWithEmailAndPassword,
+            createUserWithEmailAndPassword,
+            updateProfile,
+            GoogleAuthProvider,
+            signInWithPopup
         } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { 
-            getFirestore, 
-            doc, 
-            setDoc, 
+        import {
+            getFirestore,
+            doc,
+            setDoc,
             serverTimestamp
         } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         // === 2. FIREBASE INITIALIZATION ===
 
-        /*
-          !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-          !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-          !                                                                 !
-          !  [ACTION REQUIRED] ERROR: (auth/configuration-not-found)        !
-          !                                                                 !
-          !  This error is NOT a code bug. It means you must enable         !
-          !  sign-in methods in your Firebase project settings.             !
-          !  NO CODE CHANGE CAN FIX THIS.                                   !
-          !                                                                 !
-          !  HOW TO FIX:                                                    !
-          !  1. Go to your Firebase project console:                        !
-          !     https://console.firebase.google.com/project/studyhelper-quizzes/
-          !  2. Go to: Build -> Authentication -> Sign-in method            !
-          !  3. Click "Get started" if you see it.                          !
-          !  4. ENABLE "Email/Password"                                     !
-          !  5. ENABLE "Google"                                             !
-          !                                                                 !
-          !  After you do this, the error will go away.                     !
-          !  You must do this in your Firebase project.                     !
-          !                                                                 !
-          !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-          !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        */
         const firebaseConfig = {
             apiKey: "AIzaSyDXZZVwU6Q8l5GtK8ngxfIkQLEVkbihNhM",
             authDomain: "studyhelper-quizzes.firebaseapp.com",
@@ -325,9 +267,9 @@
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 // User is logged in, and they are on the login page.
-                // Send them to index.html (which we assume is in the same /pages/ directory)
+                // Send them to index.html
                 console.log('User logged in, redirecting to index.html');
-                window.location.href = 'index.html'; 
+                window.location.href = 'index.html';
             } else {
                 // User is logged out, show the login page.
                 console.log('User logged out, showing login page.');
@@ -342,7 +284,7 @@
         async function handleEmailSignup(email, password, name) {
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             await updateProfile(userCredential.user, { displayName: name });
-            
+
             const userDocRef = doc(db, 'users', userCredential.user.uid);
             await setDoc(userDocRef, {
                 uid: userCredential.user.uid,
@@ -352,7 +294,7 @@
                 quizProgress: {},
                 scores: {}
             }, { merge: true });
-            
+
             return userCredential;
         }
 
@@ -369,7 +311,7 @@
         async function handleGoogleLogin() {
             const result = await signInWithPopup(auth, provider);
             const user = result.user;
-            
+
             const userDocRef = doc(db, 'users', user.uid);
             await setDoc(userDocRef, {
                 uid: user.uid,
@@ -377,7 +319,7 @@
                 displayName: user.displayName,
                 createdAt: serverTimestamp(),
             }, { merge: true });
-            
+
             return result;
         }
 
@@ -476,4 +418,6 @@
         });
     </script>
 </body>
+
 </html>
+

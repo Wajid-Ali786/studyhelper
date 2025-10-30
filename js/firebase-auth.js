@@ -1,5 +1,5 @@
 /**
- * This is your new central Firebase logic file.
+ * This is your central Firebase logic file.
  * Place this file inside your 'js/' directory.
  * It will be imported by 'login.html', 'index.html', and all quiz pages.
  */
@@ -22,6 +22,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 // --- Firebase Initialization ---
+// This is the config you provided earlier.
 const firebaseConfig = {
     apiKey: "AIzaSyDXZZVwU6Q8l5GtK8ngxfIkQLEVkbihNhM",
     authDomain: "studyhelper-quizzes.firebaseapp.com",
@@ -39,19 +40,22 @@ export const db = getFirestore(app);
 // --- Core Authentication State Listener ---
 // This listener runs on EVERY page that imports this file.
 onAuthStateChanged(auth, async (user) => {
+    // Check if the current page is login.html
     const onLoginPage = window.location.pathname.endsWith('login.html');
-    // Check if we are in any sub-directory (like /pages/)
+    // Check if we are in the /pages/ directory
     const inPagesDir = window.location.pathname.includes('/pages/');
 
     if (user) {
         // --- User is LOGGED IN ---
         
         // 1. Ensure Firestore document exists
+        // This runs for both new signups and existing logins
         const userDocRef = doc(db, 'users', user.uid);
         const docSnap = await getDoc(userDocRef);
         if (!docSnap.exists()) {
-            console.log('New user detected, creating Firestore doc:', user.uid);
+            console.log('User doc not found, creating one:', user.uid);
             try {
+                // Create doc with default values
                 await setDoc(userDocRef, {
                     name: user.displayName || 'New User',
                     email: user.email,
@@ -65,12 +69,13 @@ onAuthStateChanged(auth, async (user) => {
 
         // 2. Handle Redirects
         if (onLoginPage) {
-            // We are on the login page, but logged in. Redirect to index.
-            // (Path is relative from /pages/login.html to /index.html)
+            // User is on the login page but is logged in.
+            // Redirect them to the main index page.
+            // Path: from /pages/login.html to /index.html
             window.location.href = '../index.html'; 
         } else {
-            // We are on a content page (index.html, html-quiz.html, etc.)
-            // Fire an event to let the page know it's safe to load user data.
+            // User is on a content page (index.html, html-quiz.html, etc.)
+            // Fire a 'user-ready' event so the page knows it can load data.
             console.log('User is ready:', user.uid);
             window.dispatchEvent(new CustomEvent('user-ready', { detail: { user } }));
         }
@@ -80,13 +85,15 @@ onAuthStateChanged(auth, async (user) => {
         
         // 1. Handle Redirects
         if (!onLoginPage) {
-            // We are NOT on the login page, and we are logged out.
-            // Redirect *to* the login page.
+            // User is NOT on the login page, and is logged out.
+            // Redirect them *to* the login page.
             if (inPagesDir) {
-                // We are in /pages/ (e.g., html-quiz.html), go to login.html
+                // We are already in /pages/ (e.g., html-quiz.html)
+                // Just go to 'login.html'
                 window.location.href = 'login.html';
             } else {
-                // We are in the root (index.html), go to pages/login.html
+                // We are in the root (index.html)
+                // Go into /pages/login.html
                 window.location.href = 'pages/login.html';
             }
         }
@@ -98,15 +105,16 @@ onAuthStateChanged(auth, async (user) => {
 
 /**
  * Signs up a new user with email and password.
+ * This is exported so login.html can use it.
  */
 export const handleEmailSignup = async (email, password, name) => {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
     
-    // Update the new user's profile with their name
+    // Update the new user's auth profile with their name
     await updateProfile(user, { displayName: name });
     
-    // Create an initial document for them in Firestore
+    // Create their initial document in Firestore
     const userData = {
         name: name,
         email: user.email,
@@ -114,7 +122,8 @@ export const handleEmailSignup = async (email, password, name) => {
         scores: {}
     };
     
-    // We pass the UID directly to avoid any race conditions.
+    // We pass the UID directly to avoid any race conditions
+    // with onAuthStateChanged.
     await saveUserData(userData, user.uid); 
     
     return userCredential;
@@ -122,6 +131,7 @@ export const handleEmailSignup = async (email, password, name) => {
 
 /**
  * Logs in an existing user with email and password.
+ * This is exported so login.html can use it.
  */
 export const handleEmailLogin = async (email, password) => {
     return await signInWithEmailAndPassword(auth, email, password);
@@ -129,6 +139,7 @@ export const handleEmailLogin = async (email, password) => {
 
 /**
  * Logs out the current user.
+ * This is for your other pages (index.html, quiz pages, etc.)
  */
 export const handleLogout = async () => {
     await signOut(auth);
@@ -136,11 +147,11 @@ export const handleLogout = async () => {
 };
 
 
-// --- Firestore Data Functions (for quiz pages, index.html) ---
+// --- Firestore Data Functions (for index.html, quiz pages) ---
 
 /**
  * Saves partial or full data to the user's Firestore document.
- * @param {Object} dataToSave - An object of data to merge. e.g., { name: "New Name" }
+ * @param {Object} dataToSave - An object of data to merge. e.g., { quizProgress: ... }
  * @param {string} [uid] - Optional UID. If not provided, defaults to auth.currentUser.uid.
  */
 export const saveUserData = async (dataToSave, uid) => {
@@ -154,8 +165,8 @@ export const saveUserData = async (dataToSave, uid) => {
     const userDocRef = doc(db, 'users', userId);
     
     try {
-        // Use { merge: true } to only update fields in dataToSave
-        // and not overwrite the whole document.
+        // Use { merge: true } to only update/add the fields in dataToSave
+        // and not overwrite the whole document. This is crucial.
         await setDoc(userDocRef, dataToSave, { merge: true });
         console.log("Data saved for user:", userId, dataToSave);
     } catch (error) {
@@ -180,6 +191,7 @@ export const loadUserData = async () => {
     if (docSnap.exists()) {
         return docSnap.data();
     } else {
+        // This might happen if onAuthStateChanged hasn't created the doc yet
         console.warn("No user document found in Firestore for user:", userId);
         return null;
     }
