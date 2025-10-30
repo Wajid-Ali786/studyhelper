@@ -1,0 +1,32 @@
+{
+  "questions": [
+    {
+      "id": "css-1",
+      "question": "Which CSS property is used to change the text color?",
+      "options": ["font-color", "text-color", "color", "fgcolor"],
+      "answer": 2,
+      "explanation": "The color property sets the color of text."
+    },
+    {
+      "id": "css-2",
+      "question": "How do you make the text bold in CSS?",
+      "options": ["font-weight: bold;", "text-style: bold;", "font: strong;", "font-style: bold;"],
+      "answer": 0,
+      "explanation": "font-weight: bold; sets the text weight to bold."
+    },
+    {
+      "id": "css-3",
+      "question": "Which property controls the layout in rows or columns with flexbox?",
+      "options": ["flex-direction", "justify-content", "align-items", "flex-wrap"],
+      "answer": 0,
+      "explanation": "flex-direction sets the main axis (row or column)."
+    },
+    {
+      "id": "css-4",
+      "question": "How do you select an element with id 'header' in CSS?",
+      "options": [".header", "#header", "header", "*header"],
+      "answer": 1,
+      "explanation": "Use #header to select an element by id."
+    }
+  ]
+}

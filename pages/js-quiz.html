@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>JavaScript Quiz — StudyHelper</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <script type="module" src="../js/firebase-auth.js"></script>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="container">
+      <a class="brand" href="../index.html">StudyHelper</a>
+      <div class="nav-right">
+        <button id="login-btn" class="btn small">Login</button>
+        <div id="profile-wrap" class="profile hidden">
+          <img id="profile-pic" src="https://via.placeholder.com/40" alt="profile" class="avatar">
+          <div id="profile-menu" class="dropdown hidden">
+            <div class="drop-item" id="view-account">View Account</div>
+            <div class="drop-item" id="logout-btn">Logout</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container quiz-container card">
+    <h1 id="subject-title">JavaScript Quiz</h1>
+
+    <div class="quiz-settings">
+      <label>Number of questions:
+        <input id="num-questions" type="number" min="1" max="50" value="10" />
+      </label>
+      <label>
+        <input id="timed" type="checkbox" /> Timed (per question)
+      </label>
+      <label id="time-per-q-wrap" style="display:none;">
+        Time per question (seconds):
+        <input id="time-per-q" type="number" min="5" max="300" value="30" />
+      </label>
+      <button id="start-btn" class="btn">Start Quiz</button>
+    </div>
+
+    <div id="quiz-area" class="hidden">
+      <div class="quiz-status">
+        <div id="progress-text">Question <span id="current-q">1</span>/<span id="total-q">10</span></div>
+        <div id="countdown" class="muted"></div>
+      </div>
+
+      <div id="question-wrap" class="question-wrap">
+      </div>
+
+      <div class="quiz-controls">
+        <button id="prev-btn" class="btn outline">Previous</button>
+        <button id="next-btn" class="btn">Next</button>
+        <button id="finish-btn" class="btn success">Finish</button>
+      </div>
+    </div>
+
+    <div id="result-area" class="hidden card">
+      <h2>Results</h2>
+      <p>Your score: <strong id="score-text"></strong></p>
+      <div id="result-details"></div>
+      <button id="return-dashboard" class="btn">Back to Dashboard</button>
+    </div>
+  </main>
+
+  <script type="module" src="../js/quiz.js" data-file="../data/js.json" data-subject="js"></script>
+  <script type="module" src="../js/main.js"></script>
+</body>
+</html>

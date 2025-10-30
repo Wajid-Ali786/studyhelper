@@ -1,0 +1,32 @@
+{
+  "questions": [
+    {
+      "id": "js-1",
+      "question": "Which keyword declares a block-scoped variable in modern JavaScript?",
+      "options": ["var", "let", "const", "both let and const"],
+      "answer": 3,
+      "explanation": "let and const are block-scoped; var is function-scoped."
+    },
+    {
+      "id": "js-2",
+      "question": "What will be output by: console.log(typeof NaN);",
+      "options": ["'number'", "'NaN'", "'undefined'", "'object'"],
+      "answer": 0,
+      "explanation": "typeof NaN is 'number'."
+    },
+    {
+      "id": "js-3",
+      "question": "Which method converts JSON text into a JavaScript object?",
+      "options": ["JSON.toObj()", "JSON.parse()", "JSON.stringify()", "JSON.convert()"],
+      "answer": 1,
+      "explanation": "JSON.parse converts JSON strings into objects."
+    },
+    {
+      "id": "js-4",
+      "question": "How do you write a comment in JavaScript?",
+      "options": ["<!-- comment -->", "// comment", "/* comment */", "Both // and /* */"],
+      "answer": 3,
+      "explanation": "JS supports single-line // and multi-line /* */ comments."
+    }
+  ]
+}

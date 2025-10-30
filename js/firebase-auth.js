@@ -1,198 +1,155 @@
-/**
- * This is your central Firebase logic file.
- * Place this file inside your 'js/' directory.
- * It will be imported by 'login.html', 'index.html', and all quiz pages.
- */
+// js/firebase-auth.js
+// Firebase initialization and auth helper functions (ES module).
+// IMPORTANT: Replace the firebaseConfig object below with your project's config
+// from Firebase Console (Project settings -> SDK snippet).
 
-// --- Firebase SDK Imports ---
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { 
-    getAuth, 
-    onAuthStateChanged,
-    createUserWithEmailAndPassword,
-    signInWithEmailAndPassword,
-    signOut,
-    updateProfile
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { 
-    getFirestore, 
-    doc, 
-    setDoc, 
-    getDoc 
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+export let auth = null;
+export let db = null;
 
-// --- Firebase Initialization ---
-// This is the config you provided earlier.
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+import {
+  getAuth,
+  onAuthStateChanged as fbOnAuthStateChanged,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  signOut as fbSignOut,
+  GoogleAuthProvider,
+  signInWithPopup
+} from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  setDoc,
+  updateDoc,
+  collection,
+  addDoc,
+  query,
+  where,
+  getDocs,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+
+/* ======= PASTE YOUR FIREBASE CONFIG HERE =======
 const firebaseConfig = {
-    apiKey: "AIzaSyDXZZVwU6Q8l5GtK8ngxfIkQLEVkbihNhM",
-    authDomain: "studyhelper-quizzes.firebaseapp.com",
-    projectId: "studyhelper-quizzes",
-    storageBucket: "studyhelper-quizzes.firebasestorage.app",
-    messagingSenderId: "217416839389",
-    appId: "1:217416839389:web:060ca955eaa8befce12b34",
-    measurementId: "G-4XVEYVNL7L"
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_PROJECT.appspot.com",
+  messagingSenderId: "SENDER_ID",
+  appId: "APP_ID",
+};
+================================================= */
+const firebaseConfig = {
+  apiKey: "REPLACE_ME",
+  authDomain: "REPLACE_ME",
+  projectId: "REPLACE_ME",
+  storageBucket: "REPLACE_ME",
+  messagingSenderId: "REPLACE_ME",
+  appId: "REPLACE_ME",
 };
 
 const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app);
-export const db = getFirestore(app);
+auth = getAuth(app);
+db = getFirestore(app);
 
-// --- Core Authentication State Listener ---
-// This listener runs on EVERY page that imports this file.
-onAuthStateChanged(auth, async (user) => {
-    // Check if the current page is login.html
-    const onLoginPage = window.location.pathname.endsWith('login.html');
-    // Check if we are in the /pages/ directory
-    const inPagesDir = window.location.pathname.includes('/pages/');
+/* Helper: wrap onAuthStateChanged so other modules can import it */
+export function onAuthStateChanged(cb) {
+  return fbOnAuthStateChanged(auth, async (user) => {
+    cb(user);
+  });
+}
 
-    if (user) {
-        // --- User is LOGGED IN ---
-        
-        // 1. Ensure Firestore document exists
-        // This runs for both new signups and existing logins
-        const userDocRef = doc(db, 'users', user.uid);
-        const docSnap = await getDoc(userDocRef);
-        if (!docSnap.exists()) {
-            console.log('User doc not found, creating one:', user.uid);
-            try {
-                // Create doc with default values
-                await setDoc(userDocRef, {
-                    name: user.displayName || 'New User',
-                    email: user.email,
-                    quizProgress: {},
-                    scores: {}
-                });
-            } catch (error) {
-                console.error("Error creating new user document:", error);
-            }
-        }
+/* Email/password sign-in */
+export async function signInWithEmail(email, password) {
+  const cred = await signInWithEmailAndPassword(auth, email, password);
+  return cred;
+}
 
-        // 2. Handle Redirects
-        if (onLoginPage) {
-            // User is on the login page but is logged in.
-            // Redirect them to the main index page.
-            // Path: from /pages/login.html to /index.html
-            window.location.href = '../index.html'; 
-        } else {
-            // User is on a content page (index.html etc.)
-            // Fire a 'user-ready' event so the page knows it can load data.
-            console.log('User is ready:', user.uid);
-            window.dispatchEvent(new CustomEvent('user-ready', { detail: { user } }));
-        }
+/* Email/password sign-up: creates a users/{uid} doc if needed */
+export async function signUpWithEmail(email, password) {
+  const cred = await createUserWithEmailAndPassword(auth, email, password);
+  // create basic user doc
+  const userRef = doc(db, 'users', cred.user.uid);
+  const exists = await getDoc(userRef);
+  if (!exists.exists()) {
+    await setDoc(userRef, {
+      email: email,
+      createdAt: serverTimestamp(),
+      roles: { user: true }, // admin can be added manually in DB (roles.admin = true)
+      quizProgress: { html: {}, css: {}, js: {} }
+    });
+  }
+  return cred;
+}
 
-    } else {
-        // --- User is LOGGED OUT ---
-        
-        // 1. Handle Redirects
-        if (!onLoginPage) {
-            // User is NOT on the login page, and is logged out.
-            // Redirect them *to* the login page.
-            if (inPagesDir) {
-                // We are already in /pages/ (e.g., html-quiz.html)
-                // Just go to 'login.html'
-                window.location.href = 'login.html';
-            } else {
-                // We are in the root (index.html)
-                // Go into /pages/login.html
-                window.location.href = 'pages/login.html';
-            }
-        }
+export async function signInWithGoogle() {
+  const provider = new GoogleAuthProvider();
+  const cred = await signInWithPopup(auth, provider);
+  // ensure user doc exists
+  const userRef = doc(db, 'users', cred.user.uid);
+  const exists = await getDoc(userRef);
+  if (!exists.exists()) {
+    await setDoc(userRef, {
+      email: cred.user.email,
+      displayName: cred.user.displayName || null,
+      createdAt: serverTimestamp(),
+      roles: { user: true },
+      quizProgress: { html: {}, css: {}, js: {} }
+    });
+  }
+  return cred;
+}
+
+/* Sign out */
+export async function signOutUser() {
+  await fbSignOut(auth);
+}
+
+/* Save attempt object to Firestore and update users/{uid} aggregated progress */
+export async function saveAttemptAndUpdateUser(uid, attempt) {
+  // attempt: { subject, questionIds, answers, score, maxScore, durationSeconds, createdAt }
+  // add to attempts collection
+  const attemptsRef = collection(db, 'attempts');
+  const added = await addDoc(attemptsRef, {
+    ...attempt,
+    userId: uid,
+    createdAt: serverTimestamp()
+  });
+
+  // update user aggregated doc
+  const userRef = doc(db, 'users', uid);
+  const userSnap = await getDoc(userRef);
+  let userData = {};
+  if (userSnap.exists()) userData = userSnap.data();
+  const subject = attempt.subject;
+  const lastAttemptDate = new Date().toISOString();
+  const progress = Math.round((attempt.score / attempt.maxScore) * 100);
+
+  const newQuizProgress = Object.assign({}, userData.quizProgress || {}, {
+    [subject]: {
+      score: attempt.score,
+      lastAttemptDate,
+      progress
     }
-});
+  });
 
+  await setDoc(userRef, {
+    ...userData,
+    quizProgress: newQuizProgress,
+    updatedAt: serverTimestamp()
+  }, { merge: true });
 
-// --- Authentication Functions (for login.html) ---
+  return added.id;
+}
 
-/**
- * Signs up a new user with email and password.
- * This is exported so login.html can use it.
- */
-export const handleEmailSignup = async (email, password, name) => {
-    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    const user = userCredential.user;
-    
-    // Update the new user's auth profile with their name
-    await updateProfile(user, { displayName: name });
-    
-    // Create their initial document in Firestore
-    const userData = {
-        name: name,
-        email: user.email,
-        quizProgress: {},
-        scores: {}
-    };
-    
-    // We pass the UID directly to avoid any race conditions
-    // with onAuthStateChanged.
-    await saveUserData(userData, user.uid); 
-    
-    return userCredential;
-};
+/* Utility: load user aggregated data */
+export async function getUserAggregated(uid) {
+  const userRef = doc(db, 'users', uid);
+  const snap = await getDoc(userRef);
+  if (!snap.exists()) return null;
+  return { id: snap.id, ...snap.data() };
+}
 
-/**
- * Logs in an existing user with email and password.
- * This is exported so login.html can use it.
- */
-export const handleEmailLogin = async (email, password) => {
-    return await signInWithEmailAndPassword(auth, email, password);
-};
-
-/**
- * Logs out the current user.
- * This is for your other pages (index.html, quiz pages, etc.)
- */
-export const handleLogout = async () => {
-    await signOut(auth);
-    // onAuthStateChanged will handle the redirect
-};
-
-
-// --- Firestore Data Functions (for index.html, quiz pages) ---
-
-/**
- * Saves partial or full data to the user's Firestore document.
- * @param {Object} dataToSave - An object of data to merge. e.g., { quizProgress: ... }
- * @param {string} [uid] - Optional UID. If not provided, defaults to auth.currentUser.uid.
- */
-export const saveUserData = async (dataToSave, uid) => {
-    const userId = uid || auth.currentUser?.uid; 
-    
-    if (!userId) {
-        console.error("No user ID found. User might be logged out.");
-        return;
-    }
-    
-    const userDocRef = doc(db, 'users', userId);
-    
-    try {
-        // Use { merge: true } to only update/add the fields in dataToSave
-        // and not overwrite the whole document. This is crucial.
-        await setDoc(userDocRef, dataToSave, { merge: true });
-        console.log("Data saved for user:", userId, dataToSave);
-    } catch (error) {
-        console.error("Error saving user data:", error);
-    }
-};
-
-/**
- * Loads the current user's entire data document from Firestore.
- * @returns {Object|null} The user's data object, or null if not found.
- */
-export const loadUserData = async () => {
-    const userId = auth.currentUser?.uid;
-    if (!userId) {
-        console.error("No user ID found to load data.");
-        return null;
-    }
-
-    const userDocRef = doc(db, 'users', userId);
-    const docSnap = await getDoc(userDocRef);
-
-    if (docSnap.exists()) {
-        return docSnap.data();
-    } else {
-        // This might happen if onAuthStateChanged hasn't created the doc yet
-        console.warn("No user document found in Firestore for user:", userId);
-        return null;
-    }
-};
+export { getDoc, doc, setDoc, updateDoc, collection, getDocs, query, where, addDoc };
