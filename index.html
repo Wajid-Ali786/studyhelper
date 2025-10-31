@@ -1060,7 +1060,7 @@
         function formatFirebaseDate(timestamp) {
             if (!timestamp) return 'N/A';
             const date = timestamp.toDate();
-            return date.toLocaleDateDateString('en-US', {
+            return date.toLocaleDateString('en-US', {
                 month: 'short',
                 day: 'numeric',
                 year: 'numeric'
@@ -1463,6 +1463,7 @@
                     </div>
                 </div>
              `).join('');
+             lucide.createIcons(); // Ensure new icons are rendered
         }
 
         /**
