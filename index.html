@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" class=""> <!-- 'dark' class will be toggled here -->
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -27,52 +28,141 @@
     </script>
     <style>
         /* Custom scrollbar */
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-        .dark ::-webkit-scrollbar-thumb { background: #475569; }
-        .dark ::-webkit-scrollbar-thumb:hover { background: #64748b; }
-        body, .app-shell { transition: background-color 0.3s ease, color 0.3s ease; }
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        .dark ::-webkit-scrollbar-thumb {
+            background: #475569;
+        }
+
+        .dark ::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+
+        body,
+        .app-shell,
+        main,
+        nav {
+            transition: background-color 0.3s ease, color 0.3s ease, margin-left 0.3s ease, width 0.3s ease;
+        }
+
         /* Hide number input spinners */
         input[type='number']::-webkit-outer-spin-button,
-        input[type='number']::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-        input[type='number'] { -moz-appearance: textfield; }
+        input[type='number']::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        input[type='number'] {
+            -moz-appearance: textfield;
+        }
+
         /* Sidebar active state */
         .sidebar-link[data-active="true"] {
-            background-color: #e0f2fe; color: #0284c7; font-weight: 600;
+            background-color: #e0f2fe;
+            color: #0284c7;
+            font-weight: 600;
         }
+
         .dark .sidebar-link[data-active="true"] {
-            background-color: #0c4a6e; color: #e0f2fe;
+            background-color: #0c4a6e;
+            color: #e0f2fe;
         }
+
         /* Modal transitions */
         .modal-backdrop {
             transition: opacity 0.2s ease-in-out;
         }
+
         .modal-content {
             transition: transform 0.2s ease-in-out, opacity 0.2s ease-in-out;
             transform: scale(0.95);
             opacity: 0;
         }
+
         .modal-backdrop.open {
             opacity: 1;
         }
+
         .modal-backdrop.open .modal-content {
             transform: scale(1);
             opacity: 1;
         }
+
+        /* Toast Notification */
+        #toast-notification {
+            transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+            transform: translateY(100%);
+            opacity: 0;
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            z-index: 100;
+        }
+
+        #toast-notification.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        /* Sidebar collapsing */
+        nav {
+            width: 16rem;
+            /* w-64 */
+            transition: width 0.3s ease-in-out, transform 0.3s ease-in-out;
+        }
+
+        main {
+            margin-left: 16rem;
+            /* ml-64 */
+            width: calc(100% - 16rem);
+            transition: margin-left 0.3s ease-in-out, width 0.3s ease-in-out;
+        }
+
+        nav.collapsed {
+            width: 0;
+            transform: translateX(-100%);
+        }
+
+        main.sidebar-collapsed {
+            margin-left: 0;
+            width: 100%;
+        }
+
+        /* Disabled button styles */
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
     </style>
 </head>
-<body class="bg-slate-50 dark:bg-slate-900 font-sans text-slate-900 dark:text-slate-100 antialiased">
+
+<body class="bg-slate-50 dark:bg-slate-900 font-sans text-slate-900 dark:text-slate-100 antialiased overflow-hidden">
 
     <!-- 
       ================================================================
       APP LOADER
       ================================================================
     -->
-    <div id="app-loader" class="fixed inset-0 flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-900 z-[100]">
-        <svg class="animate-spin h-12 w-12 text-sky-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+    <div id="app-loader"
+        class="fixed inset-0 flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-900 z-[100]">
+        <svg class="animate-spin h-12 w-12 text-sky-600" xmlns="http://www.w3.org/2000/svg" fill="none"
+            viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            <path class="opacity-75" fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+            </path>
         </svg>
         <p class="mt-4 text-lg font-medium text-slate-700 dark:text-slate-300">Loading StudyHelper...</p>
         <p class="text-sm text-slate-500 dark:text-slate-400">Initializing secure session...</p>
@@ -91,43 +181,60 @@
           SIDEBAR
           --------------------------------------
         -->
-        <nav class="w-64 bg-white dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700 flex flex-col shrink-0">
+        <nav id="sidebar"
+            class="bg-white dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700 flex flex-col shrink-0 overflow-hidden">
             <!-- Sidebar Header -->
-            <div class="h-16 flex items-center px-6 border-b border-slate-200 dark:border-slate-700">
+            <div class="h-16 flex items-center px-6 border-b border-slate-200 dark:border-slate-700 shrink-0">
                 <div class="bg-sky-600 p-2.5 rounded-lg">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13.m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.747 0-3.332.477-4.5 1.253"></path></svg>
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 6.253v13.m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.747 0-3.332.477-4.5 1.253">
+                        </path>
+                    </svg>
                 </div>
                 <span class="text-xl font-bold ml-3 text-slate-900 dark:text-white">StudyHelper</span>
             </div>
 
             <!-- Navigation Links -->
             <div class="flex-grow overflow-y-auto py-6 px-4 space-y-2">
-                <a href="#" class="sidebar-link flex items-center space-x-3 px-3 py-2.5 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700" data-page="page-home">
+                <a href="#"
+                    class="sidebar-link flex items-center space-x-3 px-3 py-2.5 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700"
+                    data-page="page-home">
                     <i data-lucide="home" class="w-5 h-5"></i>
                     <span class="font-medium">Home</span>
                 </a>
-                <a href="#" class="sidebar-link flex items-center space-x-3 px-3 py-2.5 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700" data-page="page-manage-bank">
+                <a href="#"
+                    class="sidebar-link flex items-center space-x-3 px-3 py-2.5 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700"
+                    data-page="page-manage-bank">
                     <i data-lucide="database" class="w-5 h-5"></i>
                     <span class="font-medium">Manage Bank</span>
                 </a>
-                <a href="#" class="sidebar-link flex items-center space-x-3 px-3 py-2.5 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700" data-page="page-take-quiz">
+                <a href="#"
+                    class="sidebar-link flex items-center space-x-3 px-3 py-2.5 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700"
+                    data-page="page-take-quiz">
                     <i data-lucide="edit-3" class="w-5 h-5"></i>
                     <span class="font-medium">Take Quiz</span>
                 </a>
-                <a href="#" class="sidebar-link flex items-center space-x-3 px-3 py-2.5 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700" data-page="page-quiz-history">
+                <a href="#"
+                    class="sidebar-link flex items-center space-x-3 px-3 py-2.5 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700"
+                    data-page="page-quiz-history">
                     <i data-lucide="history" class="w-5 h-5"></i>
                     <span class="font-medium">Quiz History</span>
                 </a>
-                <a href="#" class="sidebar-link flex items-center space-x-3 px-3 py-2.5 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700" data-page="page-settings">
+                <a href="#"
+                    class="sidebar-link flex items-center space-x-3 px-3 py-2.5 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700"
+                    data-page="page-settings">
                     <i data-lucide="settings" class="w-5 h-5"></i>
                     <span class="font-medium">Settings & Data</span>
                 </a>
             </div>
 
             <!-- Sidebar Footer -->
-            <div class="p-4 border-t border-slate-200 dark:border-slate-700">
+            <div class="p-4 border-t border-slate-200 dark:border-slate-700 shrink-0">
                 <!-- Dark Mode Toggle -->
-                <button id="dark-mode-toggle" class="w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700">
+                <button id="dark-mode-toggle"
+                    class="w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700">
                     <span class="font-medium flex items-center space-x-3">
                         <i data-lucide="moon" class="w-5 h-5 hidden dark:inline"></i>
                         <i data-lucide="sun" class="w-5 h-5 inline dark:hidden"></i>
@@ -136,7 +243,8 @@
                     <!-- Toggle Switch -->
                     <div class="relative inline-flex items-center cursor-pointer">
                         <span class="w-11 h-6 bg-slate-200 dark:bg-slate-600 rounded-full"></span>
-                        <span class="absolute left-1 top-1 w-4 h-4 bg-white dark:bg-slate-300 rounded-full transition-transform dark:translate-x-5"></span>
+                        <span id="dark-mode-switch"
+                            class="absolute left-1 top-1 w-4 h-4 bg-white dark:bg-slate-300 rounded-full transition-transform dark:translate-x-5"></span>
                     </div>
                 </button>
                 <div class="mt-4 text-xs text-center text-slate-400 dark:text-slate-500">
@@ -150,27 +258,40 @@
           MAIN CONTENT AREA
           --------------------------------------
         -->
-        <main class="flex-1 flex flex-col overflow-hidden">
+        <main id="main-content" class="flex-1 flex flex-col overflow-hidden">
             <!-- Main Content Header -->
-            <header class="h-16 bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between px-6 shrink-0">
-                <h1 id="page-title" class="text-2xl font-bold text-slate-900 dark:text-white">Home</h1>
-                
+            <header
+                class="h-16 bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between px-6 shrink-0">
+                <div class="flex items-center space-x-3">
+                    <button id="sidebar-toggle-btn"
+                        class="p-2 rounded-md text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700">
+                        <i data-lucide="panel-left-close" class="w-6 h-6"></i>
+                    </button>
+                    <h1 id="page-title" class="text-2xl font-bold text-slate-900 dark:text-white">Home</h1>
+                </div>
+
                 <!-- Header Auth Area -->
                 <div class="relative">
-                    <button id="login-button-header" class="bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center space-x-2 transition duration-150 ease-in-out">
+                    <button id="login-button-header"
+                        class="bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center space-x-2 transition duration-150 ease-in-out">
                         <i data-lucide="log-in" class="w-5 h-5"></i>
                         <span>Login / Sign Up</span>
                     </button>
-                    
-                    <button id="account-button-header" class="hidden w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center hover:ring-2 hover:ring-sky-500 hover:ring-offset-2 dark:hover:ring-offset-slate-800">
-                        <img id="user-avatar" class="w-full h-full rounded-full object-cover" src="https://placehold.co/40x40/e2e8f0/64748b?text=U" alt="User Avatar">
+
+                    <button id="account-button-header"
+                        class="hidden w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center hover:ring-2 hover:ring-sky-500 hover:ring-offset-2 dark:hover:ring-offset-slate-800">
+                        <img id="user-avatar" class="w-full h-full rounded-full object-cover"
+                            src="https://placehold.co/40x40/e2e8f0/64748b?text=U" alt="User Avatar">
                     </button>
 
                     <!-- Account Details Dropdown/Modal -->
-                    <div id="account-modal" class="modal-content hidden absolute top-14 right-0 w-64 bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 z-50 p-4">
+                    <div id="account-modal"
+                        class="modal-content hidden absolute top-14 right-0 w-64 bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 z-50 p-4">
                         <p class="text-sm font-medium text-slate-900 dark:text-white truncate">Welcome!</p>
-                        <p id="account-modal-email" class="text-sm text-slate-500 dark:text-slate-400 truncate mb-4">...</p>
-                        <button id="logout-button" class="w-full flex items-center justify-center space-x-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-semibold py-2.5 px-4 rounded-lg">
+                        <p id="account-modal-email" class="text-sm text-slate-500 dark:text-slate-400 truncate mb-4">...
+                        </p>
+                        <button id="logout-button"
+                            class="w-full flex items-center justify-center space-x-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-semibold py-2.5 px-4 rounded-lg">
                             <i data-lucide="log-out" class="w-5 h-5"></i>
                             <span>Sign Out</span>
                         </button>
@@ -197,7 +318,7 @@
 
                     <!-- Main Dashboard Cards -->
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        
+
                         <!-- Card: Quick Start -->
                         <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow flex flex-col">
                             <div class="flex items-center space-x-3">
@@ -206,8 +327,10 @@
                                 </div>
                                 <h3 class="text-xl font-semibold">Quick Start</h3>
                             </div>
-                            <p class="text-slate-500 dark:text-slate-400 mt-4 mb-5 flex-grow">Jump right into your next quiz. Pick a subject and get started.</p>
-                            <button data-page="page-take-quiz" class="nav-button w-full bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2.5 px-4 rounded-lg">
+                            <p class="text-slate-500 dark:text-slate-400 mt-4 mb-5 flex-grow">Jump right into your next
+                                quiz. Pick a subject and get started.</p>
+                            <button data-page="page-take-quiz"
+                                class="nav-button w-full bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2.5 px-4 rounded-lg">
                                 Take a Quiz
                             </button>
                         </div>
@@ -216,11 +339,13 @@
                         <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow flex flex-col">
                             <div class="flex items-center space-x-3">
                                 <div class="p-3 rounded-lg bg-emerald-100 dark:bg-emerald-900">
-                                    <i data-lucide="database" class="w-6 h-6 text-emerald-600 dark:text-emerald-300"></i>
+                                    <i data-lucide="database"
+                                        class="w-6 h-6 text-emerald-600 dark:text-emerald-300"></i>
                                 </div>
                                 <h3 class="text-xl font-semibold">Question Bank</h3>
                             </div>
-                            <p class="text-slate-500 dark:text-slate-400 mt-4 mb-5 flex-grow">Manage your subjects and questions. Add new topics or edit existing ones.</p>
+                            <p class="text-slate-500 dark:text-slate-400 mt-4 mb-5 flex-grow">Manage your subjects and
+                                questions. Add new topics or edit existing ones.</p>
                             <div class="flex items-baseline space-x-2">
                                 <span id="db-question-count" class="text-4xl font-bold">0</span>
                                 <span class="text-slate-500 dark:text-slate-400">Questions</span>
@@ -229,7 +354,8 @@
                                 <span id="db-subject-count" class="text-4xl font-bold">0</span>
                                 <span class="text-slate-500 dark:text-slate-400">Subjects</span>
                             </div>
-                            <button data-page="page-manage-bank" class="nav-button w-full mt-5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 px-4 rounded-lg">
+                            <button data-page="page-manage-bank"
+                                class="nav-button w-full mt-5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 px-4 rounded-lg">
                                 Manage Bank
                             </button>
                         </div>
@@ -238,11 +364,13 @@
                         <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow flex flex-col">
                             <div class="flex items-center space-x-3">
                                 <div class="p-3 rounded-lg bg-indigo-100 dark:bg-indigo-900">
-                                    <i data-lucide="trending-up" class="w-6 h-6 text-indigo-600 dark:text-indigo-300"></i>
+                                    <i data-lucide="trending-up"
+                                        class="w-6 h-6 text-indigo-600 dark:text-indigo-300"></i>
                                 </div>
                                 <h3 class="text-xl font-semibold">Your Progress</h3>
                             </div>
-                            <p class="text-slate-500 dark:text-slate-400 mt-4 mb-5 flex-grow">Review your quiz history and track your improvement over time.</p>
+                            <p class="text-slate-500 dark:text-slate-400 mt-4 mb-5 flex-grow">Review your quiz history
+                                and track your improvement over time.</p>
                             <div class="space-y-3">
                                 <div>
                                     <p class="text-sm font-medium text-slate-500 dark:text-slate-400">Average Score</p>
@@ -253,7 +381,8 @@
                                     <p id="db-quizzes-taken" class="text-2xl font-bold">0</p>
                                 </div>
                             </div>
-                            <button data-page="page-quiz-history" class="nav-button w-full mt-5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 px-4 rounded-lg">
+                            <button data-page="page-quiz-history"
+                                class="nav-button w-full mt-5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 px-4 rounded-lg">
                                 View History
                             </button>
                         </div>
@@ -267,14 +396,16 @@
                 <div id="page-manage-bank" class="page-content hidden space-y-6">
                     <div class="flex justify-between items-center">
                         <h2 class="text-2xl font-bold">Manage Question Bank</h2>
-                        <button id="add-new-subject-btn" class="bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center space-x-2">
+                        <button id="add-new-subject-btn"
+                            class="bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center space-x-2">
                             <i data-lucide="plus" class="w-5 h-5"></i>
                             <span>New Subject</span>
                         </button>
                     </div>
 
                     <!-- Subject Cards Grid -->
-                    <div id="subject-card-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    <div id="subject-card-grid"
+                        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                         <!-- Subject cards will be dynamically inserted here -->
                         <p id="no-subjects-msg" class="text-slate-500 dark:text-slate-400 md:col-span-2 lg:col-span-3">
                             You haven't added any subjects yet. Click "New Subject" to get started.
@@ -288,11 +419,14 @@
                 <div id="page-take-quiz" class="page-content hidden">
                     <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow">
                         <h2 class="text-2xl font-bold mb-4">Select a Quiz</h2>
-                        <p class="text-slate-500 dark:text-slate-400 mb-6">Choose a subject to start your quiz. You must add subjects and at least one question in the "Manage Bank" section first.</p>
-                        
+                        <p class="text-slate-500 dark:text-slate-400 mb-6">Choose a subject to start your quiz. You must
+                            add subjects and at least one question in the "Manage Bank" section first.</p>
+
                         <div id="quiz-selection-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             <!-- Quiz subject cards will be inserted here -->
-                            <p id="no-quizzes-msg" class="text-slate-500 dark:text-slate-400 md:col-span-2 lg:col-span-3">No quizzes available. Go to "Manage Bank" to add subjects and questions.</p>
+                            <p id="no-quizzes-msg"
+                                class="text-slate-500 dark:text-slate-400 md:col-span-2 lg:col-span-3">No quizzes
+                                available. Go to "Manage Bank" to add subjects and questions.</p>
                         </div>
                     </div>
                 </div>
@@ -305,9 +439,10 @@
                         <!-- Quiz Header -->
                         <div class="flex justify-between items-center mb-4">
                             <h2 id="quiz-active-title" class="text-2xl font-bold">HTML Quiz</h2>
-                            <span id="quiz-progress-text" class="text-lg font-semibold text-sky-600 dark:text-sky-300">Question 1 / 10</span>
+                            <span id="quiz-progress-text"
+                                class="text-lg font-semibold text-sky-600 dark:text-sky-300">Question 1 / 10</span>
                         </div>
-                        
+
                         <!-- Progress Bar -->
                         <div class="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2.5 mb-6">
                             <div id="quiz-progress-bar" class="bg-sky-600 h-2.5 rounded-full" style="width: 10%"></div>
@@ -315,24 +450,28 @@
 
                         <!-- Question -->
                         <div class="mb-6">
-                            <p id="quiz-active-question" class="text-xl font-medium mb-6 min-h-[50px]">What does HTML stand for?</p>
+                            <p id="quiz-active-question" class="text-xl font-medium mb-6 min-h-[50px]">What does HTML
+                                stand for?</p>
                             <div id="quiz-options-container" class="space-y-3">
                                 <!-- Options will be dynamically inserted here -->
                             </div>
                         </div>
-                        
+
                         <!-- Feedback Message -->
                         <div id="quiz-feedback" class="hidden p-4 rounded-lg mb-6 text-sm"></div>
 
                         <!-- Navigation -->
                         <div class="flex justify-between items-center">
-                            <button id="quiz-exit-button" class="bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-semibold py-2.5 px-5 rounded-lg">
+                            <button id="quiz-exit-button"
+                                class="bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-semibold py-2.5 px-5 rounded-lg">
                                 Exit Quiz
                             </button>
-                            <button id="quiz-next-button" class="bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2.5 px-5 rounded-lg">
+                            <button id="quiz-next-button"
+                                class="bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2.5 px-5 rounded-lg">
                                 Next
                             </button>
-                            <button id="quiz-submit-button" class="hidden bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 px-5 rounded-lg">
+                            <button id="quiz-submit-button"
+                                class="hidden bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 px-5 rounded-lg">
                                 Submit Quiz
                             </button>
                         </div>
@@ -346,19 +485,24 @@
                     <div class="bg-white dark:bg-slate-800 p-8 rounded-2xl shadow max-w-2xl mx-auto text-center">
                         <i data-lucide="check-circle" class="w-20 h-20 text-emerald-500 mx-auto"></i>
                         <h2 class="text-4xl font-bold mt-4">Quiz Complete!</h2>
-                        <p id="results-subject-name" class="text-lg text-slate-500 dark:text-slate-400 mt-1">HTML Quiz</p>
+                        <p id="results-subject-name" class="text-lg text-slate-500 dark:text-slate-400 mt-1">HTML Quiz
+                        </p>
 
                         <div class="my-8">
                             <p class="text-lg text-slate-600 dark:text-slate-300">Your Score:</p>
-                            <p id="results-score-text" class="text-7xl font-bold text-sky-600 dark:text-sky-300 my-2">80%</p>
-                            <p id="results-score-details" class="text-lg text-slate-600 dark:text-slate-300">You answered 8 out of 10 questions correctly.</p>
+                            <p id="results-score-text" class="text-7xl font-bold text-sky-600 dark:text-sky-300 my-2">
+                                80%</p>
+                            <p id="results-score-details" class="text-lg text-slate-600 dark:text-slate-300">You
+                                answered 8 out of 10 questions correctly.</p>
                         </div>
 
                         <div class="flex items-center justify-center space-x-4">
-                            <button data-page="page-home" class="nav-button bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-semibold py-2.5 px-6 rounded-lg">
+                            <button data-page="page-home"
+                                class="nav-button bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-semibold py-2.5 px-6 rounded-lg">
                                 Go to Home
                             </button>
-                            <button id="results-retake-button" class="bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2.5 px-6 rounded-lg">
+                            <button id="results-retake-button"
+                                class="bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2.5 px-6 rounded-lg">
                                 Retake Quiz
                             </button>
                         </div>
@@ -375,17 +519,23 @@
                             <table class="w-full min-w-[600px] text-left">
                                 <thead class="border-b border-slate-200 dark:border-slate-700">
                                     <tr>
-                                        <th class="p-3 text-sm font-semibold text-slate-500 dark:text-slate-400">Subject</th>
-                                        <th class="p-3 text-sm font-semibold text-slate-500 dark:text-slate-400">Date</th>
-                                        <th class="p-3 text-sm font-semibold text-slate-500 dark:text-slate-400">Score</th>
-                                        <th class="p-3 text-sm font-semibold text-slate-500 dark:text-slate-400">Correct</th>
-                                        <th class="p-3 text-sm font-semibold text-slate-500 dark:text-slate-400">Total</th>
+                                        <th class="p-3 text-sm font-semibold text-slate-500 dark:text-slate-400">Subject
+                                        </th>
+                                        <th class="p-3 text-sm font-semibold text-slate-500 dark:text-slate-400">Date
+                                        </th>
+                                        <th class="p-3 text-sm font-semibold text-slate-500 dark:text-slate-400">Score
+                                        </th>
+                                        <th class="p-3 text-sm font-semibold text-slate-500 dark:text-slate-400">Correct
+                                        </th>
+                                        <th class="p-3 text-sm font-semibold text-slate-500 dark:text-slate-400">Total
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody id="quiz-history-table-body">
                                     <!-- History rows will be inserted here -->
                                     <tr id="no-history-msg">
-                                        <td colspan="5" class="p-4 text-center text-slate-500 dark:text-slate-400">You haven't completed any quizzes yet.</td>
+                                        <td colspan="5" class="p-4 text-center text-slate-500 dark:text-slate-400">You
+                                            haven't completed any quizzes yet.</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -398,16 +548,18 @@
                 -->
                 <div id="page-settings" class="page-content hidden space-y-6">
                     <h2 class="text-2xl font-bold">Settings & Data</h2>
-                    
+
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <!-- Import Card -->
                         <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow space-y-6">
                             <h3 class="text-xl font-bold">Import Data</h3>
-                            
+
                             <!-- Import Subject -->
                             <form id="import-subject-form" class="space-y-3">
-                                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Import Subject (.json)</label>
-                                <select id="import-subject-select" required class="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500">
+                                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Import
+                                    Subject (.json)</label>
+                                <select id="import-subject-select" required
+                                    class="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500">
                                     <option value="">Select subject to import into...</option>
                                     <!-- Subject options -->
                                 </select>
@@ -418,7 +570,8 @@
                                     file:bg-sky-50 dark:file:bg-sky-900
                                     file:text-sky-700 dark:file:text-sky-300
                                     hover:file:bg-sky-100 dark:hover:file:bg-sky-800">
-                                <button type="submit" class="w-full bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2.5 px-4 rounded-lg">
+                                <button type="submit"
+                                    class="w-full bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2.5 px-4 rounded-lg">
                                     Import Subject
                                 </button>
                             </form>
@@ -427,7 +580,8 @@
 
                             <!-- Import Full Backup -->
                             <form id="import-full-form" class="space-y-3">
-                                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Import Full Backup (.json)</label>
+                                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Import Full
+                                    Backup (.json)</label>
                                 <input type="file" id="import-full-file" accept=".json" required class="block w-full text-sm text-slate-500 dark:text-slate-400
                                     file:mr-4 file:py-2 file:px-4
                                     file:rounded-lg file:border-0
@@ -435,35 +589,41 @@
                                     file:bg-sky-50 dark:file:bg-sky-900
                                     file:text-sky-700 dark:file:text-sky-300
                                     hover:file:bg-sky-100 dark:hover:file:bg-sky-800">
-                                <button type="submit" class="w-full bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2.5 px-4 rounded-lg">
+                                <button type="submit"
+                                    class="w-full bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2.5 px-4 rounded-lg">
                                     Import Full Backup
                                 </button>
                             </form>
                             <p id="import-status" class="text-sm text-slate-500 text-center"></p>
                         </div>
-                        
+
                         <!-- Export Card -->
                         <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow space-y-6">
                             <h3 class="text-xl font-bold">Export Data</h3>
 
                             <!-- Export Subject -->
                             <div class="space-y-3">
-                                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Export Subject as .json</label>
-                                <select id="export-subject-select" class="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500">
+                                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Export
+                                    Subject as .json</label>
+                                <select id="export-subject-select"
+                                    class="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500">
                                     <option value="">Select subject to export...</option>
                                     <!-- Subject options -->
                                 </select>
-                                <button id="export-subject-button" class="w-full bg-slate-600 hover:bg-slate-700 text-white font-semibold py-2.5 px-4 rounded-lg">
+                                <button id="export-subject-button"
+                                    class="w-full bg-slate-600 hover:bg-slate-700 text-white font-semibold py-2.5 px-4 rounded-lg">
                                     Export Subject
                                 </button>
                             </div>
-                            
+
                             <div class="border-t border-slate-200 dark:border-slate-700"></div>
-                            
+
                             <!-- Export Full Backup -->
                             <div class="space-y-3">
-                                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Export Full Backup</label>
-                                <button id="export-full-button" class="w-full bg-slate-600 hover:bg-slate-700 text-white font-semibold py-2.5 px-4 rounded-lg">
+                                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Export Full
+                                    Backup</label>
+                                <button id="export-full-button"
+                                    class="w-full bg-slate-600 hover:bg-slate-700 text-white font-semibold py-2.5 px-4 rounded-lg">
                                     Export All Data as .json
                                 </button>
                             </div>
@@ -471,11 +631,14 @@
                     </div>
 
                     <!-- Danger Zone -->
-                    <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow border-2 border-red-300 dark:border-red-700">
+                    <div
+                        class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow border-2 border-red-300 dark:border-red-700">
                         <h2 class="text-xl font-bold mb-2 text-red-700 dark:text-red-300">Danger Zone</h2>
-                        <p class_component="text-slate-500 dark:text-slate-400 mb-4">These actions are permanent and cannot be undone. Be careful!</p>
-                        
-                        <button id="delete-all-data-button" class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2.5 px-5 rounded-lg flex items-center space-x-2">
+                        <p class="text-slate-500 dark:text-slate-400 mb-4">These actions are permanent and cannot be
+                            undone. Be careful!</p>
+
+                        <button id="delete-all-data-button"
+                            class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2.5 px-5 rounded-lg flex items-center space-x-2">
                             <i data-lucide="trash-2" class="w-5 h-5"></i>
                             <span>Delete All My Data</span>
                         </button>
@@ -486,70 +649,99 @@
         </main> <!-- /End Main Content Area -->
     </div> <!-- /End App Shell -->
 
-    
+
     <!-- 
       ================================================================
       MODALS SECTION
-      All pop-ups are defined here and toggled with JS.
       ================================================================
     -->
 
     <!-- --- Universal Modal Backdrop --- -->
-    <div id="modal-backdrop" class="modal-backdrop fixed inset-0 bg-black/60 z-40 hidden opacity-0 items-center justify-center p-4" data-closable="true">
-        
+    <div id="modal-backdrop"
+        class="modal-backdrop fixed inset-0 bg-black/60 z-40 hidden opacity-0 items-center justify-center p-4"
+        data-closable="true">
+
         <!-- 
           --------------------------------------
           AUTH MODAL (Login / Sign Up)
           --------------------------------------
         -->
-        <div id="auth-modal" class="modal-content hidden bg-white dark:bg-slate-800 rounded-2xl shadow-xl w-full max-w-md p-8">
+        <div id="auth-modal"
+            class="modal-content hidden bg-white dark:bg-slate-800 rounded-2xl shadow-xl w-full max-w-md p-8">
             <!-- Logo and Title -->
             <div class="flex flex-col items-center mb-6">
                 <div class="bg-sky-600 p-3 rounded-full">
-                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13.m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.747 0-3.332.477-4.5 1.253"></path></svg>
+                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 6.253v13.m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.747 0-3.332.477-4.5 1.253">
+                        </path>
+                    </svg>
                 </div>
                 <h1 class="text-3xl font-bold text-slate-900 dark:text-white mt-4">StudyHelper</h1>
                 <p id="auth-form-title" class="text-slate-500 dark:text-slate-400 mt-1">Sign in to your account</p>
             </div>
 
             <!-- Auth Error Message -->
-            <div id="auth-error" class="hidden bg-red-100 dark:bg-red-900 border border-red-300 dark:border-red-700 text-red-700 dark:text-red-200 px-4 py-3 rounded-lg relative mb-4 text-sm" role="alert"></div>
+            <div id="auth-error"
+                class="hidden bg-red-100 dark:bg-red-900 border border-red-300 dark:border-red-700 text-red-700 dark:text-red-200 px-4 py-3 rounded-lg relative mb-4 text-sm"
+                role="alert"></div>
 
             <!-- Email/Password Form -->
             <form id="auth-form" class="space-y-4">
                 <div class="space-y-2">
-                    <label for="email" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Email address</label>
-                    <input type="email" id="email" name="email" required autocomplete="email" class="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent">
+                    <label for="email" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Email
+                        address</label>
+                    <input type="email" id="email" name="email" required autocomplete="email"
+                        class="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent">
                 </div>
                 <div class="space-y-2">
-                    <label for="password" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Password</label>
-                    <input type="password" id="password" name="password" required autocomplete="current-password" class="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent">
+                    <label for="password"
+                        class="block text-sm font-medium text-slate-700 dark:text-slate-300">Password</label>
+                    <input type="password" id="password" name="password" required autocomplete="current-password"
+                        class="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent">
                 </div>
-                
+
                 <div id="login-buttons" class="pt-2 space-y-3">
-                    <button type="submit" id="login-button" class="w-full bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2.5 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 dark:focus:ring-offset-slate-800 transition duration-150 ease-in-out">
+                    <button type="submit" id="login-button"
+                        class="w-full bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2.5 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 dark:focus:ring-offset-slate-800 transition duration-150 ease-in-out">
                         Sign In
                     </button>
-                    <button type="button" id="toggle-to-signup" class="w-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-semibold py-2.5 px-4 rounded-lg">
+                    <button type="button" id="toggle-to-signup"
+                        class="w-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-semibold py-2.5 px-4 rounded-lg">
                         Don't have an account? Sign Up
                     </button>
                 </div>
                 <div id="signup-buttons" class="pt-2 space-y-3 hidden">
-                    <button type="submit" id="signup-button" class="w-full bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2.5 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 dark:focus:ring-offset-slate-800 transition duration-150 ease-in-out">
+                    <button type="submit" id="signup-button"
+                        class="w-full bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2.5 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 dark:focus:ring-offset-slate-800 transition duration-150 ease-in-out">
                         Create Account
                     </button>
-                    <button type="button" id="toggle-to-login" class="w-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-semibold py-2.5 px-4 rounded-lg">
+                    <button type="button" id="toggle-to-login"
+                        class="w-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-semibold py-2.5 px-4 rounded-lg">
                         Already have an account? Sign In
                     </button>
                 </div>
             </form>
 
             <div class="flex items-center justify-center my-6">
-                <div class="flex-grow border-t border-slate-300 dark:border-slate-600"></div><span class="mx-4 text-sm font-medium text-slate-500 dark:text-slate-400">OR</span><div class="flex-grow border-t border-slate-300 dark:border-slate-600"></div>
+                <div class="flex-grow border-t border-slate-300 dark:border-slate-600"></div><span
+                    class="mx-4 text-sm font-medium text-slate-500 dark:text-slate-400">OR</span>
+                <div class="flex-grow border-t border-slate-300 dark:border-slate-600"></div>
             </div>
 
-            <button id="google-signin-button" class="w-full bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-semibold py-2.5 px-4 rounded-lg flex items-center justify-center space-x-2">
-                <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8c-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4C12.955 4 4 12.955 4 24s8.955 20 20 20s20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z"/><path fill="#FF3D00" d="m6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4C16.318 4 9.656 8.337 6.306 14.691z"/><path fill="#4CAF50" d="m24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238C29.211 35.091 26.715 36 24 36c-5.202 0-9.619-3.317-11.283-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z"/><path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303c-0.792 2.237-2.231 4.166-4.087 5.571l6.19 5.238C42.012 34.569 44 29.865 44 24c0-1.341-.138-2.65-.389-3.917z"/></svg>
+            <button id="google-signin-button"
+                class="w-full bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-semibold py-2.5 px-4 rounded-lg flex items-center justify-center space-x-2">
+                <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+                    <path fill="#FFC107"
+                        d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8c-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4C12.955 4 4 12.955 4 24s8.955 20 20 20s20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z" />
+                    <path fill="#FF3D00"
+                        d="m6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4C16.318 4 9.656 8.337 6.306 14.691z" />
+                    <path fill="#4CAF50"
+                        d="m24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238C29.211 35.091 26.715 36 24 36c-5.202 0-9.619-3.317-11.283-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z" />
+                    <path fill="#1976D2"
+                        d="M43.611 20.083H42V20H24v8h11.303c-0.792 2.237-2.231 4.166-4.087 5.571l6.19 5.238C42.012 34.569 44 29.865 44 24c0-1.341-.138-2.65-.389-3.917z" />
+                </svg>
                 <span>Sign in with Google</span>
             </button>
         </div>
@@ -559,14 +751,18 @@
           CONFIRM MODAL (Deletions)
           --------------------------------------
         -->
-        <div id="confirm-modal" class="modal-content hidden bg-white dark:bg-slate-800 rounded-2xl shadow-xl w-full max-w-md p-6">
+        <div id="confirm-modal"
+            class="modal-content hidden bg-white dark:bg-slate-800 rounded-2xl shadow-xl w-full max-w-md p-6">
             <h3 id="confirm-modal-title" class="text-xl font-bold mb-2">Are you sure?</h3>
-            <p id="confirm-modal-message" class="text-slate-600 dark:text-slate-300 mb-6">This action cannot be undone.</p>
+            <p id="confirm-modal-message" class="text-slate-600 dark:text-slate-300 mb-6">This action cannot be undone.
+            </p>
             <div class="flex justify-end space-x-3">
-                <button id="modal-cancel-button" class="bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-semibold py-2 px-4 rounded-lg">
+                <button id="modal-cancel-button"
+                    class="bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-semibold py-2 px-4 rounded-lg">
                     Cancel
                 </button>
-                <button id="modal-confirm-button" class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg">
+                <button id="modal-confirm-button"
+                    class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg">
                     Confirm
                 </button>
             </div>
@@ -577,20 +773,25 @@
           SUBJECT MODAL (Add / Edit)
           --------------------------------------
         -->
-        <div id="subject-modal" class="modal-content hidden bg-white dark:bg-slate-800 rounded-2xl shadow-xl w-full max-w-md p-6">
+        <div id="subject-modal"
+            class="modal-content hidden bg-white dark:bg-slate-800 rounded-2xl shadow-xl w-full max-w-md p-6">
             <form id="subject-form">
                 <h3 id="subject-modal-title" class="text-xl font-bold mb-4">Add New Subject</h3>
                 <input type="hidden" id="subject-id-input">
                 <div class="space-y-2">
-                    <label for="subject-name-input" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Subject Name</label>
-                    <input type="text" id="subject-name-input" placeholder="e.g., Mathematics" required class="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500">
+                    <label for="subject-name-input"
+                        class="block text-sm font-medium text-slate-700 dark:text-slate-300">Subject Name</label>
+                    <input type="text" id="subject-name-input" placeholder="e.g., Mathematics" required
+                        class="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500">
                 </div>
                 <p id="subject-form-error" class="text-sm text-red-500 mt-2 hidden"></p>
                 <div class="flex justify-end space-x-3 mt-6">
-                    <button type="button" class="modal-close-button bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-semibold py-2 px-4 rounded-lg">
+                    <button type="button"
+                        class="modal-close-button bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-semibold py-2 px-4 rounded-lg">
                         Cancel
                     </button>
-                    <button type="submit" class="bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2 px-4 rounded-lg">
+                    <button type="submit"
+                        class="bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2 px-4 rounded-lg">
                         Save Subject
                     </button>
                 </div>
@@ -602,63 +803,85 @@
           MANAGE QUESTIONS MODAL (List)
           --------------------------------------
         -->
-        <div id="manage-questions-modal" class="modal-content hidden bg-white dark:bg-slate-800 rounded-2xl shadow-xl w-full max-w-2xl p-6 flex flex-col h-[90vh]">
-            <div class="flex justify-between items-center mb-4">
+        <div id="manage-questions-modal"
+            class="modal-content hidden bg-white dark:bg-slate-800 rounded-2xl shadow-xl w-full max-w-2xl p-6 flex flex-col max-h-[90vh]">
+            <div class="flex justify-between items-center mb-4 shrink-0">
                 <h3 id="manage-q-modal-title" class="text-xl font-bold">Manage Questions</h3>
-                <button type="button" class="modal-close-button text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+                <button type="button"
+                    class="modal-close-button text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
                     <i data-lucide="x" class="w-6 h-6"></i>
                 </button>
             </div>
-            <div class="flex justify-between items-center mb-4">
-                <button id="edit-subject-name-btn" class="bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-semibold py-2 px-4 rounded-lg flex items-center space-x-2">
+            <div class="flex justify-between items-center mb-4 shrink-0">
+                <button id="edit-subject-name-btn"
+                    class="bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-semibold py-2 px-4 rounded-lg flex items-center space-x-2">
                     <i data-lucide="edit-2" class="w-4 h-4"></i>
                     <span>Edit Subject</span>
                 </button>
-                <button id="add-new-question-btn" class="bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center space-x-2">
+                <button id="add-new-question-btn"
+                    class="bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center space-x-2">
                     <i data-lucide="plus" class="w-5 h-5"></i>
                     <span>Add New Question</span>
                 </button>
             </div>
             <div id="question-list-container" class="flex-grow overflow-y-auto space-y-3 pr-2">
                 <!-- Question list will be rendered here -->
-                <p id="no-questions-msg" class="text-slate-500 dark:text-slate-400">No questions added yet for this subject.</p>
+                <p id="no-questions-msg" class="text-slate-500 dark:text-slate-400">No questions added yet for this
+                    subject.</p>
             </div>
         </div>
-        
+
         <!-- 
           --------------------------------------
           QUESTION MODAL (Add / Edit)
           --------------------------------------
         -->
-        <div id="question-modal" class="modal-content hidden bg-white dark:bg-slate-800 rounded-2xl shadow-xl w-full max-w-2xl p-6">
+        <div id="question-modal"
+            class="modal-content hidden bg-white dark:bg-slate-800 rounded-2xl shadow-xl w-full max-w-2xl p-6">
             <form id="question-form" class="space-y-4">
                 <h3 id="question-modal-title" class="text-xl font-bold mb-4">Add New Question</h3>
                 <input type="hidden" id="question-id-input">
                 <input type="hidden" id="question-subject-id-input">
-                
+
                 <!-- Question Text -->
                 <div>
-                    <label for="question-text" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Question</label>
-                    <textarea id="question-text" rows="2" required class="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500" placeholder="What does HTML stand for?"></textarea>
+                    <label for="question-text"
+                        class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Question</label>
+                    <textarea id="question-text" rows="2" required
+                        class="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                        placeholder="What does HTML stand for?"></textarea>
                 </div>
 
                 <!-- Options -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label for="option-0" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Option 1 (Correct Answer)</label>
-                        <input type="text" id="option-0" required class="question-option w-full px-4 py-2 border border-emerald-400 dark:border-emerald-600 rounded-lg bg-emerald-50 dark:bg-emerald-900 focus:outline-none focus:ring-2 focus:ring-emerald-500" placeholder="Correct Answer">
+                        <label for="option-0"
+                            class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Option 1 (Correct
+                            Answer)</label>
+                        <input type="text" id="option-0" required
+                            class="question-option w-full px-4 py-2 border border-emerald-400 dark:border-emerald-600 rounded-lg bg-emerald-50 dark:bg-emerald-900 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                            placeholder="Correct Answer">
                     </div>
                     <div>
-                        <label for="option-1" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Option 2</label>
-                        <input type="text" id="option-1" required class="question-option w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500" placeholder="Wrong Answer 1">
+                        <label for="option-1"
+                            class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Option 2</label>
+                        <input type="text" id="option-1" required
+                            class="question-option w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                            placeholder="Wrong Answer 1">
                     </div>
                     <div>
-                        <label for="option-2" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Option 3</label>
-                        <input type="text" id="option-2" required class="question-option w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500" placeholder="Wrong Answer 2">
+                        <label for="option-2"
+                            class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Option 3</label>
+                        <input type="text" id="option-2" required
+                            class="question-option w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                            placeholder="Wrong Answer 2">
                     </div>
                     <div>
-                        <label for="option-3" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Option 4</label>
-                        <input type="text" id="option-3" required class="question-option w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500" placeholder="Wrong Answer 3">
+                        <label for="option-3"
+                            class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Option 4</label>
+                        <input type="text" id="option-3" required
+                            class="question-option w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                            placeholder="Wrong Answer 3">
                     </div>
                 </div>
 
@@ -666,10 +889,12 @@
 
                 <!-- Buttons -->
                 <div class="flex justify-end space-x-3 pt-4">
-                    <button type="button" class="modal-close-button bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-semibold py-2 px-4 rounded-lg">
+                    <button type="button"
+                        class="modal-close-button bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-semibold py-2 px-4 rounded-lg">
                         Cancel
                     </button>
-                    <button type="submit" class="bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2 px-4 rounded-lg">
+                    <button type="submit"
+                        class="bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2 px-4 rounded-lg">
                         Save Question
                     </button>
                 </div>
@@ -677,6 +902,18 @@
         </div>
 
     </div> <!-- /End Modal Backdrop -->
+
+    <!-- 
+      ================================================================
+      TOAST NOTIFICATION
+      ================================================================
+    -->
+    <div id="toast-notification" class="w-full max-w-xs p-4 rounded-lg shadow-lg" role="alert">
+        <div class="flex items-center">
+            <i id="toast-icon" data-lucide="check-circle" class="w-5 h-5"></i>
+            <span id="toast-message" class="ml-3 text-sm font-medium">Item saved successfully.</span>
+        </div>
+    </div>
 
 
     <!-- 
@@ -690,11 +927,11 @@
         // === FIREBASE & APP INITIALIZATION ===============================
         // =================================================================
         // 
-        
+
         // Import Firebase modules
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { 
-            getAuth, 
+        import {
+            getAuth,
             onAuthStateChanged,
             signInWithEmailAndPassword,
             createUserWithEmailAndPassword,
@@ -705,16 +942,16 @@
             signInAnonymously,
             signInWithCustomToken
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { 
-            getFirestore, 
-            doc, 
-            getDoc, 
-            setDoc, 
+        import {
+            getFirestore,
+            doc,
+            getDoc,
+            setDoc,
             addDoc,
-            updateDoc, 
-            deleteDoc, 
-            onSnapshot, 
-            collection, 
+            updateDoc,
+            deleteDoc,
+            onSnapshot,
+            collection,
             query,
             writeBatch,
             getDocs,
@@ -723,22 +960,22 @@
 
         // --- USER'S FIREBASE CONFIG ---
         const firebaseConfig = {
-          apiKey: "AIzaSyDXZZVwU6Q8l5GtK8ngxfIkQLEVkbihNhM",
-          authDomain: "studyhelper-quizzes.firebaseapp.com",
-          projectId: "studyhelper-quizzes",
-          storageBucket: "studyhelper-quizzes.firebasestorage.app",
-          messagingSenderId: "217416839389",
-          appId: "1:217416839389:web:060ca955eaa8befce12b34",
-          measurementId: "G-4XVEYVNL7L"
+            apiKey: "AIzaSyDXZZVwU6Q8l5GtK8ngxfIkQLEVkbihNhM",
+            authDomain: "studyhelper-quizzes.firebaseapp.com",
+            projectId: "studyhelper-quizzes",
+            storageBucket: "studyhelper-quizzes.firebasestorage.app",
+            messagingSenderId: "217416839389",
+            appId: "1:217416839389:web:060ca955eaa8befce12b34",
+            measurementId: "G-4XVEYVNL7L"
         };
         // -----------------------------
-        
+
         // Initialize Firebase
         let app, auth, db;
         try {
             // Check for __firebase_config first (for canvas environment)
-            const config = typeof __firebase_config !== 'undefined' 
-                ? JSON.parse(__firebase_config) 
+            const config = typeof __firebase_config !== 'undefined'
+                ? JSON.parse(__firebase_config)
                 : firebaseConfig;
 
             app = initializeApp(config);
@@ -750,12 +987,13 @@
             document.getElementById('app-loader').innerHTML = '<p class="text-red-500 p-4">Error: Firebase config is missing or invalid. Please check `index.html`.</p>';
             throw new Error("Firebase initialization failed.");
         }
-        
+
         // App-wide variables
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'studyhelper-quizzes'; // Use project ID as default
         let currentUserId = null;
         let currentAuthUser = null;
         let currentEditingSubject = null; // Stores {id, name} when managing questions
+        let toastTimeout;
 
         // Global state object
         const appState = {
@@ -763,13 +1001,14 @@
             questions: [],
             quizHistory: [],
             activeQuiz: null,
-            isAuthReady: false
+            isAuthReady: false,
+            isSidebarOpen: true
         };
 
         // Firestore collection unsubscribe listeners
-        let unsubSubjects = () => {};
-        let unsubQuestions = () => {};
-        let unsubHistory = () => {};
+        let unsubSubjects = () => { };
+        let unsubQuestions = () => { };
+        let unsubHistory = () => { };
 
         // 
         // =================================================================
@@ -781,6 +1020,9 @@
 
         const appLoader = $('#app-loader');
         const appShell = $('#app-shell');
+        const sidebar = $('#sidebar');
+        const mainContent = $('#main-content');
+        const sidebarToggleBtn = $('#sidebar-toggle-btn');
         const pageTitle = $('#page-title');
         const contentPages = $$('.page-content');
         const userIdDisplay = $('#user-id-display');
@@ -829,7 +1071,7 @@
         const addNewQuestionBtn = $('#add-new-question-btn');
         const questionListContainer = $('#question-list-container');
         const noQuestionsMsg = $('#no-questions-msg');
-        
+
         // Question Modal
         const questionModal = $('#question-modal');
         const questionForm = $('#question-form');
@@ -886,11 +1128,42 @@
         const exportFullButton = $('#export-full-button');
         const deleteAllDataButton = $('#delete-all-data-button');
 
+        // Toast
+        const toast = $('#toast-notification');
+        const toastIcon = $('#toast-icon');
+        const toastMessage = $('#toast-message');
+
         // 
         // =================================================================
-        // === UTILITY & MODAL FUNCTIONS ===================================
+        // === UTILITY, MODAL & TOAST FUNCTIONS ============================
         // =================================================================
         // 
+
+        /**
+         * Shows a toast notification.
+         * @param {string} message - The message to display.
+         * @param {'success' | 'error'} type - The type of toast.
+         */
+        function showToast(message, type = 'success') {
+            clearTimeout(toastTimeout);
+
+            toastMessage.textContent = message;
+
+            if (type === 'success') {
+                toast.className = "w-full max-w-xs p-4 rounded-lg shadow-lg bg-emerald-500 text-white";
+                toastIcon.setAttribute('data-lucide', 'check-circle');
+            } else {
+                toast.className = "w-full max-w-xs p-4 rounded-lg shadow-lg bg-red-500 text-white";
+                toastIcon.setAttribute('data-lucide', 'alert-circle');
+            }
+            lucide.createIcons();
+
+            toast.classList.add('show');
+
+            toastTimeout = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
 
         /**
          * Clears all active Firestore listeners. Called on logout.
@@ -920,16 +1193,16 @@
         function clearDynamicUI() {
             subjectCardGrid.innerHTML = '';
             subjectCardGrid.append(noSubjectsMsg);
-            
+
             quizSelectionList.innerHTML = '';
             quizSelectionList.append(noQuizzesMsg);
-            
+
             quizHistoryTableBody.innerHTML = '';
             quizHistoryTableBody.append(noHistoryMsg);
 
             importSubjectSelect.innerHTML = '<option value="">Select subject...</option>';
             exportSubjectSelect.innerHTML = '<option value="">Select subject...</option>';
-            
+
             // Reset dashboard
             welcomeUserName.textContent = 'User';
             dbQuestionCount.textContent = '0';
@@ -948,7 +1221,7 @@
             if (!modalId) {
                 // Hide all
                 modalBackdrop.classList.add('opacity-0');
-                allModals.forEach(m => m.classList.add('opacity-0', 'scale-95'));
+                allModals.forEach(m => m.classList.remove('open', 'opacity-100', 'scale-100'));
                 setTimeout(() => {
                     modalBackdrop.classList.add('hidden');
                     allModals.forEach(m => m.classList.add('hidden'));
@@ -959,9 +1232,9 @@
             modalBackdrop.dataset.closable = isClosable;
             modalBackdrop.classList.remove('hidden');
             allModals.forEach(m => m.classList.add('hidden')); // Hide all first
-            
+
             const modalToShow = $(`#${modalId}`);
-            if(modalToShow) {
+            if (modalToShow) {
                 modalToShow.classList.remove('hidden');
                 setTimeout(() => {
                     modalBackdrop.classList.add('open', 'opacity-100');
@@ -970,17 +1243,23 @@
                 }, 10); // Short delay to allow CSS transition
             }
         }
-        
+
         // Backdrop click listener to close modals
         modalBackdrop.addEventListener('click', (e) => {
             if (e.target === modalBackdrop && modalBackdrop.dataset.closable === 'true') {
                 showModal(null);
             }
         });
-        
+
         // All modal close buttons
         $$('.modal-close-button').forEach(btn => {
-            btn.addEventListener('click', () => showModal(null));
+            btn.addEventListener('click', () => {
+                // Find the parent modal and hide it, which will hide the backdrop
+                const parentModal = btn.closest('.modal-content');
+                if (parentModal.id) {
+                    showModal(null);
+                }
+            });
         });
 
         /**
@@ -990,9 +1269,9 @@
             confirmModalTitle.textContent = title;
             confirmModalMessage.textContent = message;
             modalConfirmBtn.textContent = confirmText;
-            
+
             modalConfirmBtn.className = 'text-white font-semibold py-2 px-4 rounded-lg';
-            modalConfirmBtn.classList.add(confirmClass); 
+            modalConfirmBtn.classList.add(confirmClass);
 
             modalConfirmCallback = onConfirm;
             showModal('confirm-modal', false);
@@ -1012,11 +1291,10 @@
          */
         function showPage(pageId) {
             if (!appState.isAuthReady && pageId !== 'page-home') {
-                 // Don't allow navigation until auth is ready, unless it's home
-                 if(currentAuthUser == null) {
-                    showModal('auth-modal'); // Prompt login if trying to navigate while logged out
+                if (currentAuthUser == null) {
+                    showModal('auth-modal');
                     return;
-                 }
+                }
             }
 
             contentPages.forEach(page => page.classList.add('hidden'));
@@ -1024,11 +1302,9 @@
             if (newPage) {
                 newPage.classList.remove('hidden');
 
-                // Update page title
                 const link = $(`[data-page="${pageId}"]`);
                 if (link) {
                     pageTitle.textContent = link.querySelector('span').textContent;
-                    // Update active sidebar link
                     $$('.sidebar-link').forEach(l => l.setAttribute('data-active', 'false'));
                     link.setAttribute('data-active', 'true');
                 } else if (pageId === 'page-home') {
@@ -1077,7 +1353,7 @@
                 [array[i], array[j]] = [array[j], array[i]];
             }
         }
-        
+
         // 
         // =================================================================
         // === AUTHENTICATION LOGIC ========================================
@@ -1097,32 +1373,32 @@
 
                 updateUserInfoUI(user);
                 attachFirestoreListeners();
-                
+
                 loginButtonHeader.classList.add('hidden');
                 accountButtonHeader.classList.remove('hidden');
-                
+
                 appLoader.classList.add('hidden');
                 appShell.classList.remove('hidden');
-                showPage('page-home'); // Go to home on login
-                showModal(null); // Close auth modal if it was open
+                showPage('page-home');
+                showModal(null);
 
             } else {
                 // User is signed out
                 console.log("Auth state changed: User is signed out.");
                 currentAuthUser = null;
                 currentUserId = null;
-                appState.isAuthReady = true; // Auth is "ready" (we know state)
+                appState.isAuthReady = true;
 
                 detachFirestoreListeners();
                 resetAppState();
                 clearDynamicUI();
-                
+
                 loginButtonHeader.classList.remove('hidden');
                 accountButtonHeader.classList.add('hidden');
-                
-                appShell.classList.remove('hidden'); // Show shell even if logged out
+
+                appShell.classList.remove('hidden');
                 appLoader.classList.add('hidden');
-                showPage('page-home'); // Stay on home page
+                showPage('page-home');
             }
         });
 
@@ -1135,7 +1411,6 @@
                     console.log("Custom token sign in successful.");
                 } else if (auth.currentUser) {
                     console.log("User already signed in:", auth.currentUser.uid);
-                    // onAuthStateChanged will handle the rest
                 } else {
                     console.log("No user or token found. App is ready for login.");
                     appState.isAuthReady = true;
@@ -1144,16 +1419,15 @@
                     showPage('page-home');
                 }
             } catch (error) {
-                 console.error("Auth initialization error:", error);
-                 // Fallback to anonymous for canvas, or just show app
-                 if (typeof __initial_auth_token !== 'undefined') {
+                console.error("Auth initialization error:", error);
+                if (typeof __initial_auth_token !== 'undefined') {
                     await signInAnonymously(auth);
-                 } else {
+                } else {
                     appState.isAuthReady = true;
                     appShell.classList.remove('hidden');
                     appLoader.classList.add('hidden');
                     showPage('page-home');
-                 }
+                }
             }
         }
 
@@ -1165,8 +1439,7 @@
             if (user) {
                 const displayName = user.displayName || user.email.split('@')[0] || 'User';
                 const email = user.email || 'No email provided';
-                
-                // Header Account Button
+
                 accountModalEmail.textContent = email;
                 if (user.photoURL) {
                     userAvatar.src = user.photoURL;
@@ -1174,14 +1447,9 @@
                     const initial = (displayName[0] || 'U').toUpperCase();
                     userAvatar.src = `https://placehold.co/40x40/e2e8f0/64748b?text=${initial}`;
                 }
-
-                // Dashboard
                 welcomeUserName.textContent = displayName.split(' ')[0];
-                
-                // Sidebar Footer
                 userIdDisplay.textContent = user.uid;
             } else {
-                // Reset to defaults
                 accountModalEmail.textContent = '...';
                 userAvatar.src = 'https://placehold.co/40x40/e2e8f0/64748b?text=U';
                 welcomeUserName.textContent = 'User';
@@ -1196,16 +1464,15 @@
         });
 
         accountButtonHeader.addEventListener('click', (e) => {
-            e.stopPropagation(); // Prevent backdrop click
+            e.stopPropagation();
             accountModal.classList.toggle('hidden');
-            if(!accountModal.classList.contains('hidden')) {
+            if (!accountModal.classList.contains('hidden')) {
                 accountModal.classList.add('open', 'opacity-100', 'scale-100');
             } else {
                 accountModal.classList.remove('open', 'opacity-100', 'scale-100');
             }
         });
-        
-        // Hide account modal if clicking anywhere else
+
         document.addEventListener('click', (e) => {
             if (!accountButtonHeader.contains(e.target) && !accountModal.contains(e.target)) {
                 accountModal.classList.add('hidden');
@@ -1218,6 +1485,7 @@
             signOut(auth);
             accountModal.classList.add('hidden');
             accountModal.classList.remove('open', 'opacity-100', 'scale-100');
+            showToast('You have been logged out.', 'success');
         });
 
         /**
@@ -1237,11 +1505,10 @@
             }
         }
 
-        // Auth form submission listener
         authForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             hideAuthError();
-            
+
             const email = emailInput.value;
             const password = passwordInput.value;
             const isSignUp = !signupButtons.classList.contains('hidden');
@@ -1251,26 +1518,25 @@
                     console.log('Attempting sign up...');
                     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                     console.log('Sign up successful:', userCredential.user.uid);
-                    // Update profile with a default name from email
                     const defaultName = email.split('@')[0];
                     await updateProfile(userCredential.user, { displayName: defaultName });
+                    showToast('Welcome! Your account has been created.', 'success');
                 } else {
                     console.log('Attempting login...');
                     await signInWithEmailAndPassword(auth, email, password);
                     console.log('Login successful.');
+                    showToast('Welcome back!', 'success');
                 }
-                // onAuthStateChanged will handle the UI transition and modal closing
             } catch (error) {
                 console.error("Auth error:", error.message);
                 showAuthError(error.message);
+                showToast(error.message, 'error');
             }
         });
 
-        // Auth form toggle listeners
         $('#toggle-to-signup').addEventListener('click', () => setAuthFormMode('signup'));
         $('#toggle-to-login').addEventListener('click', () => setAuthFormMode('login'));
 
-        // Google Sign-In listener
         googleSigninButton.addEventListener('click', async () => {
             hideAuthError();
             const provider = new GoogleAuthProvider();
@@ -1278,9 +1544,11 @@
                 console.log('Attempting Google Sign-In...');
                 await signInWithPopup(auth, provider);
                 console.log('Google Sign-In successful.');
+                showToast('Signed in with Google!', 'success');
             } catch (error) {
                 console.error("Google Sign-In error:", error.message);
                 showAuthError(error.message);
+                showToast(error.message, 'error');
             }
         });
 
@@ -1297,11 +1565,9 @@
         function attachFirestoreListeners() {
             if (!currentUserId) return;
             console.log(`Attaching Firestore listeners for user ${currentUserId}`);
-            
-            // Detach old listeners first
+
             detachFirestoreListeners();
 
-            // --- Listener for Subjects ---
             const subjectsQuery = query(getSubjectsCol());
             unsubSubjects = onSnapshot(subjectsQuery, (snapshot) => {
                 appState.subjects = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -1312,22 +1578,18 @@
                 renderSettingsDropdowns();
             }, (error) => console.error("Error listening to subjects:", error));
 
-            // --- Listener for Questions ---
             const questionsQuery = query(getQuestionsCol());
             unsubQuestions = onSnapshot(questionsQuery, (snapshot) => {
                 appState.questions = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 console.log('Firestore update: Questions', appState.questions);
-                renderQuizSelectionList(); // Update question counts
+                renderQuizSelectionList();
                 renderDashboardStats();
-                // If manage questions modal is open, refresh it
                 if (!manageQuestionsModal.classList.contains('hidden') && currentEditingSubject) {
                     renderQuestionListModal(currentEditingSubject.id);
                 }
-                // Also refresh subject cards to update question counts
                 renderSubjectCards();
             }, (error) => console.error("Error listening to questions:", error));
 
-            // --- Listener for Quiz History ---
             const historyQuery = query(getHistoryCol());
             unsubHistory = onSnapshot(historyQuery, (snapshot) => {
                 appState.quizHistory = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -1343,10 +1605,7 @@
         // === UI RENDERING FUNCTIONS ======================================
         // =================================================================
         // 
-        
-        /**
-         * Renders the subject cards in "Manage Bank".
-         */
+
         function renderSubjectCards() {
             if (!currentUserId) {
                 subjectCardGrid.innerHTML = '<p class="text-slate-500 dark:text-slate-400 md:col-span-2 lg:col-span-3">Please log in to manage your question bank.</p>';
@@ -1392,15 +1651,12 @@
             lucide.createIcons();
         }
 
-        /**
-         * Renders the subject cards on the "Take Quiz" page.
-         */
         function renderQuizSelectionList() {
             if (!currentUserId) {
                 quizSelectionList.innerHTML = '<p class="text-slate-500 dark:text-slate-400 md:col-span-2 lg:col-span-3">Please log in to take a quiz.</p>';
                 return;
             }
-            
+
             const questionCounts = appState.questions.reduce((acc, q) => {
                 acc[q.subjectId] = (acc[q.subjectId] || 0) + 1;
                 return acc;
@@ -1411,7 +1667,7 @@
                     ...subject,
                     questionCount: questionCounts[subject.id] || 0
                 }))
-                .filter(subject => subject.questionCount > 0); // Only show quizzes with questions
+                .filter(subject => subject.questionCount > 0);
 
             if (availableQuizzes.length === 0) {
                 quizSelectionList.innerHTML = '';
@@ -1429,21 +1685,17 @@
                 </div>
             `).join('');
         }
-        
-        /**
-         * Renders the list of questions in the "Manage Questions" modal.
-         * @param {string} subjectId - The ID of the subject.
-         */
+
         function renderQuestionListModal(subjectId) {
-             const questionsForSubject = appState.questions.filter(q => q.subjectId === subjectId);
-             
-             if (questionsForSubject.length === 0) {
+            const questionsForSubject = appState.questions.filter(q => q.subjectId === subjectId);
+
+            if (questionsForSubject.length === 0) {
                 questionListContainer.innerHTML = '';
                 questionListContainer.append(noQuestionsMsg);
                 return;
-             }
-             
-             questionListContainer.innerHTML = questionsForSubject.map(q => `
+            }
+
+            questionListContainer.innerHTML = questionsForSubject.map(q => `
                 <div class="p-3 bg-slate-50 dark:bg-slate-700 rounded-lg">
                     <p class="font-medium text-slate-800 dark:text-slate-100">${q.question}</p>
                     <ul class="mt-2 space-y-1 text-sm list-disc list-inside">
@@ -1463,12 +1715,9 @@
                     </div>
                 </div>
              `).join('');
-             lucide.createIcons(); // Ensure new icons are rendered
+            lucide.createIcons();
         }
 
-        /**
-         * Renders the Quiz History table.
-         */
         function renderQuizHistoryTable() {
             if (!currentUserId) {
                 quizHistoryTableBody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-slate-500 dark:text-slate-400">Please log in to view your history.</td></tr>';
@@ -1491,11 +1740,8 @@
             `).join('');
         }
 
-        /**
-         * Updates all stats on the Home/Dashboard page.
-         */
         function renderDashboardStats() {
-            if (!currentUserId) return; // Don't show stats if logged out
+            if (!currentUserId) return;
 
             dbSubjectCount.textContent = appState.subjects.length;
             dbQuestionCount.textContent = appState.questions.length;
@@ -1511,87 +1757,82 @@
                 dbAvgScore.textContent = 'N/A';
             }
         }
-        
-        /**
-         * Populates subject dropdowns in Settings
-         */
-         function renderSettingsDropdowns() {
+
+        function renderSettingsDropdowns() {
+            if (!currentUserId) {
+                importSubjectSelect.innerHTML = '<option value="">Log in to import</option>';
+                exportSubjectSelect.innerHTML = '<option value="">Log in to export</option>';
+                return;
+            }
             if (appState.subjects.length === 0) {
                 importSubjectSelect.innerHTML = '<option value="">Add a subject first</option>';
                 exportSubjectSelect.innerHTML = '<option value="">Add a subject first</option>';
                 return;
             }
-            
-            const optionsHtml = appState.subjects.map(subject => 
+
+            const optionsHtml = appState.subjects.map(subject =>
                 `<option value="${subject.id}">${subject.name}</option>`
             ).join('');
-            
+
             importSubjectSelect.innerHTML = `<option value="">Select subject to import into...</option>${optionsHtml}`;
             exportSubjectSelect.innerHTML = `<option value="">Select subject to export...</option>${optionsHtml}`;
-         }
+        }
 
         // 
         // =================================================================
         // === "MANAGE BANK" LOGIC =========================================
         // =================================================================
         // 
-        
-        // --- Open Subject Modal (Add / Edit) ---
+
         function openSubjectModal(subjectId = null, subjectName = '') {
             subjectForm.reset();
             subjectFormError.classList.add('hidden');
             if (subjectId) {
-                // Edit Mode
                 subjectModalTitle.textContent = 'Edit Subject';
                 subjectIdInput.value = subjectId;
                 subjectNameInput.value = subjectName;
             } else {
-                // Add Mode
                 subjectModalTitle.textContent = 'Add New Subject';
                 subjectIdInput.value = '';
                 subjectNameInput.value = '';
             }
             showModal('subject-modal');
         }
-        
-        // --- "+ New Subject" Button ---
+
         $('#add-new-subject-btn').addEventListener('click', () => {
-             if (!currentUserId) {
+            if (!currentUserId) {
                 showModal('auth-modal');
                 return;
             }
             openSubjectModal();
         });
 
-        // --- Save Subject (Add / Edit) ---
         subjectForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const subjectName = subjectNameInput.value.trim();
             const subjectId = subjectIdInput.value;
             if (!subjectName) return;
 
-            // Check for duplicates
             if (appState.subjects.some(s => s.name.toLowerCase() === subjectName.toLowerCase() && s.id !== subjectId)) {
                 subjectFormError.textContent = 'This subject already exists.';
                 subjectFormError.classList.remove('hidden');
                 return;
             }
-            
+
             subjectFormError.classList.add('hidden');
-            
+
             try {
                 if (subjectId) {
-                    // Update existing subject
                     const docRef = doc(getSubjectsCol(), subjectId);
                     await updateDoc(docRef, { name: subjectName });
                     console.log("Subject updated:", subjectId);
+                    showToast('Subject updated successfully!', 'success');
                 } else {
-                    // Add new subject
                     const docRef = await addDoc(getSubjectsCol(), { name: subjectName });
                     console.log("Subject added with ID:", docRef.id);
+                    showToast('Subject added successfully!', 'success');
                 }
-                showModal(null); // Close modal on success
-                // If manage questions modal was open, update its title
+                showModal(null);
                 if (!manageQuestionsModal.classList.contains('hidden') && currentEditingSubject) {
                     currentEditingSubject.name = subjectName;
                     manageQModalTitle.textContent = `Manage Questions for "${subjectName}"`;
@@ -1600,17 +1841,16 @@
                 console.error("Error saving subject:", error);
                 subjectFormError.textContent = 'Error saving subject. Please try again.';
                 subjectFormError.classList.remove('hidden');
+                showToast('Error saving subject.', 'error');
             }
         });
 
-        // --- Event Delegation for Subject Cards ---
         subjectCardGrid.addEventListener('click', (e) => {
             const subjectCard = e.target.closest('[data-subject-id]');
             if (!subjectCard) return;
-            
+
             const { subjectId, subjectName } = subjectCard.dataset;
 
-            // --- Delete Subject Button ---
             const deleteButton = e.target.closest('.delete-subject-btn');
             if (deleteButton) {
                 showConfirmModal(
@@ -1630,65 +1870,60 @@
                             });
                             await batch.commit();
                             console.log(`Successfully deleted subject and ${questionsToDelete.length} questions.`);
+                            showToast('Subject and questions deleted.', 'success');
                         } catch (error) {
                             console.error("Error deleting subject:", error);
+                            showToast('Error deleting subject.', 'error');
                         }
                     }
                 );
-                return; // Stop further actions
+                return;
             }
-            
-            // --- Manage Subject Button ---
+
             const manageButton = e.target.closest('.manage-subject-btn');
             if (manageButton) {
                 openManageQuestionsModal(subjectId, subjectName);
                 return;
             }
-            
-            // --- Start Quiz Button ---
+
             const startButton = e.target.closest('.start-quiz-btn');
-            if (startButton) {
+            if (startButton && !startButton.disabled) {
                 startQuiz(subjectId, subjectName);
                 return;
             }
         });
-        
+
         // 
         // =================================================================
         // === "MANAGE QUESTIONS" MODAL LOGIC ==============================
         // =================================================================
         // 
-        
+
         function openManageQuestionsModal(subjectId, subjectName) {
             currentEditingSubject = { id: subjectId, name: subjectName };
             manageQModalTitle.textContent = `Manage Questions for "${subjectName}"`;
             renderQuestionListModal(subjectId);
             showModal('manage-questions-modal');
         }
-        
-        // --- "Edit Subject" button (inside Manage Q modal) ---
+
         editSubjectNameBtn.addEventListener('click', () => {
             if (currentEditingSubject) {
-                // We're already in the questions modal, so just open subject modal
                 openSubjectModal(currentEditingSubject.id, currentEditingSubject.name);
             }
         });
-        
-        // --- "+ Add New Question" button (inside Manage Q modal) ---
+
         addNewQuestionBtn.addEventListener('click', () => {
             if (currentEditingSubject) {
                 openQuestionModal(currentEditingSubject.id);
             }
         });
-        
-        // --- Open Question Modal (Add / Edit) ---
+
         function openQuestionModal(subjectId, questionId = null) {
             questionForm.reset();
             questionFormError.classList.add('hidden');
             questionSubjectIdInput.value = subjectId;
-            
+
             if (questionId) {
-                // Edit Mode
                 questionModalTitle.textContent = 'Edit Question';
                 questionIdInput.value = questionId;
                 const questionData = appState.questions.find(q => q.id === questionId);
@@ -1699,14 +1934,12 @@
                     });
                 }
             } else {
-                // Add Mode
                 questionModalTitle.textContent = 'Add New Question';
                 questionIdInput.value = '';
             }
-            showModal('question-modal', false); // Don't let backdrop close this one
+            showModal('question-modal', false);
         }
 
-        // --- Save Question (Add / Edit) ---
         questionForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             questionFormError.classList.add('hidden');
@@ -1715,7 +1948,7 @@
             const questionId = questionIdInput.value;
             const question = questionTextInput.value.trim();
             const options = Array.from(questionOptions).map(input => input.value.trim());
-            const correctAnswerIndex = 0; // Option 1 is always correct answer
+            const correctAnswerIndex = 0;
 
             if (!subjectId || !question || options.some(opt => !opt)) {
                 questionFormError.textContent = 'Please fill out all fields.';
@@ -1732,34 +1965,32 @@
 
             try {
                 if (questionId) {
-                    // Update
                     const docRef = doc(getQuestionsCol(), questionId);
                     await updateDoc(docRef, questionData);
                     console.log("Question updated:", questionId);
+                    showToast('Question updated!', 'success');
                 } else {
-                    // Add
                     const docRef = await addDoc(getQuestionsCol(), questionData);
                     console.log("Question added:", docRef.id);
+                    showToast('Question added!', 'success');
                 }
-                showModal('manage-questions-modal'); // Go back to list
+                showModal('manage-questions-modal');
             } catch (error) {
                 console.error("Error saving question:", error);
                 questionFormError.textContent = 'Error saving question. Please try again.';
                 questionFormError.classList.remove('hidden');
+                showToast('Error saving question.', 'error');
             }
         });
-        
-        // --- Event Delegation for Question List (Edit/Delete) ---
+
         questionListContainer.addEventListener('click', (e) => {
-             // --- Edit Question ---
             const editButton = e.target.closest('.edit-question-btn');
             if (editButton) {
                 const questionId = editButton.dataset.questionId;
                 openQuestionModal(currentEditingSubject.id, questionId);
                 return;
             }
-            
-            // --- Delete Question ---
+
             const deleteButton = e.target.closest('.delete-question-btn');
             if (deleteButton) {
                 const questionId = deleteButton.dataset.questionId;
@@ -1771,9 +2002,10 @@
                         try {
                             await deleteDoc(doc(getQuestionsCol(), questionId));
                             console.log("Question deleted.");
-                            // No need to re-render, onSnapshot will do it
+                            showToast('Question deleted.', 'success');
                         } catch (error) {
                             console.error("Error deleting question:", error);
+                            showToast('Error deleting question.', 'error');
                         }
                     }
                 );
@@ -1788,17 +2020,12 @@
         // =================================================================
         // 
 
-        /**
-         * Starts a new quiz.
-         * @param {string} subjectId - The ID of the subject to start.
-         * @param {string} subjectName - The name of the subject.
-         */
         function startQuiz(subjectId, subjectName) {
             console.log(`Starting quiz for ${subjectName} (${subjectId})`);
 
             const questionsForSubject = appState.questions.filter(q => q.subjectId === subjectId);
             if (questionsForSubject.length === 0) {
-                console.error("No questions found for this subject.");
+                showToast('This subject has no questions.', 'error');
                 return;
             }
 
@@ -1823,24 +2050,21 @@
                 userAnswers: new Array(quizQuestions.length).fill(null),
                 score: 0
             };
-            
+
             quizActiveTitle.textContent = `${subjectName} Quiz`;
             renderActiveQuizQuestion();
             showPage('page-quiz-active');
         }
 
-        /**
-         * Renders the current question in the active quiz.
-         */
         function renderActiveQuizQuestion() {
             if (!appState.activeQuiz) return;
-            
+
             const quiz = appState.activeQuiz;
             const q = quiz.questions[quiz.currentIndex];
 
             quizFeedback.classList.add('hidden');
             quizActiveQuestion.textContent = q.question;
-            
+
             const progress = ((quiz.currentIndex + 1) / quiz.questions.length) * 100;
             quizProgressText.textContent = `Question ${quiz.currentIndex + 1} / ${quiz.questions.length}`;
             quizProgressBar.style.width = `${progress}%`;
@@ -1856,21 +2080,18 @@
             quizSubmitButton.classList.toggle('hidden', quiz.currentIndex !== quiz.questions.length - 1);
         }
 
-        /**
-         * Handles logic for the "Next" or "Submit" button click.
-         */
         function handleQuizNext() {
             if (!appState.activeQuiz) return;
             const quiz = appState.activeQuiz;
             const selectedOption = $('input[name="quiz-option"]:checked');
-            
+
             if (!selectedOption) {
                 quizFeedback.textContent = 'Please select an answer.';
                 quizFeedback.className = 'p-4 rounded-lg mb-6 text-sm bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200';
                 quizFeedback.classList.remove('hidden');
                 return;
             }
-            
+
             const selectedAnswerIndex = parseInt(selectedOption.value);
             quiz.userAnswers[quiz.currentIndex] = selectedAnswerIndex;
 
@@ -1882,13 +2103,10 @@
             }
         }
 
-        /**
-         * Calculates score, saves to Firestore, and shows results page.
-         */
         async function finishQuiz() {
             if (!appState.activeQuiz) return;
             const quiz = appState.activeQuiz;
-            
+
             let correctAnswers = 0;
             quiz.questions.forEach((q, index) => {
                 if (q.correctAnswerIndex === quiz.userAnswers[index]) {
@@ -1912,12 +2130,13 @@
                 console.log("Quiz history saved to Firestore.");
             } catch (error) {
                 console.error("Error saving quiz history:", error);
+                showToast('Error saving quiz results.', 'error');
             }
 
             resultsSubjectName.textContent = `${quiz.subjectName} Quiz`;
             resultsScoreText.textContent = `${finalScore}%`;
             resultsScoreDetails.textContent = `You answered ${correctAnswers} out of ${totalQuestions} questions correctly.`;
-            
+
             resultsRetakeButton.dataset.subjectId = quiz.subjectId;
             resultsRetakeButton.dataset.subjectName = quiz.subjectName;
 
@@ -1925,7 +2144,6 @@
             appState.activeQuiz = null;
         }
 
-        // --- Start Quiz (Event Delegation) ---
         quizSelectionList.addEventListener('click', (e) => {
             const startButton = e.target.closest('.start-quiz-btn');
             if (startButton) {
@@ -1936,7 +2154,7 @@
 
         quizNextButton.addEventListener('click', handleQuizNext);
         quizSubmitButton.addEventListener('click', handleQuizNext);
-        
+
         quizExitButton.addEventListener('click', () => {
             showConfirmModal(
                 'Exit Quiz?',
@@ -1958,7 +2176,7 @@
         // === "SETTINGS & DATA" LOGIC =====================================
         // =================================================================
         // 
-        
+
         function downloadJSON(data, filename) {
             const dataStr = JSON.stringify(data, null, 2);
             const dataBlob = new Blob([dataStr], { type: 'application/json' });
@@ -1970,53 +2188,65 @@
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
+            showToast('Data exported successfully!', 'success');
         }
-        
+
         function setImportStatus(message, isError = false) {
-             importStatus.textContent = message;
-             importStatus.classList.toggle('text-red-500', isError);
-             importStatus.classList.toggle('text-emerald-500', !isError);
-             setTimeout(() => importStatus.textContent = '', 4000);
+            importStatus.textContent = message;
+            importStatus.classList.toggle('text-red-500', isError);
+            importStatus.classList.toggle('text-emerald-500', !isError);
+            if (isError) {
+                showToast(message, 'error');
+            } else {
+                showToast(message, 'success');
+            }
+            setTimeout(() => importStatus.textContent = '', 4000);
         }
-        
-        // --- Export Subject ---
+
         exportSubjectButton.addEventListener('click', () => {
+            if (!currentUserId) { showModal('auth-modal'); return; }
             const subjectId = exportSubjectSelect.value;
-            if (!subjectId) return;
-            
+            if (!subjectId) {
+                showToast('Please select a subject to export.', 'error');
+                return;
+            }
+
             const subject = appState.subjects.find(s => s.id === subjectId);
             const questions = appState.questions
                 .filter(q => q.subjectId === subjectId)
-                .map(({id, subjectId, ...q}) => q); // Strip IDs
-                
+                .map(({ id, subjectId, ...q }) => q);
+
             const dataToExport = {
                 subjectName: subject.name,
                 questions: questions
             };
-            
+
             downloadJSON(dataToExport, `studyhelper_subject_${subject.name}.json`);
         });
 
-        // --- Export Full Backup ---
         exportFullButton.addEventListener('click', () => {
+            if (!currentUserId) { showModal('auth-modal'); return; }
             const dataToExport = {
-                subjects: appState.subjects.map(({id, ...s}) => s), // Remove IDs
-                questions: appState.questions.map(({id, ...q}) => q), // Remove IDs
-                quizHistory: appState.quizHistory.map(({id, ...h}) => ({ // Remove IDs and convert Timestamps
+                subjects: appState.subjects.map(({ id, ...s }) => s),
+                questions: appState.questions.map(({ id, ...q }) => q),
+                quizHistory: appState.quizHistory.map(({ id, ...h }) => ({
                     ...h,
-                    timestamp: h.timestamp.toDate().toISOString() // Convert to string
+                    timestamp: h.timestamp.toDate().toISOString()
                 }))
             };
             downloadJSON(dataToExport, `studyhelper_full_backup_${new Date().toISOString().split('T')[0]}.json`);
         });
 
-        // --- Import Subject ---
         importSubjectForm.addEventListener('submit', (e) => {
             e.preventDefault();
+            if (!currentUserId) { showModal('auth-modal'); return; }
             const subjectId = importSubjectSelect.value;
             const file = $('#import-subject-file').files[0];
-            if (!subjectId || !file) return;
-            
+            if (!subjectId || !file) {
+                showToast('Please select a subject and a file.', 'error');
+                return;
+            }
+
             const reader = new FileReader();
             reader.onload = async (event) => {
                 try {
@@ -2024,18 +2254,18 @@
                     if (!importedData.questions || !importedData.subjectName) {
                         throw new Error('Invalid subject file format.');
                     }
-                    
+
                     const batch = writeBatch(db);
                     importedData.questions.forEach(question => {
-                        const docRef = doc(getQuestionsCol()); // New doc, new ID
+                        const docRef = doc(getQuestionsCol());
                         batch.set(docRef, {
                             ...question,
-                            subjectId: subjectId // Assign to selected subject
+                            subjectId: subjectId
                         });
                     });
-                    
+
                     await batch.commit();
-                    setImportStatus(`Successfully imported ${importedData.questions.length} questions to ${appState.subjects.find(s=>s.id === subjectId).name}.`);
+                    setImportStatus(`Imported ${importedData.questions.length} questions to ${appState.subjects.find(s => s.id === subjectId).name}.`);
                     importSubjectForm.reset();
                 } catch (error) {
                     setImportStatus(`Error: ${error.message}`, true);
@@ -2043,13 +2273,16 @@
             };
             reader.readAsText(file);
         });
-        
-        // --- Import Full Backup ---
+
         importFullForm.addEventListener('submit', (e) => {
             e.preventDefault();
+            if (!currentUserId) { showModal('auth-modal'); return; }
             const file = $('#import-full-file').files[0];
-            if (!file) return;
-            
+            if (!file) {
+                showToast('Please select a file.', 'error');
+                return;
+            }
+
             const reader = new FileReader();
             reader.onload = (event) => {
                 try {
@@ -2057,18 +2290,15 @@
                     if (!importedData.subjects || !importedData.questions || !importedData.quizHistory) {
                         throw new Error('Invalid backup file format.');
                     }
-                    
+
                     showConfirmModal(
                         'Import Full Backup?',
-                        'This will add all subjects, questions, and history from the file. It may create duplicates. Are you sure?',
+                        'This will add all data from the file. It may create duplicates. Are you sure?',
                         async () => {
                             try {
                                 const batch = writeBatch(db);
-                                // Import subjects
                                 importedData.subjects.forEach(s => batch.set(doc(getSubjectsCol()), s));
-                                // Import questions
                                 importedData.questions.forEach(q => batch.set(doc(getQuestionsCol()), q));
-                                // Import history
                                 importedData.quizHistory.forEach(h => {
                                     batch.set(doc(getHistoryCol()), {
                                         ...h,
@@ -2092,9 +2322,9 @@
             reader.readAsText(file);
         });
 
-        
-        // --- Delete All Data ---
+
         deleteAllDataButton.addEventListener('click', () => {
+            if (!currentUserId) { showModal('auth-modal'); return; }
             showConfirmModal(
                 'DELETE ALL DATA?',
                 'This is your final warning. All your subjects, questions, and quiz history will be permanently erased. This cannot be undone.',
@@ -2102,17 +2332,18 @@
                     console.log('Deleting all data for user:', currentUserId);
                     try {
                         const batch = writeBatch(db);
-                        
                         const collections = [getSubjectsCol(), getQuestionsCol(), getHistoryCol()];
                         for (const colRef of collections) {
-                             const snapshot = await getDocs(colRef);
-                             snapshot.forEach(doc => batch.delete(doc.ref));
+                            const snapshot = await getDocs(colRef);
+                            snapshot.forEach(doc => batch.delete(doc.ref));
                         }
 
                         await batch.commit();
                         console.log('All user data deleted successfully.');
+                        showToast('All your data has been deleted.', 'success');
                     } catch (error) {
                         console.error('Error deleting all data:', error);
+                        showToast('Error deleting data.', 'error');
                     }
                 }
             );
@@ -2124,6 +2355,29 @@
         // =================================================================
         // 
 
+        // --- Sidebar Toggle ---
+        sidebarToggleBtn.addEventListener('click', () => {
+            appState.isSidebarOpen = !appState.isSidebarOpen;
+            sidebar.classList.toggle('collapsed');
+            mainContent.classList.toggle('sidebar-collapsed');
+
+            // Update icon
+            const icon = appState.isSidebarOpen ? 'panel-left-close' : 'panel-left-open';
+            sidebarToggleBtn.innerHTML = `<i data-lucide="${icon}" class="w-6 h-6"></i>`;
+            lucide.createIcons();
+
+            // Save preference
+            localStorage.setItem('studyhelper-sidebar', appState.isSidebarOpen);
+        });
+
+        // --- Load Sidebar Preference ---
+        if (localStorage.getItem('studyhelper-sidebar') === 'false') {
+            appState.isSidebarOpen = false;
+            sidebar.classList.add('collapsed');
+            mainContent.classList.add('sidebar-collapsed');
+            sidebarToggleBtn.innerHTML = `<i data-lucide="panel-left-open" class="w-6 h-6"></i>`;
+        }
+
         // --- Sidebar Navigation ---
         $$('.sidebar-link').forEach(link => {
             link.addEventListener('click', (e) => {
@@ -2133,7 +2387,7 @@
             });
         });
 
-        // --- Other Navigation Buttons (Event Delegation on document) ---
+        // --- Other Navigation Buttons (Event Delegation) ---
         document.addEventListener('click', (e) => {
             const navButton = e.target.closest('.nav-button');
             if (navButton) {
@@ -2144,21 +2398,31 @@
         });
 
         // --- Dark Mode Toggle ---
+        const darkModeSwitch = $('#dark-mode-switch');
         $('#dark-mode-toggle').addEventListener('click', () => {
             document.documentElement.classList.toggle('dark');
             const isDark = document.documentElement.classList.contains('dark');
             localStorage.setItem('studyhelper-darkmode', isDark);
+            // Manually update switch state for visual feedback
+            if (isDark) {
+                darkModeSwitch.classList.add('dark:translate-x-5');
+            } else {
+                darkModeSwitch.classList.remove('dark:translate-x-5');
+            }
         });
-        
+
         // --- Load Dark Mode Preference ---
-        if (localStorage.getItem('studyhelper-darkmode') === 'true') {
-             document.documentElement.classList.add('dark');
+        if (localStorage.getItem('studyhelper-darkmode') === 'true' ||
+            (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches && !localStorage.getItem('studyhelper-darkmode'))) {
+            document.documentElement.classList.add('dark');
+            darkModeSwitch.classList.add('dark:translate-x-5');
         }
 
         // --- Final Initialization ---
         lucide.createIcons(); // Initialize all icons on load
         initializeAuth(); // Start the auth process
-        
+
     </script>
 </body>
+
 </html>
