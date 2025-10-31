@@ -10,7 +10,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Lucide Icons CDN (FIXED) -->
+    <!-- Lucide Icons CDN -->
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
     <script>
         // Set up Tailwind CSS
@@ -77,7 +77,7 @@
             opacity: 1;
         }
         
-        /* NEW: Sidebar collapsing */
+        /* Sidebar collapsing */
         nav {
             width: 16rem; /* w-64 */
             transition: width 0.3s ease-in-out;
@@ -96,7 +96,7 @@
             width: calc(100% - 4.5rem);
         }
         
-        /* NEW: Hide text and show tooltips when collapsed */
+        /* Hide text and show tooltips when collapsed */
         nav.collapsed .sidebar-text {
             display: none;
         }
@@ -125,6 +125,28 @@
         /* Disabled button styles */
         button:disabled {
             opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Quiz answer feedback styles */
+        .quiz-option-label.correct {
+            background-color: #dcfce7; /* emerald-100 */
+            border-color: #22c55e; /* emerald-500 */
+        }
+        .dark .quiz-option-label.correct {
+            background-color: #064e3b; /* emerald-900 */
+            border-color: #22c55e;
+        }
+        .quiz-option-label.incorrect {
+            background-color: #fee2e2; /* red-100 */
+            border-color: #ef4444; /* red-500 */
+        }
+        .dark .quiz-option-label.incorrect {
+            background-color: #7f1d1d; /* red-900 */
+            border-color: #ef4444;
+        }
+        .quiz-option-label.disabled {
+            opacity: 0.7;
             cursor: not-allowed;
         }
     </style>
@@ -370,27 +392,72 @@
                 </div>
 
                 <!-- 
-                  ================ PAGE: TAKE QUIZ ================
+                  ================ PAGE: TAKE QUIZ (NEW UI) ================
                 -->
                 <div id="page-take-quiz" class="page-content hidden">
-                    <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow">
-                        <h2 class="text-2xl font-bold mb-4">Select a Quiz</h2>
-                        <p class="text-slate-500 dark:text-slate-400 mb-6">Choose a subject to start your quiz. You must add subjects and at least one question in the "Manage Bank" section first.</p>
+                    <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow max-w-lg mx-auto">
+                        <h2 class="text-2xl font-bold mb-6">Quiz Setup</h2>
                         
-                        <div id="quiz-selection-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            <!-- Quiz subject cards will be inserted here -->
-                            <p id="no-quizzes-msg" class="text-slate-500 dark:text-slate-400 md:col-span-2 lg:col-span-3">No quizzes available. Go to "Manage Bank" to add subjects and questions.</p>
-                        </div>
+                        <form id="quiz-setup-form" class="space-y-4">
+                            <div>
+                                <label for="quiz-setup-subject" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Select Subject</label>
+                                <select id="quiz-setup-subject" required class="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500">
+                                    <option value="">Select a subject...</option>
+                                    <!-- Subject options -->
+                                </select>
+                            </div>
+
+                            <div>
+                                <label for="quiz-setup-num-questions" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                                    Number of Questions <span id="quiz-setup-max-questions" class="text-xs text-slate-500">(Max: 0)</span>
+                                </label>
+                                <input type="number" id="quiz-setup-num-questions" min="1" max="0" required class="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500">
+                            </div>
+                            
+                            <div>
+                                <label for="quiz-setup-time-per-question" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                                    Time per Question (seconds)
+                                    <span class="text-xs text-slate-500">(0 for no limit)</span>
+                                </label>
+                                <input type="number" id="quiz-setup-time-per-question" min="0" value="0" required class="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500">
+                            </div>
+
+                            <div class="flex items-center justify-between">
+                                <label for="quiz-setup-show-timer" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Show Timer during Quiz?</label>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" id="quiz-setup-show-timer" class="sr-only peer">
+                                    <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-sky-300 dark:peer-focus:ring-sky-800 rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-slate-600 peer-checked:bg-sky-600"></div>
+                                </label>
+                            </div>
+
+                            <p id="quiz-setup-error" class="text-sm text-red-500 hidden"></p>
+
+                            <button type="submit" id="quiz-setup-start-button" class="w-full bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2.5 px-4 rounded-lg flex items-center justify-center space-x-2">
+                                <i data-lucide="play" class="w-5 h-5"></i>
+                                <span>Start Quiz</span>
+                            </button>
+                        </form>
                     </div>
                 </div>
 
                 <!-- 
-                  ================ PAGE: QUIZ ACTIVE ================
+                  ================ PAGE: QUIZ ACTIVE (NEW UI) ================
                 -->
                 <div id="page-quiz-active" class="page-content hidden">
-                    <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow max-w-3xl mx-auto">
+                    <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow max-w-3xl mx-auto relative">
+                        <!-- Quit Button -->
+                        <button id="quiz-exit-button-icon" class="absolute top-4 right-4 text-slate-400 hover:text-red-500 dark:hover:text-red-400">
+                            <i data-lucide="x-circle" class="w-6 h-6"></i>
+                        </button>
+                        
+                        <!-- Timer Display -->
+                        <div id="quiz-timer-display" class="hidden absolute top-4 left-6 text-lg font-semibold text-slate-700 dark:text-slate-300">
+                            <i data-lucide="clock" class="w-5 h-5 inline-block -mt-1 mr-1"></i>
+                            <span id="quiz-timer-time">00:00</span>
+                        </div>
+
                         <!-- Quiz Header -->
-                        <div class="flex justify-between items-center mb-4">
+                        <div class="flex justify-between items-center mb-4 pt-8">
                             <h2 id="quiz-active-title" class="text-2xl font-bold">HTML Quiz</h2>
                             <span id="quiz-progress-text" class="text-lg font-semibold text-sky-600 dark:text-sky-300">Question 1 / 10</span>
                         </div>
@@ -407,16 +474,10 @@
                                 <!-- Options will be dynamically inserted here -->
                             </div>
                         </div>
-                        
-                        <!-- Feedback Message -->
-                        <div id="quiz-feedback" class="hidden p-4 rounded-lg mb-6 text-sm"></div>
 
                         <!-- Navigation -->
-                        <div class="flex justify-between items-center">
-                            <button id="quiz-exit-button" class="bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-semibold py-2.5 px-5 rounded-lg">
-                                Exit Quiz
-                            </button>
-                            <button id="quiz-next-button" class="bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2.5 px-5 rounded-lg">
+                        <div class="flex justify-end items-center min-h-[44px]">
+                            <button id="quiz-next-button" class="hidden bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2.5 px-5 rounded-lg">
                                 Next
                             </button>
                             <button id="quiz-submit-button" class="hidden bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 px-5 rounded-lg">
@@ -427,7 +488,7 @@
                 </div>
 
                 <!-- 
-                  ================ PAGE: QUIZ RESULTS ================
+                  ================ PAGE: QUIZ RESULTS (NEW UI) ================
                 -->
                 <div id="page-quiz-results" class="page-content hidden">
                     <div class="bg-white dark:bg-slate-800 p-8 rounded-2xl shadow max-w-2xl mx-auto text-center">
@@ -445,9 +506,17 @@
                             <button data-page="page-home" class="nav-button bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-semibold py-2.5 px-6 rounded-lg">
                                 Go to Home
                             </button>
-                            <button id="results-retake-button" class="bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2.5 px-6 rounded-lg">
-                                Retake Quiz
+                            <button id="quiz-review-button" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 px-6 rounded-lg">
+                                Review Answers
                             </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Answer Review Section -->
+                    <div id="quiz-review-section" class="hidden bg-white dark:bg-slate-800 p-8 rounded-2xl shadow max-w-3xl mx-auto mt-6">
+                        <h3 class="text-2xl font-bold mb-6 text-center">Answer Review</h3>
+                        <div id="quiz-review-container" class="space-y-6">
+                            <!-- Review content will be dynamically inserted here -->
                         </div>
                     </div>
                 </div>
@@ -576,20 +645,15 @@
     
     <!-- 
       ================================================================
-      MODALS SECTION
+      MODALS & TOAST (Moved outside app-shell to ensure centering)
       ================================================================
     -->
 
     <!-- --- Universal Modal Backdrop --- -->
     <div id="modal-backdrop" class="modal-backdrop fixed inset-0 bg-black/60 z-40 hidden opacity-0 items-center justify-center p-4" data-closable="true">
         
-        <!-- 
-          --------------------------------------
-          AUTH MODAL (Login / Sign Up)
-          --------------------------------------
-        -->
+        <!-- AUTH MODAL -->
         <div id="auth-modal" class="modal-content hidden bg-white dark:bg-slate-800 rounded-2xl shadow-xl w-full max-w-md p-8">
-            <!-- Logo and Title -->
             <div class="flex flex-col items-center mb-6">
                 <div class="bg-sky-600 p-3 rounded-full text-white">
                     <i data-lucide="book-open" class="w-8 h-8"></i>
@@ -597,11 +661,7 @@
                 <h1 class="text-3xl font-bold text-slate-900 dark:text-white mt-4">StudyHelper</h1>
                 <p id="auth-form-title" class="text-slate-500 dark:text-slate-400 mt-1">Sign in to your account</p>
             </div>
-
-            <!-- Auth Error Message -->
             <div id="auth-error" class="hidden bg-red-100 dark:bg-red-900 border border-red-300 dark:border-red-700 text-red-700 dark:text-red-200 px-4 py-3 rounded-lg relative mb-4 text-sm" role="alert"></div>
-
-            <!-- Email/Password Form -->
             <form id="auth-form" class="space-y-4">
                 <div class="space-y-2">
                     <label for="email" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Email address</label>
@@ -611,7 +671,6 @@
                     <label for="password" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Password</label>
                     <input type="password" id="password" name="password" required autocomplete="current-password" class="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent">
                 </div>
-                
                 <div id="login-buttons" class="pt-2 space-y-3">
                     <button type="submit" id="login-button" class="w-full bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2.5 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 dark:focus:ring-offset-slate-800 transition duration-150 ease-in-out">
                         Sign In
@@ -629,22 +688,16 @@
                     </button>
                 </div>
             </form>
-
             <div class="flex items-center justify-center my-6">
                 <div class="flex-grow border-t border-slate-300 dark:border-slate-600"></div><span class="mx-4 text-sm font-medium text-slate-500 dark:text-slate-400">OR</span><div class="flex-grow border-t border-slate-300 dark:border-slate-600"></div>
             </div>
-
             <button id="google-signin-button" class="w-full bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-semibold py-2.5 px-4 rounded-lg flex items-center justify-center space-x-2">
                 <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8c-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4C12.955 4 4 12.955 4 24s8.955 20 20 20s20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z"/><path fill="#FF3D00" d="m6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4C16.318 4 9.656 8.337 6.306 14.691z"/><path fill="#4CAF50" d="m24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238C29.211 35.091 26.715 36 24 36c-5.202 0-9.619-3.317-11.283-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z"/><path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303c-0.792 2.237-2.231 4.166-4.087 5.571l6.19 5.238C42.012 34.569 44 29.865 44 24c0-1.341-.138-2.65-.389-3.917z"/></svg>
                 <span>Sign in with Google</span>
             </button>
         </div>
 
-        <!-- 
-          --------------------------------------
-          CONFIRM MODAL (Deletions)
-          --------------------------------------
-        -->
+        <!-- CONFIRM MODAL -->
         <div id="confirm-modal" class="modal-content hidden bg-white dark:bg-slate-800 rounded-2xl shadow-xl w-full max-w-md p-6">
             <h3 id="confirm-modal-title" class="text-xl font-bold mb-2">Are you sure?</h3>
             <p id="confirm-modal-message" class="text-slate-600 dark:text-slate-300 mb-6">This action cannot be undone.</p>
@@ -658,11 +711,7 @@
             </div>
         </div>
 
-        <!-- 
-          --------------------------------------
-          SUBJECT MODAL (Add / Edit)
-          --------------------------------------
-        -->
+        <!-- SUBJECT MODAL -->
         <div id="subject-modal" class="modal-content hidden bg-white dark:bg-slate-800 rounded-2xl shadow-xl w-full max-w-md p-6">
             <form id="subject-form">
                 <h3 id="subject-modal-title" class="text-xl font-bold mb-4">Add New Subject</h3>
@@ -683,11 +732,7 @@
             </form>
         </div>
 
-        <!-- 
-          --------------------------------------
-          MANAGE QUESTIONS MODAL (List)
-          --------------------------------------
-        -->
+        <!-- MANAGE QUESTIONS MODAL -->
         <div id="manage-questions-modal" class="modal-content hidden bg-white dark:bg-slate-800 rounded-2xl shadow-xl w-full max-w-2xl p-6 flex flex-col max-h-[90vh]">
             <div class="flex justify-between items-center mb-4 shrink-0">
                 <h3 id="manage-q-modal-title" class="text-xl font-bold">Manage Questions</h3>
@@ -706,29 +751,21 @@
                 </button>
             </div>
             <div id="question-list-container" class="flex-grow overflow-y-auto space-y-3 pr-2">
-                <!-- Question list will be rendered here -->
                 <p id="no-questions-msg" class="text-slate-500 dark:text-slate-400">No questions added yet for this subject.</p>
             </div>
         </div>
         
-        <!-- 
-          --------------------------------------
-          QUESTION MODAL (Add / Edit)
-          --------------------------------------
-        -->
+        <!-- QUESTION MODAL -->
         <div id="question-modal" class="modal-content hidden bg-white dark:bg-slate-800 rounded-2xl shadow-xl w-full max-w-2xl p-6">
             <form id="question-form" class="space-y-4">
                 <h3 id="question-modal-title" class="text-xl font-bold mb-4">Add New Question</h3>
                 <input type="hidden" id="question-id-input">
                 <input type="hidden" id="question-subject-id-input">
                 
-                <!-- Question Text -->
                 <div>
                     <label for="question-text" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Question</label>
                     <textarea id="question-text" rows="2" required class="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500" placeholder="What does HTML stand for?"></textarea>
                 </div>
-
-                <!-- Options -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label for="option-0" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Option 1 (Correct Answer)</label>
@@ -747,10 +784,7 @@
                         <input type="text" id="option-3" required class="question-option w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500" placeholder="Wrong Answer 3">
                     </div>
                 </div>
-
                 <p id="question-form-error" class="text-sm text-red-500 hidden"></p>
-
-                <!-- Buttons -->
                 <div class="flex justify-end space-x-3 pt-4">
                     <button type="button" class="modal-close-button bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-semibold py-2 px-4 rounded-lg">
                         Cancel
@@ -764,11 +798,7 @@
 
     </div> <!-- /End Modal Backdrop -->
 
-    <!-- 
-      ================================================================
-      TOAST NOTIFICATION
-      ================================================================
-    -->
+    <!-- TOAST NOTIFICATION -->
     <div id="toast-notification" class="w-full max-w-xs p-4 rounded-lg shadow-lg" role="alert">
         <div class="flex items-center">
             <i id="toast-icon" data-lucide="check-circle" class="w-5 h-5"></i>
@@ -789,7 +819,6 @@
         // =================================================================
         // 
         
-        // Import Firebase modules
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { 
             getAuth, 
@@ -831,10 +860,8 @@
         };
         // -----------------------------
         
-        // Initialize Firebase
         let app, auth, db;
         try {
-            // Check for __firebase_config first (for canvas environment)
             const config = typeof __firebase_config !== 'undefined' 
                 ? JSON.parse(__firebase_config) 
                 : firebaseConfig;
@@ -849,24 +876,22 @@
             throw new Error("Firebase initialization failed.");
         }
         
-        // App-wide variables
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'studyhelper-quizzes'; // Use project ID as default
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'studyhelper-quizzes'; 
         let currentUserId = null;
         let currentAuthUser = null;
-        let currentEditingSubject = null; // Stores {id, name} when managing questions
+        let currentEditingSubject = null; 
         let toastTimeout;
+        let quizTimerInterval;
 
-        // Global state object
         const appState = {
             subjects: [],
             questions: [],
             quizHistory: [],
-            activeQuiz: null,
+            activeQuiz: null, // { subjectId, subjectName, questions, currentIndex, userAnswers, score, timePerQuestion, showTimer, currentQuestionStartTime, savedQuizData }
             isAuthReady: false,
             isSidebarOpen: true
         };
 
-        // Firestore collection unsubscribe listeners
         let unsubSubjects = () => {};
         let unsubQuestions = () => {};
         let unsubHistory = () => {};
@@ -954,26 +979,35 @@
         const dbAvgScore = $('#db-avg-score');
         const dbQuizzesTaken = $('#db-quizzes-taken');
 
-        // Take Quiz
-        const quizSelectionList = $('#quiz-selection-list');
-        const noQuizzesMsg = $('#no-quizzes-msg');
+        // Take Quiz Page
+        const quizSetupForm = $('#quiz-setup-form');
+        const quizSetupSubject = $('#quiz-setup-subject');
+        const quizSetupMaxQuestions = $('#quiz-setup-max-questions');
+        const quizSetupNumQuestions = $('#quiz-setup-num-questions');
+        const quizSetupTimePerQuestion = $('#quiz-setup-time-per-question');
+        const quizSetupShowTimer = $('#quiz-setup-show-timer');
+        const quizSetupError = $('#quiz-setup-error');
+        const quizSetupStartButton = $('#quiz-setup-start-button');
 
-        // Active Quiz
+        // Active Quiz Page
+        const quizExitButtonIcon = $('#quiz-exit-button-icon');
+        const quizTimerDisplay = $('#quiz-timer-display');
+        const quizTimerTime = $('#quiz-timer-time');
         const quizActiveTitle = $('#quiz-active-title');
         const quizProgressText = $('#quiz-progress-text');
         const quizProgressBar = $('#quiz-progress-bar');
         const quizActiveQuestion = $('#quiz-active-question');
         const quizOptionsContainer = $('#quiz-options-container');
-        const quizFeedback = $('#quiz-feedback');
         const quizNextButton = $('#quiz-next-button');
         const quizSubmitButton = $('#quiz-submit-button');
-        const quizExitButton = $('#quiz-exit-button');
 
         // Results Page
         const resultsSubjectName = $('#results-subject-name');
         const resultsScoreText = $('#results-score-text');
         const resultsScoreDetails = $('#results-score-details');
-        const resultsRetakeButton = $('#results-retake-button');
+        const quizReviewButton = $('#quiz-review-button');
+        const quizReviewSection = $('#quiz-review-section');
+        const quizReviewContainer = $('#quiz-review-container');
 
         // History Page
         const quizHistoryTableBody = $('#quiz-history-table-body');
@@ -1000,14 +1034,8 @@
         // =================================================================
         // 
 
-        /**
-         * Shows a toast notification.
-         * @param {string} message - The message to display.
-         * @param {'success' | 'error'} type - The type of toast.
-         */
         function showToast(message, type = 'success') {
             clearTimeout(toastTimeout);
-            
             toastMessage.textContent = message;
             
             if (type === 'success') {
@@ -1018,7 +1046,6 @@
                 toastIcon.setAttribute('data-lucide', 'alert-circle');
             }
             lucide.createIcons();
-            
             toast.classList.add('show');
             
             toastTimeout = setTimeout(() => {
@@ -1026,9 +1053,6 @@
             }, 3000);
         }
 
-        /**
-         * Clears all active Firestore listeners. Called on logout.
-         */
         function detachFirestoreListeners() {
             unsubSubjects();
             unsubQuestions();
@@ -1036,9 +1060,6 @@
             console.log("Firestore listeners detached.");
         }
 
-        /**
-         * Resets the global app state. Called on logout.
-         */
         function resetAppState() {
             appState.subjects = [];
             appState.questions = [];
@@ -1048,15 +1069,11 @@
             console.log("App state reset.");
         }
 
-        /**
-         * Clears all dynamically rendered content from the UI. Called on logout.
-         */
         function clearDynamicUI() {
             subjectCardGrid.innerHTML = '';
             subjectCardGrid.append(noSubjectsMsg);
             
-            quizSelectionList.innerHTML = '';
-            quizSelectionList.append(noQuizzesMsg);
+            quizSetupSubject.innerHTML = '<option value="">Select a subject...</option>';
             
             quizHistoryTableBody.innerHTML = '';
             quizHistoryTableBody.append(noHistoryMsg);
@@ -1064,7 +1081,6 @@
             importSubjectSelect.innerHTML = '<option value="">Select subject...</option>';
             exportSubjectSelect.innerHTML = '<option value="">Select subject...</option>';
             
-            // Reset dashboard
             welcomeUserName.textContent = 'User';
             dbQuestionCount.textContent = '0';
             dbSubjectCount.textContent = '0';
@@ -1073,26 +1089,20 @@
             userIdDisplay.textContent = 'Not logged in';
         }
 
-        /**
-         * Shows a specific modal by its ID and hides others.
-         * @param {string | null} modalId - The ID of the modal-content to show, or null to hide all.
-         * @param {boolean} [isClosable=true] - Can the modal be closed by clicking the backdrop?
-         */
         function showModal(modalId, isClosable = true) {
             if (!modalId) {
-                // Hide all
                 modalBackdrop.classList.add('opacity-0');
                 allModals.forEach(m => m.classList.remove('open', 'opacity-100', 'scale-100'));
                 setTimeout(() => {
                     modalBackdrop.classList.add('hidden');
                     allModals.forEach(m => m.classList.add('hidden'));
-                }, 200); // Wait for transition
+                }, 200); 
                 return;
             }
 
             modalBackdrop.dataset.closable = isClosable;
             modalBackdrop.classList.remove('hidden');
-            allModals.forEach(m => m.classList.add('hidden')); // Hide all first
+            allModals.forEach(m => m.classList.add('hidden')); 
             
             const modalToShow = $(`#${modalId}`);
             if(modalToShow) {
@@ -1100,22 +1110,19 @@
                 setTimeout(() => {
                     modalBackdrop.classList.add('open', 'opacity-100');
                     modalToShow.classList.add('open', 'opacity-100', 'scale-100');
-                    lucide.createIcons(); // Re-render icons in modal
-                }, 10); // Short delay to allow CSS transition
+                    lucide.createIcons(); 
+                }, 10); 
             }
         }
         
-        // Backdrop click listener to close modals
         modalBackdrop.addEventListener('click', (e) => {
             if (e.target === modalBackdrop && modalBackdrop.dataset.closable === 'true') {
                 showModal(null);
             }
         });
         
-        // All modal close buttons
         $$('.modal-close-button').forEach(btn => {
             btn.addEventListener('click', () => {
-                // Find the parent modal and hide it, which will hide the backdrop
                 const parentModal = btn.closest('.modal-content');
                 if (parentModal.id) {
                     showModal(null);
@@ -1123,9 +1130,6 @@
             });
         });
 
-        /**
-         * Shows the custom confirmation modal.
-         */
         function showConfirmModal(title, message, onConfirm, confirmText = 'Confirm', confirmClass = 'bg-red-600') {
             confirmModalTitle.textContent = title;
             confirmModalMessage.textContent = message;
@@ -1146,12 +1150,26 @@
             showModal(null);
         });
 
-        /**
-         * Shows a page by its ID and hides all others.
-         * @param {string} pageId - The ID of the page-content element to show.
-         */
         function showPage(pageId) {
-            if (!appState.isAuthReady && pageId !== 'page-home') {
+            // New safety check: if a quiz is active, confirm before navigating away
+            if (appState.activeQuiz && pageId !== 'page-quiz-active') {
+                showConfirmModal(
+                    'Exit Quiz?',
+                    'Are you sure you want to exit? Your progress for this attempt will be lost.',
+                    () => {
+                        abandonQuiz(); // This will clear the quiz state
+                        // Now we can safely navigate
+                        _navigateToPage(pageId);
+                    }
+                );
+                return; // Stop navigation until user confirms
+            }
+            
+            _navigateToPage(pageId);
+        }
+
+        function _navigateToPage(pageId) {
+             if (!appState.isAuthReady && pageId !== 'page-home') {
                  if(currentAuthUser == null) {
                     showModal('auth-modal');
                     return;
@@ -1165,7 +1183,9 @@
 
                 const link = $(`[data-page="${pageId}"]`);
                 if (link) {
-                    pageTitle.textContent = link.querySelector('.sidebar-text').textContent;
+                    // Try to find sidebar text, fallback to tooltip
+                    const linkText = (link.querySelector('.sidebar-text') || link.querySelector('.sidebar-tooltip')).textContent.trim();
+                    pageTitle.textContent = linkText;
                     $$('.sidebar-link').forEach(l => l.setAttribute('data-active', 'false'));
                     link.setAttribute('data-active', 'true');
                 } else if (pageId === 'page-home') {
@@ -1175,10 +1195,6 @@
             }
         }
 
-        /**
-         * Shows an error message in the auth form.
-         * @param {string} message - The error message to display.
-         */
         function showAuthError(message) {
             authError.textContent = message;
             authError.classList.remove('hidden');
@@ -1189,11 +1205,6 @@
             authError.textContent = '';
         }
 
-        /**
-         * Formats a Firebase Timestamp into a readable date string.
-         * @param {Timestamp} timestamp - The Firebase Timestamp object.
-         * @returns {string} - Formatted date string (e.g., "Oct 30, 2025").
-         */
         function formatFirebaseDate(timestamp) {
             if (!timestamp) return 'N/A';
             const date = timestamp.toDate();
@@ -1204,15 +1215,17 @@
             });
         }
 
-        /**
-         * Shuffles an array in place. (Fisher-Yates shuffle)
-         * @param {Array} array - The array to shuffle.
-         */
         function shuffleArray(array) {
             for (let i = array.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [array[i], array[j]] = [array[j], array[i]];
             }
+        }
+
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
         }
         
         // 
@@ -1221,12 +1234,8 @@
         // =================================================================
         // 
 
-        /**
-         * Main auth state listener. This controls the entire app flow.
-         */
         onAuthStateChanged(auth, async (user) => {
             if (user) {
-                // User is signed in
                 console.log("Auth state changed: User is signed in.", user.uid);
                 currentAuthUser = user;
                 currentUserId = user.uid;
@@ -1244,8 +1253,10 @@
                 showModal(null); 
 
             } else {
-                // User is signed out
                 console.log("Auth state changed: User is signed out.");
+                if (appState.activeQuiz) {
+                    abandonQuiz();
+                }
                 currentAuthUser = null;
                 currentUserId = null;
                 appState.isAuthReady = true; 
@@ -1263,7 +1274,6 @@
             }
         });
 
-        // Handle Canvas custom token auth
         async function initializeAuth() {
             try {
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
@@ -1292,10 +1302,6 @@
             }
         }
 
-        /**
-         * Updates all UI elements with user information.
-         * @param {object} user - The Firebase Auth user object.
-         */
         function updateUserInfoUI(user) {
             if (user) {
                 const displayName = user.displayName || user.email.split('@')[0] || 'User';
@@ -1318,7 +1324,6 @@
             }
         }
 
-        // --- Header Auth Button Listeners ---
         loginButtonHeader.addEventListener('click', () => {
             setAuthFormMode('login');
             showModal('auth-modal');
@@ -1349,10 +1354,6 @@
             showToast('You have been logged out.', 'success');
         });
 
-        /**
-         * Toggles the auth modal form between Login and Sign Up.
-         * @param {'login' | 'signup'} mode - The mode to switch to.
-         */
         function setAuthFormMode(mode) {
             hideAuthError();
             if (mode === 'signup') {
@@ -1376,16 +1377,12 @@
 
             try {
                 if (isSignUp) {
-                    console.log('Attempting sign up...');
                     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                    console.log('Sign up successful:', userCredential.user.uid);
                     const defaultName = email.split('@')[0];
                     await updateProfile(userCredential.user, { displayName: defaultName });
                     showToast('Welcome! Your account has been created.', 'success');
                 } else {
-                    console.log('Attempting login...');
                     await signInWithEmailAndPassword(auth, email, password);
-                    console.log('Login successful.');
                     showToast('Welcome back!', 'success');
                 }
             } catch (error) {
@@ -1402,9 +1399,7 @@
             hideAuthError();
             const provider = new GoogleAuthProvider();
             try {
-                console.log('Attempting Google Sign-In...');
                 await signInWithPopup(auth, provider);
-                console.log('Google Sign-In successful.');
                 showToast('Signed in with Google!', 'success');
             } catch (error) {
                 console.error("Google Sign-In error:", error.message);
@@ -1434,7 +1429,7 @@
                 appState.subjects = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 console.log('Firestore update: Subjects', appState.subjects);
                 renderSubjectCards();
-                renderQuizSelectionList();
+                renderQuizSetupDropdown();
                 renderDashboardStats();
                 renderSettingsDropdowns();
             }, (error) => console.error("Error listening to subjects:", error));
@@ -1443,7 +1438,7 @@
             unsubQuestions = onSnapshot(questionsQuery, (snapshot) => {
                 appState.questions = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 console.log('Firestore update: Questions', appState.questions);
-                renderQuizSelectionList(); 
+                renderQuizSetupDropdown();
                 renderDashboardStats();
                 if (!manageQuestionsModal.classList.contains('hidden') && currentEditingSubject) {
                     renderQuestionListModal(currentEditingSubject.id);
@@ -1512,9 +1507,12 @@
             lucide.createIcons();
         }
 
-        function renderQuizSelectionList() {
+        /**
+         * Renders the subject dropdown on the "Take Quiz" page.
+         */
+        function renderQuizSetupDropdown() {
             if (!currentUserId) {
-                quizSelectionList.innerHTML = '<p class="text-slate-500 dark:text-slate-400 md:col-span-2 lg:col-span-3">Please log in to take a quiz.</p>';
+                quizSetupSubject.innerHTML = '<option value="">Log in to see subjects</option>';
                 return;
             }
             
@@ -1531,20 +1529,16 @@
                 .filter(subject => subject.questionCount > 0); 
 
             if (availableQuizzes.length === 0) {
-                quizSelectionList.innerHTML = '';
-                quizSelectionList.append(noQuizzesMsg);
+                quizSetupSubject.innerHTML = '<option value="">No subjects with questions</option>';
                 return;
             }
 
-            quizSelectionList.innerHTML = availableQuizzes.map(subject => `
-                <div class="bg-slate-50 dark:bg-slate-700 p-5 rounded-xl shadow-sm border border-slate-200 dark:border-slate-600">
-                    <h3 class="text-xl font-semibold">${subject.name}</h3>
-                    <p class="text-slate-500 dark:text-slate-400 my-3">${subject.questionCount} Questions</p>
-                    <button class="start-quiz-btn w-full bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2 px-4 rounded-lg" data-subject-id="${subject.id}" data-subject-name="${subject.name}">
-                        Start Quiz
-                    </button>
-                </div>
-            `).join('');
+            quizSetupSubject.innerHTML = '<option value="">Select a subject...</option>' + 
+                availableQuizzes.map(subject => `
+                    <option value="${subject.id}" data-name="${subject.name}" data-max="${subject.questionCount}">
+                        ${subject.name} (${subject.questionCount} questions)
+                    </option>
+                `).join('');
         }
         
         function renderQuestionListModal(subjectId) {
@@ -1686,11 +1680,9 @@
                 if (subjectId) {
                     const docRef = doc(getSubjectsCol(), subjectId);
                     await updateDoc(docRef, { name: subjectName });
-                    console.log("Subject updated:", subjectId);
                     showToast('Subject updated successfully!', 'success');
                 } else {
                     const docRef = await addDoc(getSubjectsCol(), { name: subjectName });
-                    console.log("Subject added with ID:", docRef.id);
                     showToast('Subject added successfully!', 'success');
                 }
                 showModal(null); 
@@ -1718,7 +1710,6 @@
                     'Delete Subject?',
                     `Are you sure you want to delete "${subjectName}"? This will also delete all associated questions. This cannot be undone.`,
                     async () => {
-                        console.log(`Deleting subject: ${subjectId}`);
                         try {
                             const batch = writeBatch(db);
                             const subjectDocRef = doc(getSubjectsCol(), subjectId);
@@ -1730,7 +1721,6 @@
                                 batch.delete(questionDocRef);
                             });
                             await batch.commit();
-                            console.log(`Successfully deleted subject and ${questionsToDelete.length} questions.`);
                             showToast('Subject and questions deleted.', 'success');
                         } catch (error) {
                             console.error("Error deleting subject:", error);
@@ -1749,7 +1739,12 @@
             
             const startButton = e.target.closest('.start-quiz-btn');
             if (startButton && !startButton.disabled) {
-                startQuiz(subjectId, subjectName);
+                // Don't start quiz, just go to the page
+                showPage('page-take-quiz');
+                // Pre-select this subject in the dropdown
+                quizSetupSubject.value = subjectId;
+                // Manually trigger change event to update max questions
+                quizSetupSubject.dispatchEvent(new Event('change'));
                 return;
             }
         });
@@ -1828,11 +1823,9 @@
                 if (questionId) {
                     const docRef = doc(getQuestionsCol(), questionId);
                     await updateDoc(docRef, questionData);
-                    console.log("Question updated:", questionId);
                     showToast('Question updated!', 'success');
                 } else {
                     const docRef = await addDoc(getQuestionsCol(), questionData);
-                    console.log("Question added:", docRef.id);
                     showToast('Question added!', 'success');
                 }
                 showModal('manage-questions-modal'); 
@@ -1859,10 +1852,8 @@
                     'Delete Question?',
                     'Are you sure you want to delete this question?',
                     async () => {
-                        console.log(`Deleting question: ${questionId}`);
                         try {
                             await deleteDoc(doc(getQuestionsCol(), questionId));
-                            console.log("Question deleted.");
                             showToast('Question deleted.', 'success');
                         } catch (error) {
                             console.error("Error deleting question:", error);
@@ -1877,44 +1868,116 @@
 
         // 
         // =================================================================
-        // === QUIZ LOGIC ==================================================
+        // === QUIZ LOGIC (NEW) ============================================
         // =================================================================
         // 
 
-        function startQuiz(subjectId, subjectName) {
-            console.log(`Starting quiz for ${subjectName} (${subjectId})`);
+        // --- Event Listener for "Take Quiz" form ---
+        quizSetupSubject.addEventListener('change', () => {
+            const selectedOption = quizSetupSubject.options[quizSetupSubject.selectedIndex];
+            const max = selectedOption.dataset.max || 0;
+            
+            quizSetupMaxQuestions.textContent = `(Max: ${max})`;
+            quizSetupNumQuestions.max = max;
+            if (parseInt(quizSetupNumQuestions.value) > max) {
+                quizSetupNumQuestions.value = max;
+            }
+            if (max == 0) {
+                 quizSetupNumQuestions.value = 0;
+            }
+        });
 
-            const questionsForSubject = appState.questions.filter(q => q.subjectId === subjectId);
-            if (questionsForSubject.length === 0) {
-                showToast('This subject has no questions.', 'error');
+        quizSetupForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            quizSetupError.classList.add('hidden');
+
+            const selectedOption = quizSetupSubject.options[quizSetupSubject.selectedIndex];
+            const subjectId = quizSetupSubject.value;
+            const subjectName = selectedOption.dataset.name;
+            const maxQuestions = parseInt(selectedOption.dataset.max || 0);
+            
+            const numQuestions = parseInt(quizSetupNumQuestions.value);
+            const timePerQuestion = parseInt(quizSetupTimePerQuestion.value) || 0;
+            const showTimer = quizSetupShowTimer.checked;
+
+            // --- Validation ---
+            if (!subjectId) {
+                quizSetupError.textContent = 'Please select a subject.';
+                quizSetupError.classList.remove('hidden');
+                return;
+            }
+            if (isNaN(numQuestions) || numQuestions <= 0 || numQuestions > maxQuestions) {
+                quizSetupError.textContent = `Please enter a valid number of questions (1 - ${maxQuestions}).`;
+                quizSetupError.classList.remove('hidden');
                 return;
             }
 
-            let quizQuestions = JSON.parse(JSON.stringify(questionsForSubject));
-            shuffleArray(quizQuestions);
-
-            quizQuestions.forEach(q => {
-                const optionsWithState = q.options.map((optionText, index) => ({
+            console.log(`Starting quiz: ${subjectName}, ${numQuestions} questions, ${timePerQuestion}s/q, timer: ${showTimer}`);
+            
+            // --- Quiz Setup ---
+            const allQuestions = appState.questions.filter(q => q.subjectId === subjectId);
+            shuffleArray(allQuestions);
+            
+            let quizQuestions = allQuestions.slice(0, numQuestions);
+            
+            // For each question, create a *deep copy* and shuffle its options
+            quizQuestions = quizQuestions.map(q => {
+                const newQ = JSON.parse(JSON.stringify(q)); // Deep copy
+                
+                const optionsWithState = newQ.options.map((optionText, index) => ({
                     text: optionText,
-                    isCorrect: index === q.correctAnswerIndex
+                    isCorrect: index === newQ.correctAnswerIndex
                 }));
                 shuffleArray(optionsWithState);
-                q.options = optionsWithState.map(opt => opt.text);
-                q.correctAnswerIndex = optionsWithState.findIndex(opt => opt.isCorrect);
+                
+                newQ.options = optionsWithState.map(opt => opt.text);
+                newQ.correctAnswerIndex = optionsWithState.findIndex(opt => opt.isCorrect);
+                return newQ;
             });
-
+            
             appState.activeQuiz = {
                 subjectId,
                 subjectName,
                 questions: quizQuestions,
                 currentIndex: 0,
-                userAnswers: new Array(quizQuestions.length).fill(null),
-                score: 0
+                userAnswers: new Array(quizQuestions.length).fill(null), // Stores selected index
+                score: 0,
+                timePerQuestion: timePerQuestion,
+                showTimer: showTimer,
+                currentQuestionStartTime: Date.now(),
+                savedQuizData: null // To store data for review
             };
             
             quizActiveTitle.textContent = `${subjectName} Quiz`;
+            quizReviewSection.classList.add('hidden'); // Hide review from previous quiz
             renderActiveQuizQuestion();
-            showPage('page-quiz-active');
+            _navigateToPage('page-quiz-active'); // Use internal nav function
+            
+            if (showTimer && timePerQuestion > 0) {
+                startQuizTimer(timePerQuestion);
+            } else {
+                quizTimerDisplay.classList.add('hidden');
+            }
+        });
+        
+        function startQuizTimer(seconds) {
+            clearInterval(quizTimerInterval);
+            let remainingTime = seconds;
+            quizTimerDisplay.classList.remove('hidden');
+            
+            function tick() {
+                quizTimerTime.textContent = formatTime(remainingTime);
+                
+                if (remainingTime <= 0) {
+                    clearInterval(quizTimerInterval);
+                    showToast('Time is up!', 'error');
+                    handleQuizNext(true); // Force next, mark as timeout
+                } else {
+                    remainingTime--;
+                }
+            }
+            tick(); // Run once immediately
+            quizTimerInterval = setInterval(tick, 1000);
         }
 
         function renderActiveQuizQuestion() {
@@ -1923,7 +1986,6 @@
             const quiz = appState.activeQuiz;
             const q = quiz.questions[quiz.currentIndex];
 
-            quizFeedback.classList.add('hidden');
             quizActiveQuestion.textContent = q.question;
             
             const progress = ((quiz.currentIndex + 1) / quiz.questions.length) * 100;
@@ -1931,30 +1993,68 @@
             quizProgressBar.style.width = `${progress}%`;
 
             quizOptionsContainer.innerHTML = q.options.map((option, index) => `
-                <label class="block w-full p-4 border border-slate-300 dark:border-slate-600 rounded-lg cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors has-[:checked]:bg-sky-100 dark:has-[:checked]:bg-sky-900 has-[:checked]:border-sky-500">
+                <label class="quiz-option-label block w-full p-4 border border-slate-300 dark:border-slate-600 rounded-lg cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
                     <input type="radio" name="quiz-option" value="${index}" class="hidden">
                     <span class="text-base font-medium">${option}</span>
                 </label>
             `).join('');
 
-            quizNextButton.classList.toggle('hidden', quiz.currentIndex === quiz.questions.length - 1);
-            quizSubmitButton.classList.toggle('hidden', quiz.currentIndex !== quiz.questions.length - 1);
+            quizNextButton.classList.add('hidden');
+            quizSubmitButton.classList.add('hidden');
+
+            // Start timer for this question
+            if (quiz.showTimer && quiz.timePerQuestion > 0) {
+                startQuizTimer(quiz.timePerQuestion);
+            }
+        }
+        
+        // --- New: Event Delegation for clicking a quiz option ---
+        quizOptionsContainer.addEventListener('change', (e) => {
+            if (e.target.name === 'quiz-option' && appState.activeQuiz) {
+                const quiz = appState.activeQuiz;
+                const selectedIndex = parseInt(e.target.value);
+                quiz.userAnswers[quiz.currentIndex] = selectedIndex;
+
+                // Stop timer
+                clearInterval(quizTimerInterval);
+
+                // Show feedback
+                showQuestionFeedback(selectedIndex);
+                
+                // Show next/submit button
+                if (quiz.currentIndex === quiz.questions.length - 1) {
+                    quizSubmitButton.classList.remove('hidden');
+                } else {
+                    quizNextButton.classList.remove('hidden');
+                }
+            }
+        });
+        
+        function showQuestionFeedback(selectedIndex) {
+            const quiz = appState.activeQuiz;
+            const correctIndex = quiz.questions[quiz.currentIndex].correctAnswerIndex;
+            
+            $$('.quiz-option-label').forEach((label, index) => {
+                const input = label.querySelector('input');
+                input.disabled = true;
+                label.classList.add('disabled');
+                
+                if (index === correctIndex) {
+                    label.classList.add('correct');
+                } else if (index === selectedIndex) {
+                    label.classList.add('incorrect');
+                }
+            });
         }
 
-        function handleQuizNext() {
+        function handleQuizNext(isTimeout = false) {
             if (!appState.activeQuiz) return;
             const quiz = appState.activeQuiz;
-            const selectedOption = $('input[name="quiz-option"]:checked');
             
-            if (!selectedOption) {
-                quizFeedback.textContent = 'Please select an answer.';
-                quizFeedback.className = 'p-4 rounded-lg mb-6 text-sm bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200';
-                quizFeedback.classList.remove('hidden');
-                return;
+            // If it was a timeout, and no answer was selected, mark it as null (or -1)
+            if (isTimeout && quiz.userAnswers[quiz.currentIndex] === null) {
+                quiz.userAnswers[quiz.currentIndex] = -1; // -1 indicates timeout
             }
-            
-            const selectedAnswerIndex = parseInt(selectedOption.value);
-            quiz.userAnswers[quiz.currentIndex] = selectedAnswerIndex;
 
             if (quiz.currentIndex === quiz.questions.length - 1) {
                 finishQuiz();
@@ -1966,6 +2066,8 @@
 
         async function finishQuiz() {
             if (!appState.activeQuiz) return;
+            clearInterval(quizTimerInterval); // Stop any running timers
+            
             const quiz = appState.activeQuiz;
             
             let correctAnswers = 0;
@@ -1978,6 +2080,12 @@
             const totalQuestions = quiz.questions.length;
             const finalScore = Math.round((correctAnswers / totalQuestions) * 100);
             quiz.score = finalScore;
+            
+            // Save full quiz data for review
+            quiz.savedQuizData = {
+                questions: quiz.questions,
+                userAnswers: quiz.userAnswers
+            };
 
             try {
                 await addDoc(getHistoryCol(), {
@@ -1994,42 +2102,78 @@
                 showToast('Error saving quiz results.', 'error');
             }
 
+            // Render results page
             resultsSubjectName.textContent = `${quiz.subjectName} Quiz`;
             resultsScoreText.textContent = `${finalScore}%`;
             resultsScoreDetails.textContent = `You answered ${correctAnswers} out of ${totalQuestions} questions correctly.`;
             
-            resultsRetakeButton.dataset.subjectId = quiz.subjectId;
-            resultsRetakeButton.dataset.subjectName = quiz.subjectName;
+            // Attach data to review button
+            quizReviewButton.dataset.quizData = JSON.stringify(quiz.savedQuizData);
 
-            showPage('page-quiz-results');
+            _navigateToPage('page-quiz-results');
             appState.activeQuiz = null;
         }
-
-        quizSelectionList.addEventListener('click', (e) => {
-            const startButton = e.target.closest('.start-quiz-btn');
-            if (startButton) {
-                const { subjectId, subjectName } = startButton.dataset;
-                startQuiz(subjectId, subjectName);
-            }
-        });
-
-        quizNextButton.addEventListener('click', handleQuizNext);
-        quizSubmitButton.addEventListener('click', handleQuizNext);
         
-        quizExitButton.addEventListener('click', () => {
+        // --- New: Review Answers Button ---
+        quizReviewButton.addEventListener('click', () => {
+            const data = JSON.parse(quizReviewButton.dataset.quizData);
+            renderQuizReview(data.questions, data.userAnswers);
+            quizReviewSection.classList.remove('hidden');
+        });
+        
+        // --- New: Render Quiz Review ---
+        function renderQuizReview(questions, userAnswers) {
+            quizReviewContainer.innerHTML = questions.map((q, index) => {
+                const userAnswerIndex = userAnswers[index];
+                const correctIndex = q.correctAnswerIndex;
+                
+                const optionsHtml = q.options.map((option, i) => {
+                    let classes = 'p-3 rounded-md border';
+                    if (i === correctIndex) {
+                        classes += ' bg-emerald-100 border-emerald-300 dark:bg-emerald-900 dark:border-emerald-700';
+                    } else if (i === userAnswerIndex) {
+                        classes += ' bg-red-100 border-red-300 dark:bg-red-900 dark:border-red-700';
+                    } else {
+                        classes += ' bg-slate-100 border-slate-200 dark:bg-slate-700 dark:border-slate-600';
+                    }
+                    
+                    return `<li class="${classes}">${option}</li>`;
+                }).join('');
+                
+                let answerFeedback = '';
+                if (userAnswerIndex === correctIndex) {
+                    answerFeedback = '<p class="text-sm font-medium text-emerald-600 dark:text-emerald-400">You answered correctly.</p>';
+                } else if (userAnswerIndex === -1) {
+                    answerFeedback = '<p class="text-sm font-medium text-yellow-600 dark:text-yellow-400">You ran out of time.</p>';
+                } else {
+                     answerFeedback = '<p class="text-sm font-medium text-red-600 dark:text-red-400">You answered incorrectly.</p>';
+                }
+
+                return `
+                    <div class="border-b border-slate-200 dark:border-slate-700 pb-4">
+                        <p class="font-semibold mb-2">${index + 1}. ${q.question}</p>
+                        <ul class="space-y-2 mb-3">${optionsHtml}</ul>
+                        ${answerFeedback}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function abandonQuiz() {
+            clearInterval(quizTimerInterval);
+            appState.activeQuiz = null;
+            console.log("Quiz abandoned.");
+        }
+
+        quizExitButtonIcon.addEventListener('click', () => {
             showConfirmModal(
                 'Exit Quiz?',
                 'Are you sure you want to exit? Your progress for this attempt will be lost.',
                 () => {
-                    appState.activeQuiz = null;
-                    showPage('page-take-quiz');
+                    abandonQuiz();
+                    _navigateToPage('page-take-quiz');
                 }
             );
-        });
-
-        resultsRetakeButton.addEventListener('click', (e) => {
-            const { subjectId, subjectName } = e.currentTarget.dataset;
-            startQuiz(subjectId, subjectName);
         });
 
         // 
@@ -2190,7 +2334,6 @@
                 'DELETE ALL DATA?',
                 'This is your final warning. All your subjects, questions, and quiz history will be permanently erased. This cannot be undone.',
                 async () => {
-                    console.log('Deleting all data for user:', currentUserId);
                     try {
                         const batch = writeBatch(db);
                         const collections = [getSubjectsCol(), getQuestionsCol(), getHistoryCol()];
@@ -2198,9 +2341,7 @@
                              const snapshot = await getDocs(colRef);
                              snapshot.forEach(doc => batch.delete(doc.ref));
                         }
-
                         await batch.commit();
-                        console.log('All user data deleted successfully.');
                         showToast('All your data has been deleted.', 'success');
                     } catch (error) {
                         console.error('Error deleting all data:', error);
@@ -2216,22 +2357,18 @@
         // =================================================================
         // 
 
-        // --- Sidebar Toggle ---
         sidebarToggleBtn.addEventListener('click', () => {
             appState.isSidebarOpen = !appState.isSidebarOpen;
             sidebar.classList.toggle('collapsed');
             mainContent.classList.toggle('sidebar-collapsed');
             
-            // Update icon
             const icon = appState.isSidebarOpen ? 'panel-left-close' : 'panel-left-open';
             sidebarToggleBtn.innerHTML = `<i data-lucide="${icon}" class="w-6 h-6"></i>`;
             lucide.createIcons();
             
-            // Save preference
             localStorage.setItem('studyhelper-sidebar', appState.isSidebarOpen);
         });
         
-        // --- Load Sidebar Preference ---
         if (localStorage.getItem('studyhelper-sidebar') === 'false') {
             appState.isSidebarOpen = false;
             sidebar.classList.add('collapsed');
@@ -2239,7 +2376,6 @@
             sidebarToggleBtn.innerHTML = `<i data-lucide="panel-left-open" class="w-6 h-6"></i>`;
         }
 
-        // --- Sidebar Navigation ---
         $$('.sidebar-link').forEach(link => {
             link.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -2248,7 +2384,6 @@
             });
         });
 
-        // --- Other Navigation Buttons (Event Delegation) ---
         document.addEventListener('click', (e) => {
             const navButton = e.target.closest('.nav-button');
             if (navButton) {
@@ -2258,13 +2393,11 @@
             }
         });
 
-        // --- Dark Mode Toggle ---
         const darkModeSwitch = $('#dark-mode-switch');
         $('#dark-mode-toggle').addEventListener('click', () => {
             document.documentElement.classList.toggle('dark');
             const isDark = document.documentElement.classList.contains('dark');
             localStorage.setItem('studyhelper-darkmode', isDark);
-            // Manually update switch state for visual feedback
             if (isDark) {
                 darkModeSwitch.classList.add('dark:translate-x-5');
             } else {
@@ -2272,7 +2405,6 @@
             }
         });
         
-        // --- Load Dark Mode Preference ---
         if (localStorage.getItem('studyhelper-darkmode') === 'true' || 
            (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches && !localStorage.getItem('studyhelper-darkmode'))) 
         {
@@ -2281,8 +2413,8 @@
         }
 
         // --- Final Initialization ---
-        lucide.createIcons(); // Initialize all icons on load
-        initializeAuth(); // Start the auth process
+        lucide.createIcons(); 
+        initializeAuth(); 
         
     </script>
 </body>
