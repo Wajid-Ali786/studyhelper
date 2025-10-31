@@ -22,12 +22,13 @@ Follow these steps to get your own copy of the site up and running.
 
     ```javascript
     const firebaseConfig = {
-      apiKey: "AIza...",
-      authDomain: "your-project-id.firebaseapp.com",
-      projectId: "your-project-id",
-      storageBucket: "your-project-id.appspot.com",
-      messagingSenderId: "123...",
-      appId: "1:123...:web:..."
+      apiKey: "AIzaSyDXZZVwU6Q8l5GtK8ngxfIkQLEVkbihNhM",
+      authDomain: "studyhelper-quizzes.firebaseapp.com",
+      projectId: "studyhelper-quizzes",
+      storageBucket: "studyhelper-quizzes.firebasestorage.app",
+      messagingSenderId: "217416839389",
+      appId: "1:217416839389:web:060ca955eaa8befce12b34",
+      measurementId: "G-4XVEYVNL7L",
     };
     ```
 
@@ -37,15 +38,17 @@ Follow these steps to get your own copy of the site up and running.
 2.  Paste the `firebaseConfig` object you just copied into this file.
 
     **File: `js/firebase-config.js`**
+
     ```javascript
     // PASTE YOUR FIREBASE CONFIG OBJECT HERE
     const firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_AUTH_DOMAIN",
-      projectId: "YOUR_PROJECT_ID",
-      storageBucket: "YOUR_STORAGE_BUCKET",
-      messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-      appId: "YOUR_APP_ID"
+      apiKey: "AIzaSyDXZZVwU6Q8l5GtK8ngxfIkQLEVkbihNhM",
+      authDomain: "studyhelper-quizzes.firebaseapp.com",
+      projectId: "studyhelper-quizzes",
+      storageBucket: "studyhelper-quizzes.firebasestorage.app",
+      messagingSenderId: "217416839389",
+      appId: "1:217416839389:web:060ca955eaa8befce12b34",
+      measurementId: "G-4XVEYVNL7L",
     };
     ```
 
@@ -58,9 +61,9 @@ Follow these steps to get your own copy of the site up and running.
 3.  Go to the **Sign-in method** tab.
 4.  Enable **Email/Password**.
 5.  (Optional) Enable **Google**.
-    * Click "Google" -> "Enable".
-    * Select a "Project support email".
-    * Click "Save".
+    - Click "Google" -> "Enable".
+    - Select a "Project support email".
+    - Click "Save".
 
 ### 5. Set Up Firestore Database
 
@@ -71,7 +74,7 @@ Follow these steps to get your own copy of the site up and running.
 5.  Click "Enable".
 
 6.  **IMPORTANT: Add Security Rules**
-    Once your app is working, go to the **Rules** tab in Firestore and replace the test rules with these. These rules ensure users can only read/write their *own* data.
+    Once your app is working, go to the **Rules** tab in Firestore and replace the test rules with these. These rules ensure users can only read/write their _own_ data.
 
     ```
     rules_version = '2';
