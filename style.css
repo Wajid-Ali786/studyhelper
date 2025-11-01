@@ -1,0 +1,6 @@
+.modal-backdrop.open .modal-content {
+    translate: 50%;
+}
+#dark-mode-toggle svg {
+    margin-left: 0;
+}

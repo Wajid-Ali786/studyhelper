@@ -109,9 +109,6 @@
         nav.collapsed .sidebar-logo-text {
             display: none;
         }
-        nav.collapsed .sidebar-footer-text {
-            display: none;
-        }
         nav.collapsed #dark-mode-toggle span:first-child {
             margin: 0;
         }
@@ -150,6 +147,7 @@
             cursor: not-allowed;
         }
     </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body class="bg-slate-50 dark:bg-slate-900 font-sans text-slate-900 dark:text-slate-100 antialiased overflow-hidden">
 
@@ -243,9 +241,6 @@
                         <span id="dark-mode-switch" class="absolute left-1 top-1 w-4 h-4 bg-white dark:bg-slate-300 rounded-full transition-transform dark:translate-x-5"></span>
                     </div>
                 </button>
-                <div class="sidebar-footer-text mt-4 text-xs text-center text-slate-400 dark:text-slate-500">
-                    <p>User ID: <span id="user-id-display">Not logged in</span></p>
-                </div>
             </div>
         </nav>
 
@@ -268,7 +263,7 @@
                 <div class="relative">
                     <button id="login-button-header" class="bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center space-x-2 transition duration-150 ease-in-out">
                         <i data-lucide="log-in" class="w-5 h-5"></i>
-                        <span>Login / Sign Up</span>
+                        <span>Login</span>
                     </button>
                     
                     <button id="account-button-header" class="hidden w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center hover:ring-2 hover:ring-sky-500 hover:ring-offset-2 dark:hover:ring-offset-slate-800">
@@ -911,7 +906,6 @@
         const sidebarToggleBtn = $('#sidebar-toggle-btn');
         const pageTitle = $('#page-title');
         const contentPages = $$('.page-content');
-        const userIdDisplay = $('#user-id-display');
 
         // Header Auth
         const loginButtonHeader = $('#login-button-header');
@@ -1086,7 +1080,6 @@
             dbSubjectCount.textContent = '0';
             dbAvgScore.textContent = 'N/A';
             dbQuizzesTaken.textContent = '0';
-            userIdDisplay.textContent = 'Not logged in';
         }
 
         function showModal(modalId, isClosable = true) {
@@ -1315,12 +1308,10 @@
                     userAvatar.src = `https://placehold.co/40x40/e2e8f0/64748b?text=${initial}`;
                 }
                 welcomeUserName.textContent = displayName.split(' ')[0];
-                userIdDisplay.textContent = user.uid;
             } else {
                 accountModalEmail.textContent = '...';
                 userAvatar.src = 'https://placehold.co/40x40/e2e8f0/64748b?text=U';
                 welcomeUserName.textContent = 'User';
-                userIdDisplay.textContent = 'Not logged in';
             }
         }
 
