@@ -1,6 +1,9 @@
 /* .modal-backdrop.open .modal-content {
     translate: 50%;
 } */
+ .modal-content.open {
+    opacity: 1;
+ }
 #dark-mode-toggle svg {
     margin-left: 0;
 }

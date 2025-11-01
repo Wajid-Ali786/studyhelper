@@ -430,7 +430,7 @@
                 <!-- Header Auth Area -->
                 <div class="flex items-center space-x-4">
                     <ul class="my-nav-ul">
-                        <li><a href="smart-study-calendar-firestore.html" class="my-study-btn">Study Callender</a></li>
+                        <li><a href="smart-study-calendar-firestore.html" class="my-study-btn" target="_blank">Study Calender</a></li>
                     </ul>
                     <button id="login-button-header"
                         class="bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center space-x-2 transition duration-150 ease-in-out">
@@ -631,7 +631,7 @@
                                         4. Time per Question (seconds)
                                         <span class="text-xs text-slate-500">(0 for no limit)</span>
                                     </label>
-                                    <input type="number" id="quiz-setup-time-per-question" min="0" value="0" required
+                                    <input type="number" id="quiz-setup-time-per-question" min="5" value="30" required
                                         class="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500">
                                 </div>
 
@@ -640,7 +640,7 @@
                                         class="block text-sm font-medium text-slate-700 dark:text-slate-300">5. Show
                                         Timer during Quiz?</label>
                                     <label class="relative inline-flex items-center cursor-pointer">
-                                        <input type="checkbox" id="quiz-setup-show-timer" class="sr-only peer">
+                                        <input type="checkbox" id="quiz-setup-show-timer" checked class="sr-only peer">
                                         <div
                                             class="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-sky-300 dark:peer-focus:ring-sky-800 rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-slate-600 peer-checked:bg-sky-600">
                                         </div>
@@ -888,7 +888,7 @@
                         <p class="text-slate-500 dark:text-slate-400 mb-4">These actions are permanent and cannot be
                             undone. Be careful!</p>
 
-                        <button id="delete-all-data-button"
+                        <button id="delete-all-data-button" disabled title="Disabled Currently"
                             class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2.5 px-5 rounded-lg flex items-center space-x-2">
                             <i data-lucide="trash-2" class="w-5 h-5"></i>
                             <span>Delete All My Data</span>

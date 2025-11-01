@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course Handouts</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans antialiased">
+
+    <!-- Header Navigation -->
+    <nav class="bg-white shadow-md">
+        <div class="container mx-auto max-w-5xl px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="text-xl font-bold text-gray-800">Study Helper</div>
+                <div class="flex space-x-4">
+                    <a href="#" class="text-gray-600 hover:text-blue-600">Home</a>
+                    <a href="#" class="text-gray-600 hover:text-blue-600">Quizzes</a>
+                    <a href="#" class="text-gray-600 hover:text-blue-600">Assignments</a>
+                    <a href="handouts.html" class="text-blue-600 font-semibold">Handouts</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto max-w-3xl p-6 my-10">
+        
+        <header class="mb-8">
+            <h1 class="text-4xl font-bold text-gray-800 text-center">Course Handouts</h1>
+            <p class="text-center text-gray-600 mt-2">All your subject PDFs in one place.</p>
+        </header>
+
+        <!-- Section to Display Handouts -->
+        <section class="bg-white p-6 rounded-lg shadow-md mb-8">
+            <h2 class="text-2xl font-semibold text-gray-700 mb-4">Available Handouts</h2>
+            <div id="handouts-list" class="space-y-3">
+                <!-- Handouts will be dynamically loaded here -->
+                <p id="loading-text" class="text-gray-500">Loading handouts...</p>
+            </div>
+        </section>
+
+        <!-- Section for Contact Info -->
+        <section class="bg-white p-6 rounded-lg shadow-md text-center">
+            <h2 class="text-xl font-semibold text-gray-700 mb-2">Need to add more?</h2>
+            <p class="text-gray-600">For adding more PDF handouts, please contact:</p>
+            <p class="text-lg font-medium text-gray-800 mt-2">03485060128 (WhatsApp)</p>
+        </section>
+
+    </div>
+
+    <!-- Simple script for static list -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // --- Initial Handout Data (from your images) ---
+            const initialHandouts = [
+                { name: "CS101", path: "S1-Handouts/CS101_Updated_Handouts.pdf" },
+                { name: "ENG101", path: "S1-Handouts/ENG101_handouts_1_45.pdf" },
+                { name: "MTH100", path: "S1-Handouts/MTH100_Handouts_PDF100645.pdf" },
+                { name: "MTH101", path: "S1-Handouts/MTH101.pdf" },
+                { name: "MTH202", path: "S1-Handouts/MTH202_Handouts_PDF102449.pdf" },
+                { name: "PAK301", path: "S1-Handouts/PAK301_handouts_1_30.pdf" },
+                { name: "PHY101", path: "S1-Handouts/PHY101_Handouts_PDF105948.pdf" }
+            ];
+
+            // --- UI Elements ---
+            const handoutsList = document.getElementById('handouts-list');
+            const loadingText = document.getElementById('loading-text');
+
+            /**
+             * Renders a single handout link to the page.
+             */
+            function renderHandout(handoutData) {
+                const { name, path } = handoutData;
+                
+                const link = document.createElement('a');
+                link.href = path;
+                link.target = "_blank"; // Open in new tab as requested
+                link.className = "block w-full p-4 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-lg shadow-sm transition duration-200 text-blue-600 hover:text-blue-800 font-medium";
+                link.textContent = name;
+                
+                return link;
+            }
+
+            /**
+             * Renders the initial static list of handouts.
+             */
+            function renderStaticHandouts() {
+                if (loadingText) {
+                    // Check if loadingText still has a parent before removing
+                    if (loadingText.parentNode) {
+                        handoutsList.removeChild(loadingText); // Remove "Loading..."
+                    }
+                }
+                // Clear list before rendering static
+                handoutsList.innerHTML = '';
+                
+                // Sort in memory
+                initialHandouts.sort((a, b) => a.name.localeCompare(b.name));
+
+                initialHandouts.forEach(handout => {
+                    const linkElement = renderHandout(handout);
+                    handoutsList.appendChild(linkElement);
+                });
+            }
+
+            // Run the function to show the static list
+            renderStaticHandouts();
+        });
+    </script>
+</body>
+</html>
