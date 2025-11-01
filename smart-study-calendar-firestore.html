@@ -327,18 +327,15 @@
                     class="p-2 rounded-lg bg-white bg-opacity-20 text-white hover:bg-opacity-30 transition-colors dark-toggle">
                     <i class="fas fa-moon"></i>
                 </button>
-
+                
                 <!-- NEW: Login Button (hidden by default, shown by JS if logged out) -->
-                <button id="loginBtn"
-                    class="hidden p-2 px-4 rounded-lg bg-white bg-opacity-20 text-white hover:bg-opacity-30 transition-colors">
+                <button id="loginBtn" class="hidden p-2 px-4 rounded-lg bg-white bg-opacity-20 text-white hover:bg-opacity-30 transition-colors">
                     <i class="fas fa-sign-in-alt mr-2"></i>Login
                 </button>
-
+                
                 <!-- Auth Status and Logout Button (hidden by default, shown by JS if logged in) -->
-                <span id="authStatus"
-                    class="hidden text-sm text-white bg-white bg-opacity-10 px-3 py-1 rounded-full transition-colors">Connecting...</span>
-                <button id="logoutBtn"
-                    class="hidden p-2 rounded-lg bg-white bg-opacity-20 text-white hover:bg-opacity-30 transition-colors">
+                <span id="authStatus" class="hidden text-sm text-white bg-white bg-opacity-10 px-3 py-1 rounded-full transition-colors">Connecting...</span>
+                <button id="logoutBtn" class="hidden p-2 rounded-lg bg-white bg-opacity-20 text-white hover:bg-opacity-30 transition-colors">
                     <i class="fas fa-sign-out-alt"></i>
                 </button>
             </div>
@@ -347,14 +344,13 @@
 
     <!-- Body content -->
     <div class="container-fluid mx-auto p-4 md:p-8">
-
+        
         <!-- NEW: Login Message (Shown when logged out) -->
         <div id="loginMessage" class="hidden text-center p-10 bg-white rounded-2xl shadow-md">
             <i class="fas fa-lock text-4xl text-indigo-500 mb-4"></i>
             <h2 class="text-2xl font-bold text-gray-700 mb-2">Login Required</h2>
             <p class="text-gray-600 mb-6">Please log in or create an account to use your study calendar.</p>
-            <button id="loginMessageBtn"
-                class="bg-indigo-600 text-white font-semibold py-2 px-6 rounded-lg shadow-md hover:bg-indigo-700 transition-colors">
+            <button id="loginMessageBtn" class="bg-indigo-600 text-white font-semibold py-2 px-6 rounded-lg shadow-md hover:bg-indigo-700 transition-colors">
                 Login / Sign Up
             </button>
         </div>
@@ -393,8 +389,7 @@
                                 </select>
                             </div>
                             <div>
-                                <label for="subjectColor" class="block text-sm font-medium text-gray-600">Color
-                                    Code</label>
+                                <label for="subjectColor" class="block text-sm font-medium text-gray-600">Color Code</label>
                                 <input type="color" id="subjectColor" value="#4f46e5"
                                     class="mt-1 block w-full h-10 bg-white border border-gray-300 rounded-md shadow-sm">
                             </div>
@@ -411,8 +406,7 @@
                         <div class="space-y-4" id="studyHoursForm">
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label for="mondayHours"
-                                        class="block text-sm font-medium text-gray-600">Monday</label>
+                                    <label for="mondayHours" class="block text-sm font-medium text-gray-600">Monday</label>
                                     <input type="number" id="mondayHours" value="2" min="0"
                                         class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm">
                                 </div>
@@ -435,8 +429,7 @@
                                         class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm">
                                 </div>
                                 <div>
-                                    <label for="fridayHours"
-                                        class="block text-sm font-medium text-gray-600">Friday</label>
+                                    <label for="fridayHours" class="block text-sm font-medium text-gray-600">Friday</label>
                                     <input type="number" id="fridayHours" value="2" min="0"
                                         class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm">
                                 </div>
@@ -447,8 +440,7 @@
                                         class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm">
                                 </div>
                                 <div>
-                                    <label for="sundayHours"
-                                        class="block text-sm font-medium text-gray-600">Sunday</label>
+                                    <label for="sundayHours" class="block text-sm font-medium text-gray-600">Sunday</label>
                                     <input type="number" id="sundayHours" value="4" min="0"
                                         class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm">
                                 </div>
@@ -861,7 +853,7 @@
             const loginMessage = document.getElementById('loginMessage');
             const loginMessageBtn = document.getElementById('loginMessageBtn');
             const appContainer = document.getElementById('appContainer');
-
+            
             const loginModal = document.getElementById('loginModal');
             const closeLoginModalBtn = document.getElementById('closeLoginModalBtn');
             const loginForm = document.getElementById('loginForm');
@@ -874,7 +866,7 @@
             // --- Show/Hide Login Modal ---
             const showLoginModal = () => loginModal.classList.remove('hidden');
             const hideLoginModal = () => loginModal.classList.add('hidden');
-
+            
             loginBtn.addEventListener('click', showLoginModal);
             loginMessageBtn.addEventListener('click', showLoginModal);
             closeLoginModalBtn.addEventListener('click', hideLoginModal);
@@ -938,7 +930,7 @@
                     loginBtn.classList.add('hidden');
                     loginMessage.classList.add('hidden');
                     appContainer.classList.remove('hidden');
-
+                    
                     // Start the app and listen for data
                     initializeApp(user.uid);
                 } else {
@@ -959,12 +951,12 @@
                     cleanupAppUI();
                 }
             });
-
+            
             // --- Element Refs (from user's code) ---
             const addSubjectForm = document.getElementById('addSubjectForm');
             const subjectList = document.getElementById('subjectList');
             const progressContainer = document.getElementById('progressContainer');
-            const weeklySchedule = document.getElementById('weeklySchedule');
+            let weeklySchedule = document.getElementById('weeklySchedule');
             const updateScheduleBtn = document.getElementById('updateScheduleBtn');
             const editModal = document.getElementById('editModal');
             const closeModalBtn = document.getElementById('closeModalBtn');
@@ -1051,18 +1043,18 @@
                 progressContainer.innerHTML = '';
                 weeklySchedule.innerHTML = '';
                 studyHistoryTable.innerHTML = '';
-
+                
                 if (progressChart) progressChart.destroy();
                 if (timeChart) timeChart.destroy();
-
+                
                 document.getElementById('totalSubjects').textContent = '0';
                 document.getElementById('totalCompleted').textContent = '0';
                 document.getElementById('totalRemaining').textContent = '0';
                 document.getElementById('weekSessions').textContent = '0';
-
+                
                 document.body.classList.remove('dark-mode');
                 darkModeToggle.innerHTML = '<i class="fas fa-moon"></i>';
-
+                
                 console.log("App UI and state cleaned up.");
             }
 
@@ -1070,7 +1062,7 @@
             function initializeApp(userId) {
                 // Set the single document reference for this user
                 const userDocRef = db.collection('users').doc(userId);
-
+                
                 // ===============================================================
                 // --- REPLACEMENT for `saveData()` ---
                 // ===============================================================
@@ -1095,7 +1087,7 @@
                 };
 
                 // --- All original functions below ---
-
+                
                 const saveState = () => {
                     const state = {
                         subjects: JSON.parse(JSON.stringify(subjects)),
@@ -1243,11 +1235,11 @@
                         setTimeout(() => notification.remove(), 300);
                     });
                 };
-
+                
                 // Remove existing listener to avoid duplicates
                 const newDarkModeToggle = darkModeToggle.cloneNode(true);
                 darkModeToggle.parentNode.replaceChild(newDarkModeToggle, darkModeToggle);
-
+                
                 newDarkModeToggle.addEventListener('click', () => {
                     isDarkMode = !isDarkMode;
                     document.body.classList.toggle('dark-mode');
@@ -1297,7 +1289,7 @@
                         subjectList.appendChild(subjectEl);
                     });
                 };
-
+                
                 // Clone and replace to avoid duplicate listeners on re-login
                 const newAddSubjectForm = addSubjectForm.cloneNode(true);
                 addSubjectForm.parentNode.replaceChild(newAddSubjectForm, addSubjectForm);
@@ -1327,7 +1319,7 @@
                         showNotification(`Subject "${name}" successfully added!`, 'success');
                     }
                 });
-
+                
                 // Re-attach listeners for dynamically created content
                 const newSubjectList = subjectList.cloneNode(true);
                 subjectList.parentNode.replaceChild(newSubjectList, subjectList);
@@ -1455,10 +1447,13 @@
                     });
                 };
 
-                closeSubjectNotesModalBtn.addEventListener('click', () => {
+                // --- Fix: Re-attach listener to avoid duplicates ---
+                const newCloseSubjectNotesModalBtn = closeSubjectNotesModalBtn.cloneNode(true);
+                closeSubjectNotesModalBtn.parentNode.replaceChild(newCloseSubjectNotesModalBtn, closeSubjectNotesModalBtn);
+                newCloseSubjectNotesModalBtn.addEventListener('click', () => {
                     subjectNotesModal.classList.add('hidden');
                 });
-
+                
                 const newAddSubjectNoteForm = addSubjectNoteForm.cloneNode(true);
                 addSubjectNoteForm.parentNode.replaceChild(newAddSubjectNoteForm, addSubjectNoteForm);
                 newAddSubjectNoteForm.addEventListener('submit', (e) => {
@@ -1767,7 +1762,7 @@
                         }
                     }
 
-                    saveData();
+                    // saveData(); // <-- REMOVED this call. The button listener will handle saving.
                 };
 
                 const renderSchedule = () => {
@@ -1941,7 +1936,10 @@
                     });
                 };
 
-                closeAddLectureModalBtn.addEventListener('click', () => {
+                // --- Fix: Re-attach listener to avoid duplicates ---
+                const newCloseAddLectureModalBtn = closeAddLectureModalBtn.cloneNode(true);
+                closeAddLectureModalBtn.parentNode.replaceChild(newCloseAddLectureModalBtn, closeAddLectureModalBtn);
+                newCloseAddLectureModalBtn.addEventListener('click', () => {
                     addLectureModal.classList.add('hidden');
                 });
 
@@ -1972,7 +1970,10 @@
                     }
                 };
 
-                updateScheduleBtn.addEventListener('click', () => {
+                // --- Fix: Re-attach listener to avoid duplicates ---
+                const newUpdateScheduleBtn = updateScheduleBtn.cloneNode(true);
+                updateScheduleBtn.parentNode.replaceChild(newUpdateScheduleBtn, updateScheduleBtn);
+                newUpdateScheduleBtn.addEventListener('click', () => {
                     saveState();
                     studyHours.monday = parseInt(document.getElementById('mondayHours').value);
                     studyHours.tuesday = parseInt(document.getElementById('tuesdayHours').value);
@@ -1982,16 +1983,18 @@
                     studyHours.saturday = parseInt(document.getElementById('saturdayHours').value);
                     studyHours.sunday = parseInt(document.getElementById('sundayHours').value);
 
-                    generateSchedule();
-                    saveData();
-                    renderSchedule();
+                    generateSchedule(); // Regenerates schedule in memory
+                    saveData(); // Saves new hours and schedule to Firestore
+                    renderSchedule(); // Renders the change immediately
                     showNotification('Schedule updated successfully!', 'success');
                 });
-
+                
                 // Re-attach listeners for dynamically created content
                 const newWeeklySchedule = weeklySchedule.cloneNode(true);
                 weeklySchedule.parentNode.replaceChild(newWeeklySchedule, weeklySchedule);
-                newWeeklySchedule.addEventListener('change', (e) => {
+                weeklySchedule = newWeeklySchedule; // <-- FIX: Re-assign the variable to the new clone
+                
+                weeklySchedule.addEventListener('change', (e) => {
                     if (e.target.classList.contains('done-checkbox')) {
                         saveState();
                         const date = e.target.dataset.date;
@@ -2018,87 +2021,13 @@
                     }
                 });
 
-                const renderLectureNotes = (date, index) => {
-                    if (!schedule[date] || !schedule[date][index]) return; // Guard clause
-                    const slot = schedule[date][index];
-                    lectureNotesList.innerHTML = '';
-
-                    if (!slot.notes || slot.notes.length === 0) {
-                        lectureNotesList.innerHTML = '<p class="text-gray-500 text-sm text-center">No notes added yet.</p>';
-                        return;
-                    }
-
-                    slot.notes.forEach((note, noteIndex) => {
-                        const noteEl = document.createElement('div');
-                        noteEl.className = 'p-3 bg-gray-100 rounded-lg mb-2 fade-in';
-                        noteEl.innerHTML = `
-                            <div class="flex justify-between items-start">
-                                <p class="text-sm flex-1" style="word-break: break-all;">${note.text}</p>
-                                <div class="flex space-x-2 ml-2">
-                                    <button class="edit-lecture-note text-blue-500 text-xs" data-index="${noteIndex}">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button class="delete-lecture-note text-red-500 text-xs" data-index="${noteIndex}">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            <p class="text-xs text-gray-500 mt-1">${new Date(note.timestamp).toLocaleString()}</p>
-                        `;
-                        lectureNotesList.appendChild(noteEl);
-                    });
-
-                    document.querySelectorAll('.edit-lecture-note').forEach(button => {
-                        button.addEventListener('click', (e) => {
-                            const noteIndex = parseInt(button.dataset.index);
-                            const note = slot.notes[noteIndex];
-                            const newText = prompt('Edit your note:', note.text);
-
-                            if (newText !== null && newText.trim() !== '') {
-                                saveState();
-                                slot.notes[noteIndex].text = newText.trim();
-                                saveData();
-                                renderLectureNotes(date, index);
-                                showNotification('Note updated successfully!', 'success');
-                            }
-                        });
-                    });
-
-                    document.querySelectorAll('.delete-lecture-note').forEach(button => {
-                        button.addEventListener('click', (e) => {
-                            const noteIndex = parseInt(button.dataset.index);
-
-                            if (confirm('Are you sure you want to delete this note?')) {
-                                saveState();
-                                slot.notes.splice(noteIndex, 1);
-                                saveData();
-                                renderLectureNotes(date, index);
-                                renderSchedule();
-                                showNotification('Note deleted successfully!', 'success');
-                            }
-                        });
-                    });
-                };
-
-                newWeeklySchedule.addEventListener('click', (e) => {
-                    if (e.target.classList.contains('notes-btn') || e.target.closest('.notes-btn')) {
-                        const btn = e.target.classList.contains('notes-btn') ? e.target : e.target.closest('.notes-btn');
-                        const date = btn.dataset.date;
-                        const index = parseInt(btn.dataset.index);
-
-                        lectureNotesDate.value = date;
-                        lectureNotesIndex.value = index;
-                        newLectureNote.value = '';
-
-                        renderLectureNotes(date, index);
-                        lectureNotesModal.classList.remove('hidden');
-                    }
-                });
-
-                closeLectureNotesModalBtn.addEventListener('click', () => {
+                // --- Fix: Re-attach listener to avoid duplicates ---
+                const newCloseLectureNotesModalBtn = closeLectureNotesModalBtn.cloneNode(true);
+                closeLectureNotesModalBtn.parentNode.replaceChild(newCloseLectureNotesModalBtn, closeLectureNotesModalBtn);
+                newCloseLectureNotesModalBtn.addEventListener('click', () => {
                     lectureNotesModal.classList.add('hidden');
                 });
-
+                
                 const newAddLectureNoteForm = addLectureNoteForm.cloneNode(true);
                 addLectureNoteForm.parentNode.replaceChild(newAddLectureNoteForm, addLectureNoteForm);
                 newAddLectureNoteForm.addEventListener('submit', (e) => {
@@ -2132,35 +2061,44 @@
                     }
                 });
 
-                prevWeekBtn.addEventListener('click', () => {
+                // --- Fix: Re-attach listeners to avoid duplicates ---
+                const newPrevWeekBtn = prevWeekBtn.cloneNode(true);
+                prevWeekBtn.parentNode.replaceChild(newPrevWeekBtn, prevWeekBtn);
+                newPrevWeekBtn.addEventListener('click', () => {
                     currentDate.setDate(currentDate.getDate() - 7);
                     renderSchedule();
                     checkWeekCompletion();
                 });
-                nextWeekBtn.addEventListener('click', () => {
+
+                const newNextWeekBtn = nextWeekBtn.cloneNode(true);
+                nextWeekBtn.parentNode.replaceChild(newNextWeekBtn, nextWeekBtn);
+                newNextWeekBtn.addEventListener('click', () => {
                     currentDate.setDate(currentDate.getDate() + 7);
                     renderSchedule();
                     checkWeekCompletion();
                 });
-                todayBtn.addEventListener('click', () => {
+
+                const newTodayBtn = todayBtn.cloneNode(true);
+                todayBtn.parentNode.replaceChild(newTodayBtn, todayBtn);
+                newTodayBtn.addEventListener('click', () => {
                     currentDate = new Date();
                     renderSchedule();
                     checkWeekCompletion();
                 });
 
                 let draggedItem = null;
-                newWeeklySchedule.addEventListener('dragstart', (e) => {
+                weeklySchedule.addEventListener('dragstart', (e) => {
                     draggedItem = e.target;
                     setTimeout(() => e.target.classList.add('dragging'), 0);
                 });
-                newWeeklySchedule.addEventListener('dragend', (e) => {
+                weeklySchedule.addEventListener('dragend', (e) => {
                     draggedItem.classList.remove('dragging');
                     draggedItem = null;
                 });
-                newWeeklySchedule.addEventListener('dragover', (e) => {
+                weeklySchedule.addEventListener('dragover', (e) => {
                     e.preventDefault();
                 });
-                newWeeklySchedule.addEventListener('drop', (e) => {
+                weeklySchedule.addEventListener('drop', (e) => {
                     e.preventDefault();
                     const target = e.target.closest('[draggable="true"]');
                     if (target && target !== draggedItem) {
@@ -2181,11 +2119,14 @@
                     }
                 });
 
-                sidebarToggle.addEventListener('click', () => {
+                // --- Fix: Re-attach listener to avoid duplicates ---
+                const newSidebarToggle = sidebarToggle.cloneNode(true);
+                sidebarToggle.parentNode.replaceChild(newSidebarToggle, sidebarToggle);
+                newSidebarToggle.addEventListener('click', () => {
                     sidebar.classList.toggle('collapsed');
                     mainContent.classList.toggle('expanded');
 
-                    const icon = sidebarToggle.querySelector('i');
+                    const icon = newSidebarToggle.querySelector('i');
                     if (sidebar.classList.contains('collapsed')) {
                         icon.classList.remove('fa-bars');
                         icon.classList.add('fa-chevron-right');
@@ -2195,10 +2136,18 @@
                     }
                 });
 
-                undoBtn.addEventListener('click', undo);
-                redoBtn.addEventListener('click', redo);
+                // --- Fix: Re-attach listeners to avoid duplicates ---
+                const newUndoBtn = undoBtn.cloneNode(true);
+                undoBtn.parentNode.replaceChild(newUndoBtn, undoBtn);
+                newUndoBtn.addEventListener('click', undo);
 
-                clearDataBtn.addEventListener('click', () => {
+                const newRedoBtn = redoBtn.cloneNode(true);
+                redoBtn.parentNode.replaceChild(newRedoBtn, redoBtn);
+                newRedoBtn.addEventListener('click', redo);
+
+                const newClearDataBtn = clearDataBtn.cloneNode(true);
+                clearDataBtn.parentNode.replaceChild(newClearDataBtn, clearDataBtn);
+                newClearDataBtn.addEventListener('click', () => {
                     if (confirm('Kya aap sure hain saara data clear karna chahte hain? Ye action undo nahi ho sakta.')) {
                         saveState();
                         subjects = [];
@@ -2211,7 +2160,9 @@
                     }
                 });
 
-                exportDataBtn.addEventListener('click', () => {
+                const newExportDataBtn = exportDataBtn.cloneNode(true);
+                exportDataBtn.parentNode.replaceChild(newExportDataBtn, exportDataBtn);
+                newExportDataBtn.addEventListener('click', () => {
                     const data = {
                         subjects,
                         schedule,
@@ -2236,15 +2187,22 @@
                     showNotification('Data exported successfully!', 'success');
                 });
 
-                importDataBtn.addEventListener('click', () => {
+                const newImportDataBtn = importDataBtn.cloneNode(true);
+                importDataBtn.parentNode.replaceChild(newImportDataBtn, importDataBtn);
+                newImportDataBtn.addEventListener('click', () => {
                     importModal.classList.remove('hidden');
                 });
 
-                closeImportModalBtn.addEventListener('click', () => {
+                // --- Fix: Re-attach listeners to avoid duplicates ---
+                const newCloseImportModalBtn = closeImportModalBtn.cloneNode(true);
+                closeImportModalBtn.parentNode.replaceChild(newCloseImportModalBtn, closeImportModalBtn);
+                newCloseImportModalBtn.addEventListener('click', () => {
                     importModal.classList.add('hidden');
                 });
 
-                confirmImportBtn.addEventListener('click', () => {
+                const newConfirmImportBtn = confirmImportBtn.cloneNode(true);
+                confirmImportBtn.parentNode.replaceChild(newConfirmImportBtn, confirmImportBtn);
+                newConfirmImportBtn.addEventListener('click', () => {
                     const fileInput = document.getElementById('importFile');
                     if (fileInput.files.length === 0) {
                         showNotification('Please select a file to import.', 'error');
@@ -2278,18 +2236,25 @@
                     reader.readAsText(file);
                 });
 
-                addReminderBtn.addEventListener('click', () => {
+                // --- Fix: Re-attach listeners to avoid duplicates ---
+                const newAddReminderBtn = addReminderBtn.cloneNode(true);
+                addReminderBtn.parentNode.replaceChild(newAddReminderBtn, addReminderBtn);
+                newAddReminderBtn.addEventListener('click', () => {
                     const today = new Date().toISOString().split('T')[0];
                     document.getElementById('reminderDate').value = today;
                     document.getElementById('reminderTime').value = '18:00';
                     reminderModal.classList.remove('hidden');
                 });
 
-                closeReminderModalBtn.addEventListener('click', () => {
+                const newCloseReminderModalBtn = closeReminderModalBtn.cloneNode(true);
+                closeReminderModalBtn.parentNode.replaceChild(newCloseReminderModalBtn, closeReminderModalBtn);
+                newCloseReminderModalBtn.addEventListener('click', () => {
                     reminderModal.classList.add('hidden');
                 });
 
-                saveReminderBtn.addEventListener('click', () => {
+                const newSaveReminderBtn = saveReminderBtn.cloneNode(true);
+                saveReminderBtn.parentNode.replaceChild(newSaveReminderBtn, saveReminderBtn);
+                newSaveReminderBtn.addEventListener('click', () => {
                     const title = document.getElementById('reminderTitle').value.trim();
                     const date = document.getElementById('reminderDate').value;
                     const time = document.getElementById('reminderTime').value;
@@ -2336,13 +2301,13 @@
                         reminders = data.reminders || [];
                         studyHistory = data.studyHistory || [];
                         isDarkMode = data.settings ? data.settings.darkMode : false;
-
+                        
                         console.log("Data loaded/updated from Firestore.");
                     } else {
                         console.log("New user. Initializing with default data.");
                         saveData(); // Save the defaults
                     }
-
+                    
                     document.getElementById('mondayHours').value = studyHours.monday;
                     document.getElementById('tuesdayHours').value = studyHours.tuesday;
                     document.getElementById('wednesdayHours').value = studyHours.wednesday;
@@ -2350,7 +2315,7 @@
                     document.getElementById('fridayHours').value = studyHours.friday;
                     document.getElementById('saturdayHours').value = studyHours.saturday;
                     document.getElementById('sundayHours').value = studyHours.sunday;
-
+                    
                     if (isDarkMode) {
                         document.body.classList.add('dark-mode');
                         newDarkModeToggle.innerHTML = '<i class="fas fa-sun"></i>';
@@ -2358,7 +2323,7 @@
                         document.body.classList.remove('dark-mode');
                         newDarkModeToggle.innerHTML = '<i class="fas fa-moon"></i>';
                     }
-
+                    
                     renderAll();
                     updateStudyHistory();
 
@@ -2369,7 +2334,7 @@
                     authStatus.classList.add('bg-red-500', 'bg-opacity-50');
                 });
 
-
+                
                 setTimeout(() => {
                     if (subjects.length === 0) {
                         showNotification('Welcome! Start by adding your subjects and setting study hours.', 'info');

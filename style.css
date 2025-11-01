@@ -8,6 +8,11 @@ header .relative.my-nav {
     display: flex;
     flex-direction: row;
 }
+
+header .my-nav-ul {
+    display: flex;
+    flex-direction: row;
+}
 header .my-nav-ul .my-study-btn {
     display: inline-block;
     margin-right: 15px;
