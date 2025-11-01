@@ -2164,6 +2164,10 @@
             appState.activeQuiz = null;
             console.log("Quiz abandoned.");
         }
+        
+        // Event listeners for quiz navigation
+        quizNextButton.addEventListener('click', () => handleQuizNext(false));
+        quizSubmitButton.addEventListener('click', () => handleQuizNext(false));
 
         quizExitButtonIcon.addEventListener('click', () => {
             showConfirmModal(
