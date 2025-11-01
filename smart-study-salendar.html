@@ -1,0 +1,2162 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Study Calendar</title>
+    <script src="assets/js/tailwind.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/all.min.css">
+    <script src="assets/js/all.min.js"></script>
+    <script src="assets/js/chart.js"></script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+        }
+
+        .dark-mode {
+            background-color: #1f2937;
+            color: #f9fafb;
+        }
+
+        .dark-mode .text-gray-800 {
+            color: #1f2937;
+        }
+
+        .dark-mode .text-gray-600 {
+            color: #4b5563;
+        }
+
+        .dark-mode .bg-gray-50 {
+            background-color: #f9fafb;
+        }
+
+        .dark-mode .bg-gray-100 {
+            background-color: #f3f4f6;
+        }
+
+        .dark-mode .border-gray-300 {
+            border-color: #d1d5db;
+        }
+
+        .dark-mode .shadow-md {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .subject-card {
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+        }
+
+        .subject-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        /* Drag and Drop Styles */
+        .dragging {
+            opacity: 0.5;
+            border: 2px dashed #4f46e5;
+        }
+
+        .drag-over {
+            background-color: #e0e7ff;
+            border: 2px dashed #6366f1;
+        }
+
+        .notes-area {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+
+        .notes-area.expanded {
+            max-height: 200px;
+        }
+
+        /* New Styles */
+        .priority-high {
+            border-left: 4px solid #ef4444;
+        }
+
+        .priority-medium {
+            border-left: 4px solid #f59e0b;
+        }
+
+        .priority-low {
+            border-left: 4px solid #10b981;
+        }
+
+        .study-session {
+            transition: all 0.2s;
+        }
+
+        .study-session:hover {
+            transform: scale(1.02);
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .pulse-reminder {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7);
+            }
+
+            70% {
+                box-shadow: 0 0 0 10px rgba(59, 130, 246, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+            }
+        }
+
+        .task-completed {
+            text-decoration: line-through;
+            opacity: 0.7;
+        }
+
+        /* Sidebar toggle */
+        .sidebar {
+            transition: all 0.3s ease;
+        }
+
+        .sidebar.collapsed {
+            transform: translateX(-100%);
+            opacity: 0;
+            width: 0;
+        }
+
+        .main-content {
+            transition: all 0.3s ease;
+        }
+
+        .main-content.expanded {
+            width: 100%;
+        }
+
+        /* Notification at bottom */
+        #notificationArea {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            pointer-events: none;
+        }
+
+        .notification {
+            pointer-events: auto;
+            margin-bottom: 0.5rem;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        /* Dark mode toggle */
+        .dark-toggle {
+            transition: all 0.3s ease;
+        }
+
+        .container-fluid {
+            max-width: 100%;
+            margin: auto;
+            padding: 0 15px;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .tab-button {
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px 5px 0 0;
+            background: #f1f5f9;
+            margin-right: 5px;
+        }
+
+        .tab-button.active {
+            background: #4f46e5;
+            color: white;
+        }
+
+        .header-gradient {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .footer-gradient {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        button.subject-notes-btn {
+            position: relative;
+        }
+
+        .subject-notes-btn span {
+            font-size: 10px;
+        }
+
+        #darkModeToggle {
+            min-width: 40px;
+        }
+
+        .add-lecture-btn {
+            position: absolute;
+            margin: 0;
+            top: 16px;
+            right: 15px;
+            width: fit-content;
+            padding: 2px 8px;
+            background: transparent;
+            opacity: 0;
+            visibility: hidden;
+            transition: .3s !important;
+        }
+
+        .add-lecture-btn svg {
+            margin: 0;
+        }
+
+        .add-lecture-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .subject-card:hover .add-lecture-btn {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .delete-lecture-btn,
+        .notes-btn {
+            opacity: 0;
+            visibility: hidden;
+            transition: .3s !important;
+        }
+
+        .study-session:hover .delete-lecture-btn,
+        .study-session:hover .notes-btn {
+            opacity: 1;
+            visibility: visible;
+        }
+    </style>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="bg-gray-50 text-gray-800">
+    <!-- Header -->
+    <header class="header-gradient text-white shadow-lg">
+        <div class="container-fluid py-4 px-6 flex justify-between items-center">
+            <div class="flex items-center">
+                <button style="padding: 5px 12px;" id="sidebarToggle"
+                    class="p-2 rounded-lg bg-white bg-opacity-20 text-white hover:bg-opacity-30 transition-colors mr-4">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="flex items-center">
+                    <i class="fas fa-book-open text-white text-2xl mr-3"></i>
+                    <h1 class="text-2xl font-bold text-white">Smart Study Calendar</h1>
+                </div>
+            </div>
+            <div class="flex items-center space-x-2">
+                <ul class="my-nav-ul">
+                    <li><a href="index.html" class="my-study-btn">Study Helper</a></li>
+                </ul>
+                <button id="undoBtn"
+                    class="p-2 rounded-lg bg-white bg-opacity-20 text-white hover:bg-opacity-30 transition-colors">
+                    <i class="fas fa-undo"></i>
+                </button>
+                <button id="redoBtn"
+                    class="p-2 rounded-lg bg-white bg-opacity-20 text-white hover:bg-opacity-30 transition-colors">
+                    <i class="fas fa-redo"></i>
+                </button>
+                <button id="darkModeToggle"
+                    class="p-2 rounded-lg bg-white bg-opacity-20 text-white hover:bg-opacity-30 transition-colors dark-toggle">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div class="container-fluid mx-auto p-4 md:p-8">
+
+        <!-- Notifications Section -->
+        <div id="notificationArea"></div>
+
+        <div class="flex flex-col lg:flex-row gap-8 mt-4">
+            <!-- Left Column: Inputs and Settings -->
+            <div class="sidebar lg:w-1/3 space-y-8">
+                <!-- Subjects Management -->
+                <div class="bg-white p-6 rounded-2xl shadow-md">
+                    <h2 class="text-2xl font-bold mb-4 border-b pb-3 text-gray-700">Subjects Manage Karein</h2>
+                    <form id="addSubjectForm" class="space-y-4">
+                        <div>
+                            <label for="subjectName" class="block text-sm font-medium text-gray-600">Subject ka
+                                Naam</label>
+                            <input type="text" id="subjectName" placeholder="e.g., CS101"
+                                class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm"
+                                required>
+                        </div>
+                        <div>
+                            <label for="totalLectures" class="block text-sm font-medium text-gray-600">Total
+                                Lectures</label>
+                            <input type="number" id="totalLectures" placeholder="e.g., 25" min="1"
+                                class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm"
+                                required>
+                        </div>
+                        <div>
+                            <label for="subjectPriority"
+                                class="block text-sm font-medium text-gray-600">Priority</label>
+                            <select id="subjectPriority"
+                                class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm">
+                                <option value="medium">Medium</option>
+                                <option value="high">High</option>
+                                <option value="low">Low</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="subjectColor" class="block text-sm font-medium text-gray-600">Color Code</label>
+                            <input type="color" id="subjectColor" value="#4f46e5"
+                                class="mt-1 block w-full h-10 bg-white border border-gray-300 rounded-md shadow-sm">
+                        </div>
+                        <button type="submit"
+                            class="w-full bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-indigo-700 transition-colors">
+                            <i class="fas fa-plus-circle mr-2"></i>Subject Add Karein
+                        </button>
+                    </form>
+                    <div id="subjectList" class="mt-6 space-y-3">
+                        <!-- Subjects will be dynamically inserted here -->
+                    </div>
+                </div>
+
+                <!-- Study Hours Configuration -->
+                <div class="bg-white p-6 rounded-2xl shadow-md">
+                    <h2 class="text-2xl font-bold mb-4 border-b pb-3 text-gray-700">Study Hours Set Karein</h2>
+                    <div class="space-y-4" id="studyHoursForm">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label for="mondayHours" class="block text-sm font-medium text-gray-600">Monday</label>
+                                <input type="number" id="mondayHours" value="2" min="0"
+                                    class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm">
+                            </div>
+                            <div>
+                                <label for="tuesdayHours"
+                                    class="block text-sm font-medium text-gray-600">Tuesday</label>
+                                <input type="number" id="tuesdayHours" value="2" min="0"
+                                    class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm">
+                            </div>
+                            <div>
+                                <label for="wednesdayHours"
+                                    class="block text-sm font-medium text-gray-600">Wednesday</label>
+                                <input type="number" id="wednesdayHours" value="2" min="0"
+                                    class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm">
+                            </div>
+                            <div>
+                                <label for="thursdayHours"
+                                    class="block text-sm font-medium text-gray-600">Thursday</label>
+                                <input type="number" id="thursdayHours" value="2" min="0"
+                                    class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm">
+                            </div>
+                            <div>
+                                <label for="fridayHours" class="block text-sm font-medium text-gray-600">Friday</label>
+                                <input type="number" id="fridayHours" value="2" min="0"
+                                    class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm">
+                            </div>
+                            <div>
+                                <label for="saturdayHours"
+                                    class="block text-sm font-medium text-gray-600">Saturday</label>
+                                <input type="number" id="saturdayHours" value="4" min="0"
+                                    class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm">
+                            </div>
+                            <div>
+                                <label for="sundayHours" class="block text-sm font-medium text-gray-600">Sunday</label>
+                                <input type="number" id="sundayHours" value="4" min="0"
+                                    class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm">
+                            </div>
+                        </div>
+                        <button id="updateScheduleBtn"
+                            class="w-full bg-green-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-green-700 transition-colors">
+                            <i class="fas fa-sync-alt mr-2"></i>Schedule Update Karein
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="bg-white p-6 rounded-2xl shadow-md">
+                    <h2 class="text-2xl font-bold mb-4 border-b pb-3 text-gray-700">Quick Actions</h2>
+                    <div class="grid grid-cols-2 gap-4">
+                        <button id="clearDataBtn"
+                            class="p-3 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors">
+                            <i class="fas fa-trash-alt mr-2"></i>Clear Data
+                        </button>
+                        <button id="exportDataBtn"
+                            class="p-3 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors">
+                            <i class="fas fa-file-export mr-2"></i>Export Data
+                        </button>
+                        <button id="importDataBtn"
+                            class="p-3 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors">
+                            <i class="fas fa-file-import mr-2"></i>Import Data
+                        </button>
+                        <button id="addReminderBtn"
+                            class="p-3 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition-colors">
+                            <i class="fas fa-bell mr-2"></i>Add Reminder
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Schedule and Progress -->
+            <div class="main-content lg:w-2/3 space-y-8">
+                <!-- Weekly Schedule View -->
+                <div class="bg-white p-6 rounded-2xl shadow-md">
+                    <div class="flex flex-col sm:flex-row justify-between items-center mb-4 border-b pb-3">
+                        <h2 class="text-2xl font-bold text-gray-700 mb-2 sm:mb-0">Study Plan</h2>
+                        <div class="flex items-center space-x-2">
+                            <button id="prevWeekBtn" class="p-2 rounded-full hover:bg-gray-200 transition-colors"><i
+                                    class="fas fa-chevron-left"></i></button>
+                            <button id="todayBtn"
+                                class="px-4 py-2 text-sm font-semibold rounded-lg bg-indigo-100 text-indigo-700 hover:bg-indigo-200">Today</button>
+                            <button id="nextWeekBtn" class="p-2 rounded-full hover:bg-gray-200 transition-colors"><i
+                                    class="fas fa-chevron-right"></i></button>
+                        </div>
+                    </div>
+                    <p id="weekRange" class="text-center font-semibold text-gray-600 mb-4"></p>
+                    <!-- Week Completion Message -->
+                    <div id="weekCompletionMessage"
+                        class="hidden mb-4 p-4 bg-green-100 border-l-4 border-green-500 text-green-700 rounded-md">
+                        <div class="flex items-center">
+                            <i class="fas fa-trophy text-green-500 text-xl mr-3"></i>
+                            <div>
+                                <p class="font-bold">Congratulations! 🎉</p>
+                                <p class="text-sm">You've completed all lectures for this week! Great job!</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="weeklySchedule"
+                        class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4">
+                        <!-- Schedule will be dynamically inserted here -->
+                    </div>
+                </div>
+
+                <!-- Analytics Dashboard -->
+                <div class="bg-white p-6 rounded-2xl shadow-md">
+                    <h2 class="text-2xl font-bold mb-4 border-b pb-3 text-gray-700">Study Analytics & History</h2>
+
+                    <!-- Tabs -->
+                    <div class="flex mb-4">
+                        <button class="tab-button active" data-tab="charts">Progress & Distribution</button>
+                        <button class="tab-button" data-tab="history">Weekly History</button>
+                    </div>
+
+                    <!-- Tab Content -->
+                    <div id="charts" class="tab-content active">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <h3 class="text-lg font-semibold mb-2">Progress Overview</h3>
+                                <canvas id="progressChart" width="400" height="200"></canvas>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-semibold mb-2">Time Distribution</h3>
+                                <canvas id="timeChart" width="400" height="200"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="history" class="tab-content">
+                        <div class="mt-6">
+                            <h3 class="text-lg font-semibold mb-2">Weekly Study History</h3>
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full bg-white border border-gray-300 rounded-lg">
+                                    <thead>
+                                        <tr class="bg-gray-100">
+                                            <th class="py-2 px-4 border-b text-left">Week</th>
+                                            <th class="py-2 px-4 border-b text-left">Sessions</th>
+                                            <th class="py-2 px-4 border-b text-left">Completed</th>
+                                            <th class="py-2 px-4 border-b text-left">Completion %</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="studyHistoryTable">
+                                        <!-- Study history will be dynamically inserted here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div class="bg-blue-50 p-4 rounded-lg text-center">
+                            <p class="text-sm text-blue-600">Total Subjects</p>
+                            <p id="totalSubjects" class="text-2xl font-bold text-blue-700">0</p>
+                        </div>
+                        <div class="bg-green-50 p-4 rounded-lg text-center">
+                            <p class="text-sm text-green-600">Completed</p>
+                            <p id="totalCompleted" class="text-2xl font-bold text-green-700">0</p>
+                        </div>
+                        <div class="bg-yellow-50 p-4 rounded-lg text-center">
+                            <p class="text-sm text-yellow-600">This Week</p>
+                            <p id="weekSessions" class="text-2xl font-bold text-yellow-700">0</p>
+                        </div>
+                        <div class="bg-purple-50 p-4 rounded-lg text-center">
+                            <p class="text-sm text-purple-600">Remaining</p>
+                            <p id="totalRemaining" class="text-2xl font-bold text-purple-700">0</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Subject Progress View -->
+                <div class="bg-white p-6 rounded-2xl shadow-md">
+                    <h2 class="text-2xl font-bold mb-4 border-b pb-3 text-gray-700">Subject Progress</h2>
+                    <div id="progressContainer" class="space-y-4">
+                        <!-- Progress bars will be dynamically inserted here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer-gradient text-white shadow-lg">
+        <div class="container-fluid py-4 mt-8">
+            <div class="container mx-auto px-6 text-center text-white">
+                <p>Study Calendar by asimcridio - A Smart Way to Organize Your Study Schedule</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Modal for editing a subject -->
+    <div id="editModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-2xl bg-white">
+            <div class="mt-3 text-center">
+                <h3 class="text-lg leading-6 font-medium text-gray-900">Subject Edit Karein</h3>
+                <div class="mt-2 px-7 py-3 text-left">
+                    <form id="editSubjectForm" class="space-y-4">
+                        <input type="hidden" id="editSubjectId">
+                        <div>
+                            <label for="editSubjectName" class="block text-sm font-medium text-gray-600">Subject ka
+                                Naam</label>
+                            <input type="text" id="editSubjectName"
+                                class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md" required>
+                        </div>
+                        <div>
+                            <label for="editTotalLectures" class="block text-sm font-medium text-gray-600">Total
+                                Lectures</label>
+                            <input type="number" id="editTotalLectures"
+                                class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md" required
+                                min="1">
+                        </div>
+                        <div>
+                            <label for="editSubjectPriority"
+                                class="block text-sm font-medium text-gray-600">Priority</label>
+                            <select id="editSubjectPriority"
+                                class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md">
+                                <option value="high">High</option>
+                                <option value="medium">Medium</option>
+                                <option value="low">Low</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="editSubjectColor" class="block text-sm font-medium text-gray-600">Color
+                                Code</label>
+                            <input type="color" id="editSubjectColor"
+                                class="mt-1 block w-full h-10 bg-white border border-gray-300 rounded-md">
+                        </div>
+                    </form>
+                </div>
+                <div class="items-center px-4 py-3">
+                    <button id="saveEditBtn"
+                        class="px-4 py-2 bg-indigo-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-indigo-600">
+                        Changes Save Karein
+                    </button>
+                    <button id="closeModalBtn"
+                        class="mt-2 px-4 py-2 bg-gray-200 text-gray-800 text-base font-medium rounded-md w-full shadow-sm hover:bg-gray-300">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Subject Notes Modal -->
+    <div id="subjectNotesModal"
+        class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-2xl bg-white">
+            <div class="mt-3 text-center">
+                <h3 class="text-lg leading-6 font-medium text-gray-900">Subject Notes</h3>
+                <div class="mt-2 px-7 py-3 text-left">
+                    <form id="addSubjectNoteForm" class="space-y-4">
+                        <input type="hidden" id="subjectNotesId">
+                        <div>
+                            <label for="newSubjectNote" class="block text-sm font-medium text-gray-600">Add New
+                                Note</label>
+                            <textarea id="newSubjectNote" rows="3"
+                                class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md"
+                                placeholder="Yahan naya note likhein..."></textarea>
+                        </div>
+                        <button type="submit"
+                            class="w-full bg-indigo-500 text-white text-sm font-medium py-2 rounded-md hover:bg-indigo-600">
+                            Add Note
+                        </button>
+                    </form>
+                    <div id="subjectNotesList" class="mt-4 max-h-60 overflow-y-auto">
+                        <!-- Subject notes will be dynamically inserted here -->
+                    </div>
+                </div>
+                <div class="items-center px-4 py-3">
+                    <button id="closeSubjectNotesModalBtn"
+                        class="mt-2 px-4 py-2 bg-gray-200 text-gray-800 text-base font-medium rounded-md w-full shadow-sm hover:bg-gray-300">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lecture Notes Modal -->
+    <div id="lectureNotesModal"
+        class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-2xl bg-white">
+            <div class="mt-3 text-center">
+                <h3 class="text-lg leading-6 font-medium text-gray-900">Lecture Notes</h3>
+                <div class="mt-2 px-7 py-3 text-left">
+                    <form id="addLectureNoteForm" class="space-y-4">
+                        <input type="hidden" id="lectureNotesDate">
+                        <input type="hidden" id="lectureNotesIndex">
+                        <div>
+                            <label for="newLectureNote" class="block text-sm font-medium text-gray-600">Add New
+                                Note</label>
+                            <textarea id="newLectureNote" rows="3"
+                                class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md"
+                                placeholder="Yahan naya note likhein..."></textarea>
+                        </div>
+                        <button type="submit"
+                            class="w-full bg-indigo-500 text-white text-sm font-medium py-2 rounded-md hover:bg-indigo-600">
+                            Add Note
+                        </button>
+                    </form>
+                    <div id="lectureNotesList" class="mt-4 max-h-60 overflow-y-auto">
+                        <!-- Lecture notes will be dynamically inserted here -->
+                    </div>
+                </div>
+                <div class="items-center px-4 py-3">
+                    <button id="closeLectureNotesModalBtn"
+                        class="mt-2 px-4 py-2 bg-gray-200 text-gray-800 text-base font-medium rounded-md w-full shadow-sm hover:bg-gray-300">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Lecture Modal -->
+    <div id="addLectureModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-2xl bg-white">
+            <div class="mt-3 text-center">
+                <h3 class="text-lg leading-6 font-medium text-gray-900">Add Lecture</h3>
+                <div class="mt-2 px-7 py-3 text-left">
+                    <input type="hidden" id="addLectureDate">
+                    <div id="subjectsForLecture" class="max-h-80 overflow-y-auto space-y-2">
+                        <!-- Subjects will be dynamically inserted here -->
+                    </div>
+                </div>
+                <div class="items-center px-4 py-3">
+                    <button id="closeAddLectureModalBtn"
+                        class="mt-2 px-4 py-2 bg-gray-200 text-gray-800 text-base font-medium rounded-md w-full shadow-sm hover:bg-gray-300">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reminder Modal -->
+    <div id="reminderModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-2xl bg-white">
+            <div class="mt-3 text-center">
+                <h3 class="text-lg leading-6 font-medium text-gray-900">Reminder Add Karein</h3>
+                <div class="mt-2 px-7 py-3 text-left">
+                    <form id="reminderForm" class="space-y-4">
+                        <div>
+                            <label for="reminderTitle" class="block text-sm font-medium text-gray-600">Reminder
+                                Title</label>
+                            <input type="text" id="reminderTitle"
+                                class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md" required>
+                        </div>
+                        <div>
+                            <label for="reminderDate" class="block text-sm font-medium text-gray-600">Date</label>
+                            <input type="date" id="reminderDate"
+                                class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md" required>
+                        </div>
+                        <div>
+                            <label for="reminderTime" class="block text-sm font-medium text-gray-600">Time</label>
+                            <input type="time" id="reminderTime"
+                                class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="items-center px-4 py-3">
+                    <button id="saveReminderBtn"
+                        class="px-4 py-2 bg-indigo-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-indigo-600">
+                        Reminder Save Karein
+                    </button>
+                    <button id="closeReminderModalBtn"
+                        class="mt-2 px-4 py-2 bg-gray-200 text-gray-800 text-base font-medium rounded-md w-full shadow-sm hover:bg-gray-300">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Import Modal -->
+    <div id="importModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-2xl bg-white">
+            <div class="mt-3 text-center">
+                <h3 class="text-lg leading-6 font-medium text-gray-900">Data Import Karein</h3>
+                <div class="mt-2 px-7 py-3 text-left">
+                    <p class="text-sm text-gray-600 mb-4">Yahan se apna study data import kar sakte hain:</p>
+                    <input type="file" id="importFile"
+                        class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md" accept=".json">
+                </div>
+                <div class="items-center px-4 py-3">
+                    <button id="confirmImportBtn"
+                        class="px-4 py-2 bg-green-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-green-600">
+                        Import Karein
+                    </button>
+                    <button id="closeImportModalBtn"
+                        class="mt-2 px-4 py-2 bg-gray-200 text-gray-800 text-base font-medium rounded-md w-full shadow-sm hover:bg-gray-300">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Element Refs
+            const addSubjectForm = document.getElementById('addSubjectForm');
+            const subjectList = document.getElementById('subjectList');
+            const progressContainer = document.getElementById('progressContainer');
+            const weeklySchedule = document.getElementById('weeklySchedule');
+            const updateScheduleBtn = document.getElementById('updateScheduleBtn');
+            const editModal = document.getElementById('editModal');
+            const closeModalBtn = document.getElementById('closeModalBtn');
+            const saveEditBtn = document.getElementById('saveEditBtn');
+            const editSubjectId = document.getElementById('editSubjectId');
+            const editSubjectName = document.getElementById('editSubjectName');
+            const editTotalLectures = document.getElementById('editTotalLectures');
+            const editSubjectPriority = document.getElementById('editSubjectPriority');
+            const editSubjectColor = document.getElementById('editSubjectColor');
+            const prevWeekBtn = document.getElementById('prevWeekBtn');
+            const nextWeekBtn = document.getElementById('nextWeekBtn');
+            const todayBtn = document.getElementById('todayBtn');
+            const weekRangeEl = document.getElementById('weekRange');
+            const notificationArea = document.getElementById('notificationArea');
+            const clearDataBtn = document.getElementById('clearDataBtn');
+            const exportDataBtn = document.getElementById('exportDataBtn');
+            const importDataBtn = document.getElementById('importDataBtn');
+            const addReminderBtn = document.getElementById('addReminderBtn');
+            const reminderModal = document.getElementById('reminderModal');
+            const saveReminderBtn = document.getElementById('saveReminderBtn');
+            const closeReminderModalBtn = document.getElementById('closeReminderModalBtn');
+            const importModal = document.getElementById('importModal');
+            const confirmImportBtn = document.getElementById('confirmImportBtn');
+            const closeImportModalBtn = document.getElementById('closeImportModalBtn');
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const sidebar = document.querySelector('.sidebar');
+            const mainContent = document.querySelector('.main-content');
+            const lectureNotesModal = document.getElementById('lectureNotesModal');
+            const closeLectureNotesModalBtn = document.getElementById('closeLectureNotesModalBtn');
+            const addLectureNoteForm = document.getElementById('addLectureNoteForm');
+            const newLectureNote = document.getElementById('newLectureNote');
+            const lectureNotesList = document.getElementById('lectureNotesList');
+            const weekCompletionMessage = document.getElementById('weekCompletionMessage');
+            const darkModeToggle = document.getElementById('darkModeToggle');
+            const subjectNotesModal = document.getElementById('subjectNotesModal');
+            const closeSubjectNotesModalBtn = document.getElementById('closeSubjectNotesModalBtn');
+            const addSubjectNoteForm = document.getElementById('addSubjectNoteForm');
+            const newSubjectNote = document.getElementById('newSubjectNote');
+            const subjectNotesList = document.getElementById('subjectNotesList');
+            const subjectNotesId = document.getElementById('subjectNotesId');
+            const studyHistoryTable = document.getElementById('studyHistoryTable');
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const tabContents = document.querySelectorAll('.tab-content');
+            const undoBtn = document.getElementById('undoBtn');
+            const redoBtn = document.getElementById('redoBtn');
+            const addLectureModal = document.getElementById('addLectureModal');
+            const closeAddLectureModalBtn = document.getElementById('closeAddLectureModalBtn');
+            const subjectsForLecture = document.getElementById('subjectsForLecture');
+            const addLectureDate = document.getElementById('addLectureDate');
+
+            // Charts
+            let progressChart, timeChart;
+
+            // App State
+            let subjects = JSON.parse(localStorage.getItem('studySubjects')) || [];
+            let schedule = JSON.parse(localStorage.getItem('studySchedule')) || {};
+            let studyHours = JSON.parse(localStorage.getItem('studyHours')) || {
+                monday: 2, tuesday: 2, wednesday: 2, thursday: 2, friday: 2, saturday: 4, sunday: 4
+            };
+            let reminders = JSON.parse(localStorage.getItem('studyReminders')) || [];
+            let studyHistory = JSON.parse(localStorage.getItem('studyHistory')) || [];
+            let currentDate = new Date();
+            let isDarkMode = localStorage.getItem('darkMode') === 'true';
+
+            // Undo/Redo System
+            let undoStack = [];
+            let redoStack = [];
+            let maxUndoSteps = 20;
+
+            // Initialize UI based on saved settings
+            document.getElementById('mondayHours').value = studyHours.monday;
+            document.getElementById('tuesdayHours').value = studyHours.tuesday;
+            document.getElementById('wednesdayHours').value = studyHours.wednesday;
+            document.getElementById('thursdayHours').value = studyHours.thursday;
+            document.getElementById('fridayHours').value = studyHours.friday;
+            document.getElementById('saturdayHours').value = studyHours.saturday;
+            document.getElementById('sundayHours').value = studyHours.sunday;
+
+            // Apply dark mode if enabled
+            if (isDarkMode) {
+                document.body.classList.add('dark-mode');
+                darkModeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+            }
+
+            // Save state for undo/redo
+            const saveState = () => {
+                const state = {
+                    subjects: JSON.parse(JSON.stringify(subjects)),
+                    schedule: JSON.parse(JSON.stringify(schedule)),
+                    studyHours: JSON.parse(JSON.stringify(studyHours)),
+                    reminders: JSON.parse(JSON.stringify(reminders)),
+                    studyHistory: JSON.parse(JSON.stringify(studyHistory))
+                };
+
+                undoStack.push(state);
+                if (undoStack.length > maxUndoSteps) {
+                    undoStack.shift();
+                }
+                redoStack = [];
+            };
+
+            // Undo functionality
+            const undo = () => {
+                if (undoStack.length > 0) {
+                    const currentState = {
+                        subjects: JSON.parse(JSON.stringify(subjects)),
+                        schedule: JSON.parse(JSON.stringify(schedule)),
+                        studyHours: JSON.parse(JSON.stringify(studyHours)),
+                        reminders: JSON.parse(JSON.stringify(reminders)),
+                        studyHistory: JSON.parse(JSON.stringify(studyHistory))
+                    };
+
+                    redoStack.push(currentState);
+                    const previousState = undoStack.pop();
+
+                    subjects = previousState.subjects;
+                    schedule = previousState.schedule;
+                    studyHours = previousState.studyHours;
+                    reminders = previousState.reminders;
+                    studyHistory = previousState.studyHistory;
+
+                    saveData();
+                    renderAll();
+                    showNotification('Action undone', 'info');
+                } else {
+                    showNotification('Nothing to undo', 'warning');
+                }
+            };
+
+            // Redo functionality
+            const redo = () => {
+                if (redoStack.length > 0) {
+                    const currentState = {
+                        subjects: JSON.parse(JSON.stringify(subjects)),
+                        schedule: JSON.parse(JSON.stringify(schedule)),
+                        studyHours: JSON.parse(JSON.stringify(studyHours)),
+                        reminders: JSON.parse(JSON.stringify(reminders)),
+                        studyHistory: JSON.parse(JSON.stringify(studyHistory))
+                    };
+
+                    undoStack.push(currentState);
+                    const nextState = redoStack.pop();
+
+                    subjects = nextState.subjects;
+                    schedule = nextState.schedule;
+                    studyHours = nextState.studyHours;
+                    reminders = nextState.reminders;
+                    studyHistory = nextState.studyHistory;
+
+                    saveData();
+                    renderAll();
+                    showNotification('Action redone', 'info');
+                } else {
+                    showNotification('Nothing to redo', 'warning');
+                }
+            };
+
+            // Tab functionality
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const tabId = button.getAttribute('data-tab');
+
+                    // Remove active class from all buttons and contents
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    tabContents.forEach(content => content.classList.remove('active'));
+
+                    // Add active class to clicked button and corresponding content
+                    button.classList.add('active');
+                    document.getElementById(tabId).classList.add('active');
+                });
+            });
+
+            const renderAll = () => {
+                renderSubjects();
+                renderProgress();
+                renderSchedule();
+                renderAnalytics();
+                renderStudyHistory();
+                checkReminders();
+                checkWeekCompletion();
+            };
+
+            const saveData = () => {
+                localStorage.setItem('studySubjects', JSON.stringify(subjects));
+                localStorage.setItem('studySchedule', JSON.stringify(schedule));
+                localStorage.setItem('studyHours', JSON.stringify(studyHours));
+                localStorage.setItem('studyReminders', JSON.stringify(reminders));
+                localStorage.setItem('studyHistory', JSON.stringify(studyHistory));
+            };
+
+            const getMonday = (d) => {
+                d = new Date(d);
+                const day = d.getDay();
+                const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+                return new Date(d.setDate(diff));
+            };
+
+            const getPriorityColor = (priority) => {
+                switch (priority) {
+                    case 'high': return 'bg-red-500';
+                    case 'medium': return 'bg-yellow-500';
+                    case 'low': return 'bg-green-500';
+                    default: return 'bg-gray-500';
+                }
+            };
+
+            const getPriorityClass = (priority) => {
+                switch (priority) {
+                    case 'high': return 'priority-high';
+                    case 'medium': return 'priority-medium';
+                    case 'low': return 'priority-low';
+                    default: return '';
+                }
+            };
+
+            // ---- NOTIFICATION SYSTEM ----
+            const showNotification = (message, type = 'info') => {
+                const bgColor = {
+                    'info': 'bg-blue-100 border-blue-500 text-blue-700',
+                    'success': 'bg-green-100 border-green-500 text-green-700',
+                    'warning': 'bg-yellow-100 border-yellow-500 text-yellow-700',
+                    'error': 'bg-red-100 border-red-500 text-red-700'
+                }[type];
+
+                const notification = document.createElement('div');
+                notification.className = `notification p-4 border-l-4 rounded-md shadow-sm fade-in ${bgColor}`;
+                notification.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <p>${message}</p>
+                        <button class="text-gray-500 hover:text-gray-700 close-notification">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                `;
+                notificationArea.appendChild(notification);
+
+                // Auto remove after 5 seconds
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.style.opacity = '0';
+                        setTimeout(() => notification.remove(), 300);
+                    }
+                }, 5000);
+
+                // Close button functionality
+                notification.querySelector('.close-notification').addEventListener('click', () => {
+                    notification.style.opacity = '0';
+                    setTimeout(() => notification.remove(), 300);
+                });
+            };
+
+            // ---- DARK MODE TOGGLE ----
+            darkModeToggle.addEventListener('click', () => {
+                isDarkMode = !isDarkMode;
+                document.body.classList.toggle('dark-mode');
+
+                if (isDarkMode) {
+                    darkModeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+                } else {
+                    darkModeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+                }
+
+                localStorage.setItem('darkMode', isDarkMode);
+            });
+
+            // ---- SUBJECT MANAGEMENT ----
+            const renderSubjects = () => {
+                subjectList.innerHTML = '';
+                if (subjects.length === 0) {
+                    subjectList.innerHTML = `<p class="text-gray-500 text-sm">Abhi tak koi subject add nahi hua.</p>`;
+                    return;
+                }
+                subjects.forEach(subject => {
+                    const hasNotes = subject.notes && subject.notes.length > 0;
+                    const subjectEl = document.createElement('div');
+                    subjectEl.className = `p-3 bg-gray-100 rounded-lg ${getPriorityClass(subject.priority)} fade-in`;
+                    subjectEl.innerHTML = `
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center">
+                                <span class="w-3 h-3 rounded-full mr-3" style="background-color: ${subject.color || '#4f46e5'}"></span>
+                                <div>
+                                    <p class="font-semibold">${subject.name}</p>
+                                    <p class="text-sm text-gray-500">${subject.completed} / ${subject.total} lectures</p>
+                                </div>
+                            </div>
+                            <div>
+                                <button class="subject-notes-btn text-gray-500 hover:text-gray-700 mr-2" data-id="${subject.id}">
+                                    <i class="fas fa-sticky-note"></i>
+                                    ${hasNotes ? '<span class="absolute -top-1 -right-1 bg-indigo-500 text-white rounded-full w-4 h-4 text-xs flex items-center justify-center">' + subject.notes.length + '</span>' : ''}
+                                </button>
+                                <button class="edit-btn text-blue-500 hover:text-blue-700 mr-2" data-id="${subject.id}">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="delete-btn text-red-500 hover:text-red-700" data-id="${subject.id}">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    subjectList.appendChild(subjectEl);
+                });
+            };
+
+            addSubjectForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const name = document.getElementById('subjectName').value.trim();
+                const total = parseInt(document.getElementById('totalLectures').value);
+                const priority = document.getElementById('subjectPriority').value;
+                const color = document.getElementById('subjectColor').value;
+
+                if (name && total > 0) {
+                    saveState();
+                    subjects.push({
+                        id: Date.now(),
+                        name,
+                        total,
+                        completed: 0,
+                        priority,
+                        color,
+                        notes: []
+                    });
+                    addSubjectForm.reset();
+                    document.getElementById('subjectColor').value = '#4f46e5';
+                    generateSchedule();
+                    saveData();
+                    renderAll();
+                    showNotification(`Subject "${name}" successfully added!`, 'success');
+                }
+            });
+
+            subjectList.addEventListener('click', (e) => {
+                const target = e.target.closest('button');
+                if (!target) return;
+                const id = parseInt(target.dataset.id);
+
+                if (target.classList.contains('delete-btn')) {
+                    const subject = subjects.find(s => s.id === id);
+                    if (confirm(`Kya aap sure hain "${subject.name}" subject delete karna chahte hain?`)) {
+                        saveState();
+                        subjects = subjects.filter(s => s.id !== id);
+                        generateSchedule();
+                        saveData();
+                        renderAll();
+                        showNotification(`Subject "${subject.name}" deleted successfully.`, 'success');
+                    }
+                }
+
+                if (target.classList.contains('edit-btn')) {
+                    const subject = subjects.find(s => s.id === id);
+                    editSubjectId.value = subject.id;
+                    editSubjectName.value = subject.name;
+                    editTotalLectures.value = subject.total;
+                    editSubjectPriority.value = subject.priority;
+                    editSubjectColor.value = subject.color || '#4f46e5';
+                    editModal.classList.remove('hidden');
+                }
+
+                if (target.classList.contains('subject-notes-btn')) {
+                    const subject = subjects.find(s => s.id === id);
+                    subjectNotesId.value = subject.id;
+                    newSubjectNote.value = '';
+                    renderSubjectNotes(subject.id);
+                    subjectNotesModal.classList.remove('hidden');
+                }
+            });
+
+            closeModalBtn.addEventListener('click', () => editModal.classList.add('hidden'));
+
+            saveEditBtn.addEventListener('click', () => {
+                const id = parseInt(editSubjectId.value);
+                const name = editSubjectName.value.trim();
+                const total = parseInt(editTotalLectures.value);
+                const priority = editSubjectPriority.value;
+                const color = editSubjectColor.value;
+                const subjectIndex = subjects.findIndex(s => s.id === id);
+
+                if (subjectIndex > -1 && name && total > 0) {
+                    saveState();
+                    subjects[subjectIndex].name = name;
+                    subjects[subjectIndex].total = total;
+                    subjects[subjectIndex].priority = priority;
+                    subjects[subjectIndex].color = color;
+                    if (subjects[subjectIndex].completed > total) subjects[subjectIndex].completed = total;
+
+                    generateSchedule();
+                    saveData();
+                    renderAll();
+                    editModal.classList.add('hidden');
+                    showNotification(`Subject "${name}" updated successfully.`, 'success');
+                }
+            });
+
+            // ---- SUBJECT NOTES ----
+            const renderSubjectNotes = (subjectId) => {
+                const subject = subjects.find(s => s.id === subjectId);
+                subjectNotesList.innerHTML = '';
+
+                if (!subject.notes || subject.notes.length === 0) {
+                    subjectNotesList.innerHTML = '<p class="text-gray-500 text-sm text-center">No notes added yet.</p>';
+                    return;
+                }
+
+                subject.notes.forEach((note, noteIndex) => {
+                    const noteEl = document.createElement('div');
+                    noteEl.className = 'p-3 bg-gray-100 rounded-lg mb-2 fade-in';
+                    noteEl.innerHTML = `
+                        <div class="flex justify-between items-start">
+                            <p class="text-sm flex-1" style="word-break: break-all;">${note.text}</p>
+                            <div class="flex space-x-2 ml-2">
+                                <button class="edit-subject-note text-blue-500 text-xs" data-index="${noteIndex}">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="delete-subject-note text-red-500 text-xs" data-index="${noteIndex}">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-1">${new Date(note.timestamp).toLocaleString()}</p>
+                    `;
+                    subjectNotesList.appendChild(noteEl);
+                });
+
+                // Add event listeners for note actions
+                document.querySelectorAll('.edit-subject-note').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const noteIndex = parseInt(button.dataset.index);
+                        const note = subject.notes[noteIndex];
+                        const newText = prompt('Edit your note:', note.text);
+
+                        if (newText !== null && newText.trim() !== '') {
+                            saveState();
+                            subject.notes[noteIndex].text = newText.trim();
+                            saveData();
+                            renderSubjectNotes(subjectId);
+                            renderSubjects();
+                            showNotification('Note updated successfully!', 'success');
+                        }
+                    });
+                });
+
+                document.querySelectorAll('.delete-subject-note').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const noteIndex = parseInt(button.dataset.index);
+
+                        if (confirm('Are you sure you want to delete this note?')) {
+                            saveState();
+                            subject.notes.splice(noteIndex, 1);
+                            saveData();
+                            renderSubjectNotes(subjectId);
+                            renderSubjects();
+                            showNotification('Note deleted successfully!', 'success');
+                        }
+                    });
+                });
+            };
+
+            closeSubjectNotesModalBtn.addEventListener('click', () => {
+                subjectNotesModal.classList.add('hidden');
+            });
+
+            addSubjectNoteForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const subjectId = parseInt(subjectNotesId.value);
+                const noteText = newSubjectNote.value.trim();
+                const subject = subjects.find(s => s.id === subjectId);
+
+                if (noteText === '') {
+                    showNotification('Please enter a note!', 'error');
+                    return;
+                }
+
+                if (subject) {
+                    saveState();
+                    if (!subject.notes) {
+                        subject.notes = [];
+                    }
+
+                    subject.notes.push({
+                        id: Date.now(),
+                        text: noteText,
+                        timestamp: new Date().toISOString()
+                    });
+
+                    saveData();
+                    renderSubjectNotes(subjectId);
+                    renderSubjects();
+                    newSubjectNote.value = '';
+                    showNotification('Note added successfully!', 'success');
+                }
+            });
+
+            // ---- PROGRESS TRACKING ----
+            const renderProgress = () => {
+                progressContainer.innerHTML = '';
+                if (subjects.length === 0) {
+                    progressContainer.innerHTML = `<p class="text-gray-500 text-sm">Progress dekhne ke liye subjects add karein.</p>`;
+                    return;
+                }
+                subjects.forEach(subject => {
+                    const percentage = subject.total > 0 ? (subject.completed / subject.total) * 100 : 0;
+                    const progressEl = document.createElement('div');
+                    progressEl.className = 'fade-in';
+                    progressEl.innerHTML = `
+                        <div class="flex justify-between mb-1">
+                            <span class="text-base font-medium text-gray-700">${subject.name}</span>
+                            <span class="text-sm font-medium text-gray-700">${subject.completed} / ${subject.total}</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2.5">
+                            <div class="h-2.5 rounded-full" style="width: ${percentage}%; background-color: ${subject.color || '#4f46e5'}"></div>
+                        </div>
+                    `;
+                    progressContainer.appendChild(progressEl);
+                });
+            };
+
+            // ---- ANALYTICS ----
+            const renderAnalytics = () => {
+                // Update stats
+                document.getElementById('totalSubjects').textContent = subjects.length;
+                const totalCompleted = subjects.reduce((sum, subject) => sum + subject.completed, 0);
+                document.getElementById('totalCompleted').textContent = totalCompleted;
+
+                const totalLectures = subjects.reduce((sum, subject) => sum + subject.total, 0);
+                document.getElementById('totalRemaining').textContent = totalLectures - totalCompleted;
+
+                // Calculate this week's sessions
+                const monday = getMonday(currentDate);
+                let weekSessions = 0;
+                for (let i = 0; i < 7; i++) {
+                    const date = new Date(monday);
+                    date.setDate(monday.getDate() + i);
+                    const dateString = date.toISOString().split('T')[0];
+                    if (schedule[dateString]) {
+                        weekSessions += schedule[dateString].length;
+                    }
+                }
+                document.getElementById('weekSessions').textContent = weekSessions;
+
+                // Progress Chart
+                const ctx1 = document.getElementById('progressChart').getContext('2d');
+                if (progressChart) progressChart.destroy();
+
+                const subjectNames = subjects.map(s => s.name);
+                const completedLectures = subjects.map(s => s.completed);
+                const totalLecturesPerSubject = subjects.map(s => s.total);
+
+                progressChart = new Chart(ctx1, {
+                    type: 'bar',
+                    data: {
+                        labels: subjectNames,
+                        datasets: [
+                            {
+                                label: 'Completed',
+                                data: completedLectures,
+                                backgroundColor: subjects.map(s => s.color || '#4f46e5'),
+                                borderColor: subjects.map(s => s.color || '#4f46e5'),
+                                borderWidth: 1
+                            },
+                            {
+                                label: 'Total',
+                                data: totalLecturesPerSubject,
+                                backgroundColor: 'rgba(200, 200, 200, 0.5)',
+                                borderColor: 'rgba(200, 200, 200, 1)',
+                                borderWidth: 1
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+
+                // Time Chart
+                const ctx2 = document.getElementById('timeChart').getContext('2d');
+                if (timeChart) timeChart.destroy();
+
+                // Calculate study time distribution by subject
+                const studyTimeBySubject = {};
+                Object.keys(schedule).forEach(date => {
+                    schedule[date].forEach(session => {
+                        if (!studyTimeBySubject[session.subjectName]) {
+                            studyTimeBySubject[session.subjectName] = 0;
+                        }
+                        studyTimeBySubject[session.subjectName]++;
+                    });
+                });
+
+                timeChart = new Chart(ctx2, {
+                    type: 'doughnut',
+                    data: {
+                        labels: Object.keys(studyTimeBySubject),
+                        datasets: [{
+                            data: Object.values(studyTimeBySubject),
+                            backgroundColor: subjects.map(s => s.color || '#4f46e5'),
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'bottom'
+                            }
+                        }
+                    }
+                });
+            };
+
+            // ---- STUDY HISTORY TABLE ----
+            const renderStudyHistory = () => {
+                studyHistoryTable.innerHTML = '';
+
+                if (studyHistory.length === 0) {
+                    studyHistoryTable.innerHTML = `
+                        <tr>
+                            <td colspan="4" class="py-4 px-4 text-center text-gray-500">
+                                No study history available yet.
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+
+                // Show last 5 weeks
+                const recentHistory = studyHistory.slice(-5).reverse();
+
+                recentHistory.forEach(week => {
+                    const completionPercentage = week.totalSessions > 0
+                        ? Math.round((week.completedSessions / week.totalSessions) * 100)
+                        : 0;
+
+                    const row = document.createElement('tr');
+                    row.className = 'border-b';
+                    row.innerHTML = `
+                        <td class="py-2 px-4">${week.weekRange}</td>
+                        <td class="py-2 px-4">${week.totalSessions}</td>
+                        <td class="py-2 px-4">${week.completedSessions}</td>
+                        <td class="py-2 px-4">
+                            <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                <div class="bg-indigo-600 h-2.5 rounded-full" style="width: ${completionPercentage}%"></div>
+                            </div>
+                            <span class="text-xs">${completionPercentage}%</span>
+                        </td>
+                    `;
+                    studyHistoryTable.appendChild(row);
+                });
+            };
+
+            // Update study history
+            const updateStudyHistory = () => {
+                const monday = getMonday(currentDate);
+                const weekStart = new Date(monday);
+                const weekEnd = new Date(monday);
+                weekEnd.setDate(weekEnd.getDate() + 6);
+
+                const weekRange = `${weekStart.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${weekEnd.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
+
+                // Check if this week already exists in history
+                const existingWeekIndex = studyHistory.findIndex(w => w.weekRange === weekRange);
+
+                let totalSessions = 0;
+                let completedSessions = 0;
+
+                for (let i = 0; i < 7; i++) {
+                    const date = new Date(monday);
+                    date.setDate(monday.getDate() + i);
+                    const dateString = date.toISOString().split('T')[0];
+
+                    if (schedule[dateString]) {
+                        totalSessions += schedule[dateString].length;
+                        completedSessions += schedule[dateString].filter(s => s.done).length;
+                    }
+                }
+
+                if (existingWeekIndex !== -1) {
+                    // Update existing week
+                    studyHistory[existingWeekIndex].totalSessions = totalSessions;
+                    studyHistory[existingWeekIndex].completedSessions = completedSessions;
+                } else {
+                    // Add new week
+                    studyHistory.push({
+                        weekRange,
+                        totalSessions,
+                        completedSessions
+                    });
+                }
+
+                saveData();
+                renderStudyHistory();
+            };
+
+            // ---- IMPROVED SCHEDULE GENERATION ----
+            const generateSchedule = () => {
+                saveState();
+
+                // Clear existing schedule but preserve completed lectures
+                const preservedLectures = {};
+                Object.keys(schedule).forEach(date => {
+                    preservedLectures[date] = schedule[date].filter(session => session.done);
+                });
+
+                schedule = {};
+
+                // Get subjects with remaining lectures
+                const subjectsWithRemaining = subjects.filter(s => s.completed < s.total);
+
+                if (subjectsWithRemaining.length === 0) {
+                    // Restore preserved lectures
+                    Object.keys(preservedLectures).forEach(date => {
+                        if (preservedLectures[date].length > 0) {
+                            schedule[date] = preservedLectures[date];
+                        }
+                    });
+                    saveData();
+                    renderSchedule();
+                    return;
+                }
+
+                // Calculate total remaining lectures
+                const totalRemainingLectures = subjectsWithRemaining.reduce((sum, subject) =>
+                    sum + (subject.total - subject.completed), 0);
+
+                // Calculate total available sessions in 12 weeks
+                const totalWeeks = 12;
+                let totalAvailableSessions = 0;
+                const startDate = getMonday(new Date());
+
+                for (let i = 0; i < totalWeeks * 7; i++) {
+                    const date = new Date(startDate);
+                    date.setDate(startDate.getDate() + i);
+                    const dayOfWeek = date.getDay();
+                    const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+                    const dayName = dayNames[dayOfWeek];
+                    totalAvailableSessions += studyHours[dayName] || 0;
+                }
+
+                // Distribute lectures evenly
+                const lecturesPerWeek = Math.min(40, Math.ceil(totalRemainingLectures / totalWeeks));
+
+                let lectureIndex = 0;
+                const allLectures = [];
+
+                // Create array of all lectures to schedule
+                subjectsWithRemaining.forEach(subject => {
+                    const remaining = subject.total - subject.completed;
+                    for (let i = 0; i < remaining; i++) {
+                        allLectures.push({
+                            subjectId: subject.id,
+                            subjectName: subject.name,
+                            color: subject.color,
+                            done: false,
+                            notes: []
+                        });
+                    }
+                });
+
+                // Shuffle lectures for better distribution
+                for (let i = allLectures.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [allLectures[i], allLectures[j]] = [allLectures[j], allLectures[i]];
+                }
+
+                // Schedule lectures
+                for (let week = 0; week < totalWeeks; week++) {
+                    for (let day = 0; day < 7; day++) {
+                        const date = new Date(startDate);
+                        date.setDate(startDate.getDate() + (week * 7) + day);
+                        const dateString = date.toISOString().split('T')[0];
+                        const dayOfWeek = date.getDay();
+                        const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+                        const dayName = dayNames[dayOfWeek];
+                        const dailySessions = studyHours[dayName] || 0;
+
+                        // Start with preserved lectures for this date
+                        schedule[dateString] = preservedLectures[dateString] || [];
+
+                        // Add new lectures
+                        for (let i = schedule[dateString].length; i < dailySessions && lectureIndex < allLectures.length; i++) {
+                            if (lectureIndex < allLectures.length) {
+                                schedule[dateString].push(allLectures[lectureIndex]);
+                                lectureIndex++;
+                            }
+                        }
+                    }
+                }
+
+                saveData();
+            };
+
+            const renderSchedule = () => {
+                weeklySchedule.innerHTML = '';
+                const monday = getMonday(currentDate);
+
+                const weekStart = new Date(monday);
+                const weekEnd = new Date(monday);
+                weekEnd.setDate(weekEnd.getDate() + 6);
+                weekRangeEl.textContent = `${weekStart.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${weekEnd.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
+
+                for (let i = 0; i < 7; i++) {
+                    const date = new Date(monday);
+                    date.setDate(monday.getDate() + i);
+                    const dateString = date.toISOString().split('T')[0];
+                    const isToday = date.toDateString() === new Date().toDateString();
+                    const hasReminders = reminders.some(r => r.date === dateString);
+
+                    const dayEl = document.createElement('div');
+                    dayEl.className = `p-4 rounded-xl subject-card ${isToday ? 'bg-indigo-100 border-2 border-indigo-400' : 'bg-gray-100'} fade-in ${hasReminders ? 'pulse-reminder' : ''}`;
+                    dayEl.dataset.date = dateString;
+
+                    const dayName = date.toLocaleDateString('en-US', { weekday: 'long' });
+                    const dayDate = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+
+                    let dayHTML = `<div class="flex justify-between items-center mb-2">
+                        <h3 class="font-bold text-lg">${dayName}</h3>
+                        ${hasReminders ? '<i class="fas fa-bell text-yellow-500"></i>' : ''}
+                    </div>`;
+                    dayHTML += `<p class="text-sm text-gray-500 mb-3">${dayDate}</p>`;
+
+                    // Add Lecture Button
+                    dayHTML += `<button class="add-lecture-btn rounded-lg hover:bg-indigo-200 transition-colors" data-date="${dateString}">
+                        <i class="fas fa-plus mr-2"></i></button>`;
+
+                    dayHTML += `<div class="space-y-2">`;
+
+                    if (schedule[dateString] && schedule[dateString].length > 0) {
+                        schedule[dateString].forEach((slot, index) => {
+                            const subject = subjects.find(s => s.id === slot.subjectId);
+                            const hasNotes = slot.notes && slot.notes.length > 0;
+                            dayHTML += `
+                                <div class="study-session flex items-center justify-between p-2 rounded-md ${slot.done ? 'bg-green-200 task-completed' : 'bg-white'} cursor-move" draggable="true" data-date="${dateString}" data-index="${index}">
+                                    <div class="flex items-center">
+                                        <span class="w-2.5 h-2.5 rounded-full mr-2" style="background-color: ${subject?.color || '#4f46e5'}"></span>
+                                        <span class="text-sm font-medium">${slot.subjectName}</span>
+                                        ${hasNotes ? '<i class="fas fa-sticky-note text-gray-400 ml-2 text-xs"></i>' : ''}
+                                    </div>
+                                    <div class="flex items-center">
+                                        <button class="notes-btn text-gray-500 hover:text-gray-700 mr-2" data-date="${dateString}" data-index="${index}">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="delete-lecture-btn text-red-500 hover:text-red-700 mr-2" data-date="${dateString}" data-index="${index}">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                        <input type="checkbox" class="done-checkbox h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" data-date="${dateString}" data-index="${index}" ${slot.done ? 'checked' : ''}>
+                                    </div>
+                                </div>
+                            `;
+                        });
+                    } else {
+                        dayHTML += `<p class="text-xs text-gray-400 italic">No lectures scheduled.</p>`;
+                    }
+
+                    // Show reminders for this day
+                    const dayReminders = reminders.filter(r => r.date === dateString);
+                    if (dayReminders.length > 0) {
+                        dayHTML += `<div class="mt-3 pt-2 border-t border-gray-200">`;
+                        dayReminders.forEach(reminder => {
+                            dayHTML += `
+                                <div class="flex items-center text-xs text-purple-600 mb-1">
+                                    <i class="fas fa-bell mr-1"></i>
+                                    <span>${reminder.time} - ${reminder.title}</span>
+                                    <button class="ml-auto text-red-400 delete-reminder" data-id="${reminder.id}">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            `;
+                        });
+                        dayHTML += `</div>`;
+                    }
+
+                    dayHTML += `</div>`;
+                    dayEl.innerHTML = dayHTML;
+                    weeklySchedule.appendChild(dayEl);
+                }
+
+                // Add event listeners for new buttons
+                document.querySelectorAll('.add-lecture-btn').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const date = button.dataset.date;
+                        openAddLectureModal(date);
+                    });
+                });
+
+                document.querySelectorAll('.delete-lecture-btn').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const date = button.dataset.date;
+                        const index = parseInt(button.dataset.index);
+
+                        if (confirm('Are you sure you want to delete this lecture?')) {
+                            saveState();
+                            schedule[date].splice(index, 1);
+                            saveData();
+                            renderSchedule();
+                            showNotification('Lecture deleted successfully!', 'success');
+                        }
+                    });
+                });
+
+                // Add event listeners for reminder delete buttons
+                document.querySelectorAll('.delete-reminder').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const id = parseInt(button.dataset.id);
+                        saveState();
+                        reminders = reminders.filter(r => r.id !== id);
+                        saveData();
+                        renderSchedule();
+                        showNotification('Reminder deleted successfully.', 'success');
+                    });
+                });
+            };
+
+            // ---- ADD LECTURE MODAL ----
+            const openAddLectureModal = (date) => {
+                addLectureDate.value = date;
+                subjectsForLecture.innerHTML = '';
+
+                if (subjects.length === 0) {
+                    subjectsForLecture.innerHTML = '<p class="text-gray-500 text-sm text-center">No subjects available. Please add subjects first.</p>';
+                } else {
+                    subjects.forEach(subject => {
+                        const subjectEl = document.createElement('div');
+                        subjectEl.className = 'flex justify-between items-center p-3 bg-gray-100 rounded-lg mb-2';
+                        subjectEl.innerHTML = `
+                            <div class="flex items-center">
+                                <span class="w-3 h-3 rounded-full mr-3" style="background-color: ${subject.color || '#4f46e5'}"></span>
+                                <span class="font-medium">${subject.name}</span>
+                            </div>
+                            <button class="add-subject-lecture-btn p-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition-colors" data-id="${subject.id}">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        `;
+                        subjectsForLecture.appendChild(subjectEl);
+                    });
+                }
+
+                addLectureModal.classList.remove('hidden');
+
+                // Add event listeners for add buttons
+                document.querySelectorAll('.add-subject-lecture-btn').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const subjectId = parseInt(button.dataset.id);
+                        const subject = subjects.find(s => s.id === subjectId);
+                        const date = addLectureDate.value;
+
+                        if (subject) {
+                            saveState();
+                            if (!schedule[date]) {
+                                schedule[date] = [];
+                            }
+
+                            schedule[date].push({
+                                subjectId: subject.id,
+                                subjectName: subject.name,
+                                color: subject.color,
+                                done: false,
+                                notes: []
+                            });
+
+                            saveData();
+                            renderSchedule();
+                            addLectureModal.classList.add('hidden');
+                            showNotification(`Lecture for ${subject.name} added successfully!`, 'success');
+                        }
+                    });
+                });
+            };
+
+            closeAddLectureModalBtn.addEventListener('click', () => {
+                addLectureModal.classList.add('hidden');
+            });
+
+            // Check if the current week is fully completed
+            const checkWeekCompletion = () => {
+                const monday = getMonday(currentDate);
+                let allCompleted = true;
+                let hasSessions = false;
+
+                for (let i = 0; i < 7; i++) {
+                    const date = new Date(monday);
+                    date.setDate(monday.getDate() + i);
+                    const dateString = date.toISOString().split('T')[0];
+
+                    if (schedule[dateString] && schedule[dateString].length > 0) {
+                        hasSessions = true;
+                        const dayCompleted = schedule[dateString].every(session => session.done);
+                        if (!dayCompleted) {
+                            allCompleted = false;
+                            break;
+                        }
+                    }
+                }
+
+                if (hasSessions && allCompleted) {
+                    weekCompletionMessage.classList.remove('hidden');
+                } else {
+                    weekCompletionMessage.classList.add('hidden');
+                }
+            };
+
+            updateScheduleBtn.addEventListener('click', () => {
+                saveState();
+                studyHours.monday = parseInt(document.getElementById('mondayHours').value);
+                studyHours.tuesday = parseInt(document.getElementById('tuesdayHours').value);
+                studyHours.wednesday = parseInt(document.getElementById('wednesdayHours').value);
+                studyHours.thursday = parseInt(document.getElementById('thursdayHours').value);
+                studyHours.friday = parseInt(document.getElementById('fridayHours').value);
+                studyHours.saturday = parseInt(document.getElementById('saturdayHours').value);
+                studyHours.sunday = parseInt(document.getElementById('sundayHours').value);
+
+                generateSchedule();
+                saveData();
+                renderSchedule();
+                showNotification('Schedule updated successfully!', 'success');
+            });
+
+            weeklySchedule.addEventListener('change', (e) => {
+                if (e.target.classList.contains('done-checkbox')) {
+                    saveState();
+                    const date = e.target.dataset.date;
+                    const index = parseInt(e.target.dataset.index);
+                    const isChecked = e.target.checked;
+                    const slot = schedule[date][index];
+                    const subject = subjects.find(s => s.id === slot.subjectId);
+
+                    if (subject) {
+                        if (isChecked && !slot.done && subject.completed < subject.total) subject.completed++;
+                        else if (!isChecked && slot.done && subject.completed > 0) subject.completed--;
+                    }
+                    slot.done = isChecked;
+                    saveData();
+                    renderProgress();
+                    renderSchedule();
+                    renderAnalytics();
+                    checkWeekCompletion();
+                    updateStudyHistory();
+
+                    if (isChecked) {
+                        showNotification(`Great! You completed a session of ${slot.subjectName}`, 'success');
+                    }
+                }
+            });
+
+            // ---- LECTURE NOTES FUNCTIONALITY ----
+            const renderLectureNotes = (date, index) => {
+                const slot = schedule[date][index];
+                lectureNotesList.innerHTML = '';
+
+                if (!slot.notes || slot.notes.length === 0) {
+                    lectureNotesList.innerHTML = '<p class="text-gray-500 text-sm text-center">No notes added yet.</p>';
+                    return;
+                }
+
+                slot.notes.forEach((note, noteIndex) => {
+                    const noteEl = document.createElement('div');
+                    noteEl.className = 'p-3 bg-gray-100 rounded-lg mb-2 fade-in';
+                    noteEl.innerHTML = `
+                        <div class="flex justify-between items-start">
+                            <p class="text-sm flex-1" style="word-break: break-all;">${note.text}</p>
+                            <div class="flex space-x-2 ml-2">
+                                <button class="edit-lecture-note text-blue-500 text-xs" data-index="${noteIndex}">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="delete-lecture-note text-red-500 text-xs" data-index="${noteIndex}">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-1">${new Date(note.timestamp).toLocaleString()}</p>
+                    `;
+                    lectureNotesList.appendChild(noteEl);
+                });
+
+                // Add event listeners for note actions
+                document.querySelectorAll('.edit-lecture-note').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const noteIndex = parseInt(button.dataset.index);
+                        const note = slot.notes[noteIndex];
+                        const newText = prompt('Edit your note:', note.text);
+
+                        if (newText !== null && newText.trim() !== '') {
+                            saveState();
+                            slot.notes[noteIndex].text = newText.trim();
+                            saveData();
+                            renderLectureNotes(date, index);
+                            showNotification('Note updated successfully!', 'success');
+                        }
+                    });
+                });
+
+                document.querySelectorAll('.delete-lecture-note').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const noteIndex = parseInt(button.dataset.index);
+
+                        if (confirm('Are you sure you want to delete this note?')) {
+                            saveState();
+                            slot.notes.splice(noteIndex, 1);
+                            saveData();
+                            renderLectureNotes(date, index);
+                            renderSchedule();
+                            showNotification('Note deleted successfully!', 'success');
+                        }
+                    });
+                });
+            };
+
+            weeklySchedule.addEventListener('click', (e) => {
+                if (e.target.classList.contains('notes-btn') || e.target.closest('.notes-btn')) {
+                    const btn = e.target.classList.contains('notes-btn') ? e.target : e.target.closest('.notes-btn');
+                    const date = btn.dataset.date;
+                    const index = parseInt(btn.dataset.index);
+
+                    lectureNotesDate.value = date;
+                    lectureNotesIndex.value = index;
+                    newLectureNote.value = '';
+
+                    renderLectureNotes(date, index);
+                    lectureNotesModal.classList.remove('hidden');
+                }
+            });
+
+            closeLectureNotesModalBtn.addEventListener('click', () => {
+                lectureNotesModal.classList.add('hidden');
+            });
+
+            addLectureNoteForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const date = lectureNotesDate.value;
+                const index = parseInt(lectureNotesIndex.value);
+                const noteText = newLectureNote.value.trim();
+
+                if (noteText === '') {
+                    showNotification('Please enter a note!', 'error');
+                    return;
+                }
+
+                if (schedule[date] && schedule[date][index]) {
+                    saveState();
+                    if (!schedule[date][index].notes) {
+                        schedule[date][index].notes = [];
+                    }
+
+                    schedule[date][index].notes.push({
+                        id: Date.now(),
+                        text: noteText,
+                        timestamp: new Date().toISOString()
+                    });
+
+                    saveData();
+                    renderLectureNotes(date, index);
+                    renderSchedule();
+                    newLectureNote.value = '';
+                    showNotification('Note added successfully!', 'success');
+                }
+            });
+
+            // DATE NAVIGATION & DRAG-DROP
+            prevWeekBtn.addEventListener('click', () => {
+                currentDate.setDate(currentDate.getDate() - 7);
+                renderSchedule();
+                checkWeekCompletion();
+            });
+            nextWeekBtn.addEventListener('click', () => {
+                currentDate.setDate(currentDate.getDate() + 7);
+                renderSchedule();
+                checkWeekCompletion();
+            });
+            todayBtn.addEventListener('click', () => {
+                currentDate = new Date();
+                renderSchedule();
+                checkWeekCompletion();
+            });
+
+            let draggedItem = null;
+            weeklySchedule.addEventListener('dragstart', (e) => {
+                draggedItem = e.target;
+                setTimeout(() => e.target.classList.add('dragging'), 0);
+            });
+            weeklySchedule.addEventListener('dragend', (e) => {
+                draggedItem.classList.remove('dragging');
+                draggedItem = null;
+            });
+            weeklySchedule.addEventListener('dragover', (e) => {
+                e.preventDefault();
+            });
+            weeklySchedule.addEventListener('drop', (e) => {
+                e.preventDefault();
+                const target = e.target.closest('[draggable="true"]');
+                if (target && target !== draggedItem) {
+                    saveState();
+                    const sourceDate = draggedItem.dataset.date, sourceIndex = parseInt(draggedItem.dataset.index);
+                    const targetDate = target.dataset.date, targetIndex = parseInt(target.dataset.index);
+                    const sourceSlot = schedule[sourceDate][sourceIndex], targetSlot = schedule[targetDate][targetIndex];
+                    if (sourceSlot && targetSlot) {
+                        [sourceSlot.subjectId, targetSlot.subjectId] = [targetSlot.subjectId, sourceSlot.subjectId];
+                        [sourceSlot.subjectName, targetSlot.subjectName] = [targetSlot.subjectName, sourceSlot.subjectName];
+                        [sourceSlot.color, targetSlot.color] = [targetSlot.color, sourceSlot.color];
+                        [sourceSlot.done, targetSlot.done] = [targetSlot.done, sourceSlot.done];
+                        [sourceSlot.notes, targetSlot.notes] = [targetSlot.notes, sourceSlot.notes];
+                        saveData();
+                        renderSchedule();
+                        showNotification('Session rescheduled successfully.', 'info');
+                    }
+                }
+            });
+
+            // ---- SIDEBAR TOGGLE ----
+            sidebarToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('collapsed');
+                mainContent.classList.toggle('expanded');
+
+                // Update icon
+                const icon = sidebarToggle.querySelector('i');
+                if (sidebar.classList.contains('collapsed')) {
+                    icon.classList.remove('fa-bars');
+                    icon.classList.add('fa-chevron-right');
+                } else {
+                    icon.classList.remove('fa-chevron-right');
+                    icon.classList.add('fa-bars');
+                }
+            });
+
+            // ---- UNDO/REDO FUNCTIONALITY ----
+            undoBtn.addEventListener('click', undo);
+            redoBtn.addEventListener('click', redo);
+
+            // ---- QUICK ACTIONS ----
+            clearDataBtn.addEventListener('click', () => {
+                if (confirm('Kya aap sure hain saara data clear karna chahte hain? Ye action undo nahi ho sakta.')) {
+                    saveState();
+                    subjects = [];
+                    schedule = {};
+                    reminders = [];
+                    studyHistory = [];
+                    saveData();
+                    renderAll();
+                    showNotification('All data cleared successfully.', 'success');
+                }
+            });
+
+            exportDataBtn.addEventListener('click', () => {
+                const data = {
+                    subjects,
+                    schedule,
+                    studyHours,
+                    reminders,
+                    studyHistory,
+                    exportDate: new Date().toISOString()
+                };
+
+                const dataStr = JSON.stringify(data, null, 2);
+                const dataBlob = new Blob([dataStr], { type: 'application/json' });
+
+                const url = URL.createObjectURL(dataBlob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `study-calendar-backup-${new Date().toISOString().split('T')[0]}.json`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+
+                showNotification('Data exported successfully!', 'success');
+            });
+
+            importDataBtn.addEventListener('click', () => {
+                importModal.classList.remove('hidden');
+            });
+
+            closeImportModalBtn.addEventListener('click', () => {
+                importModal.classList.add('hidden');
+            });
+
+            confirmImportBtn.addEventListener('click', () => {
+                const fileInput = document.getElementById('importFile');
+                if (fileInput.files.length === 0) {
+                    showNotification('Please select a file to import.', 'error');
+                    return;
+                }
+
+                const file = fileInput.files[0];
+                const reader = new FileReader();
+
+                reader.onload = (e) => {
+                    try {
+                        const data = JSON.parse(e.target.result);
+
+                        if (data.subjects) subjects = data.subjects;
+                        if (data.schedule) schedule = data.schedule;
+                        if (data.studyHours) studyHours = data.studyHours;
+                        if (data.reminders) reminders = data.reminders;
+                        if (data.studyHistory) studyHistory = data.studyHistory;
+
+                        saveData();
+                        renderAll();
+                        importModal.classList.add('hidden');
+                        showNotification('Data imported successfully!', 'success');
+                    } catch (error) {
+                        showNotification('Error importing data. Please check the file format.', 'error');
+                        console.error(error);
+                    }
+                };
+
+                reader.readAsText(file);
+            });
+
+            // ---- REMINDERS ----
+            addReminderBtn.addEventListener('click', () => {
+                // Set default date to today
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('reminderDate').value = today;
+                document.getElementById('reminderTime').value = '18:00';
+                reminderModal.classList.remove('hidden');
+            });
+
+            closeReminderModalBtn.addEventListener('click', () => {
+                reminderModal.classList.add('hidden');
+            });
+
+            saveReminderBtn.addEventListener('click', () => {
+                const title = document.getElementById('reminderTitle').value.trim();
+                const date = document.getElementById('reminderDate').value;
+                const time = document.getElementById('reminderTime').value;
+
+                if (title && date && time) {
+                    saveState();
+                    reminders.push({
+                        id: Date.now(),
+                        title,
+                        date,
+                        time
+                    });
+
+                    saveData();
+                    renderSchedule();
+                    reminderModal.classList.add('hidden');
+                    showNotification('Reminder added successfully!', 'success');
+                } else {
+                    showNotification('Please fill all reminder fields.', 'error');
+                }
+            });
+
+            const checkReminders = () => {
+                const today = new Date().toISOString().split('T')[0];
+                const now = new Date();
+                const currentTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+
+                reminders.forEach(reminder => {
+                    if (reminder.date === today && reminder.time === currentTime) {
+                        showNotification(`Reminder: ${reminder.title}`, 'warning');
+                    }
+                });
+            };
+
+            // Check reminders every minute
+            setInterval(checkReminders, 60000);
+
+            // Initial Load
+            renderAll();
+            updateStudyHistory();
+
+            // Show welcome message
+            setTimeout(() => {
+                if (subjects.length === 0) {
+                    showNotification('Welcome! Start by adding your subjects and setting study hours.', 'info');
+                }
+            }, 1000);
+        });
+    </script>
+</body>
+
+</html>

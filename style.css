@@ -4,3 +4,28 @@
 #dark-mode-toggle svg {
     margin-left: 0;
 }
+header .relative.my-nav {
+    display: flex;
+    flex-direction: row;
+}
+header .my-nav-ul .my-study-btn {
+    display: inline-block;
+    margin-right: 15px;
+    background-color: #4CAF50; 
+    color: white;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: bold;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+header .my-nav-ul .my-study-btn {
+    background-color: #45a049; 
+    transform: scale(1.05);
+}
+
+header .my-nav-ul .my-study-btn {
+    background-color: #3e8e41;
+    transform: scale(0.98);
+}
