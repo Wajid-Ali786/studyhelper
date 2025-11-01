@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" class=""> <!-- 'dark' class will be toggled here -->
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -27,41 +28,80 @@
     </script>
     <style>
         /* Custom scrollbar */
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-        .dark ::-webkit-scrollbar-thumb { background: #475569; }
-        .dark ::-webkit-scrollbar-thumb:hover { background: #64748b; }
-        body, .app-shell, main, nav { 
-            transition: background-color 0.3s ease, color 0.3s ease, margin-left 0.3s ease, width 0.3s ease; 
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
         }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        .dark ::-webkit-scrollbar-thumb {
+            background: #475569;
+        }
+
+        .dark ::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+
+        body,
+        .app-shell,
+        main,
+        nav {
+            transition: background-color 0.3s ease, color 0.3s ease, margin-left 0.3s ease, width 0.3s ease;
+        }
+
         /* Hide number input spinners */
         input[type='number']::-webkit-outer-spin-button,
-        input[type='number']::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-        input[type='number'] { -moz-appearance: textfield; }
+        input[type='number']::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        input[type='number'] {
+            -moz-appearance: textfield;
+        }
+
         /* Sidebar active state */
         .sidebar-link[data-active="true"] {
-            background-color: #e0f2fe; color: #0284c7; font-weight: 600;
+            background-color: #e0f2fe;
+            color: #0284c7;
+            font-weight: 600;
         }
+
         .dark .sidebar-link[data-active="true"] {
-            background-color: #0c4a6e; color: #e0f2fe;
+            background-color: #0c4a6e;
+            color: #e0f2fe;
         }
+
         /* Modal transitions */
         .modal-backdrop {
+            display: flex;
+            /* Use flex for centering */
             transition: opacity 0.2s ease-in-out;
         }
+
         .modal-content {
             transition: transform 0.2s ease-in-out, opacity 0.2s ease-in-out;
             transform: scale(0.95);
             opacity: 0;
         }
+
         .modal-backdrop.open {
             opacity: 1;
         }
-        .modal-backdrop.open .modal-content {
+
+        .modal-backdrop.open .modal-content.open {
             transform: scale(1);
             opacity: 1;
         }
+
         /* Toast Notification */
         #toast-notification {
             transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
@@ -72,83 +112,186 @@
             right: 1.5rem;
             z-index: 100;
         }
+
         #toast-notification.show {
             transform: translateY(0);
             opacity: 1;
         }
-        
+
         /* Sidebar collapsing */
         nav {
-            width: 16rem; /* w-64 */
+            width: 16rem;
+            /* w-64 */
             transition: width 0.3s ease-in-out;
             z-index: 20;
         }
+
         main {
-            margin-left: 16rem; /* ml-64 */
+            margin-left: 16rem;
+            /* ml-64 */
             width: calc(100% - 16rem);
             transition: margin-left 0.3s ease-in-out, width 0.3s ease-in-out;
         }
+
         nav.collapsed {
-            width: 4.5rem; /* w-18 */
+            width: 4.5rem;
+            /* w-18 */
         }
+
         main.sidebar-collapsed {
             margin-left: 4.5rem;
             width: calc(100% - 4.5rem);
         }
-        
+
         /* Hide text and show tooltips when collapsed */
         nav.collapsed .sidebar-text {
             display: none;
         }
+
         nav:not(.collapsed) .sidebar-tooltip {
             display: none;
         }
+
         nav.collapsed .sidebar-link {
             justify-content: center;
         }
+
         nav.collapsed .sidebar-logo-text {
             display: none;
         }
+
         nav.collapsed #dark-mode-toggle span:first-child {
             margin: 0;
         }
+
         nav.collapsed #dark-mode-toggle span:first-child span {
-             display: none;
+            display: none;
         }
+
         nav.collapsed #dark-mode-toggle {
             justify-content: center;
         }
-        
+
         /* Disabled button styles */
-        button:disabled {
+        button:disabled,
+        .button-disabled {
             opacity: 0.5;
             cursor: not-allowed;
+            background-color: #94a3b8 !important;
+            /* Tailwind slate-400 */
+            border-color: #94a3b8 !important;
         }
 
         /* Quiz answer feedback styles */
         .quiz-option-label.correct {
-            background-color: #dcfce7; /* emerald-100 */
-            border-color: #22c55e; /* emerald-500 */
+            background-color: #dcfce7;
+            /* emerald-100 */
+            border-color: #22c55e;
+            /* emerald-500 */
         }
+
         .dark .quiz-option-label.correct {
-            background-color: #064e3b; /* emerald-900 */
+            background-color: #064e3b;
+            /* emerald-900 */
             border-color: #22c55e;
         }
+
         .quiz-option-label.incorrect {
-            background-color: #fee2e2; /* red-100 */
-            border-color: #ef4444; /* red-500 */
+            background-color: #fee2e2;
+            /* red-100 */
+            border-color: #ef4444;
+            /* red-500 */
         }
+
         .dark .quiz-option-label.incorrect {
-            background-color: #7f1d1d; /* red-900 */
+            background-color: #7f1d1d;
+            /* red-900 */
             border-color: #ef4444;
         }
+
         .quiz-option-label.disabled {
             opacity: 0.7;
             cursor: not-allowed;
         }
+
+        /* Lesson Checkbox Styling */
+        .lesson-checkbox-label {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem;
+            border: 1px solid #cbd5e1;
+            /* slate-300 */
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .dark .lesson-checkbox-label {
+            border-color: #475569;
+            /* slate-600 */
+        }
+
+        .lesson-checkbox-label:hover {
+            background-color: #f8fafc;
+            /* slate-50 */
+        }
+
+        .dark .lesson-checkbox-label:hover {
+            background-color: #1e293b;
+            /* slate-800 */
+        }
+
+        .lesson-checkbox-label input:checked~.lesson-checkbox-content {
+            border-color: #0ea5e9;
+            /* sky-500 */
+            background-color: #f0f9ff;
+            /* sky-50 */
+        }
+
+        .dark .lesson-checkbox-label input:checked~.lesson-checkbox-content {
+            border-color: #0ea5e9;
+            background-color: #0c4a6e;
+            /* sky-900 */
+        }
+
+        .lesson-checkbox-label input:checked+.lesson-checkbox-content .lesson-checkbox-icon {
+            background-color: #0ea5e9;
+            /* sky-500 */
+            border-color: #0ea5e9;
+        }
+
+        .lesson-checkbox-label input:checked+.lesson-checkbox-content .lesson-checkbox-icon svg {
+            display: block;
+        }
+
+        .lesson-checkbox-icon {
+            width: 1.25rem;
+            height: 1.25rem;
+            border: 2px solid #cbd5e1;
+            /* slate-300 */
+            border-radius: 0.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 0.75rem;
+            transition: all 0.2s ease;
+        }
+
+        .dark .lesson-checkbox-icon {
+            border-color: #475569;
+            /* slate-600 */
+        }
+
+        .lesson-checkbox-icon svg {
+            display: none;
+            color: white;
+            width: 0.875rem;
+            height: 0.875rem;
+        }
     </style>
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body class="bg-slate-50 dark:bg-slate-900 font-sans text-slate-900 dark:text-slate-100 antialiased overflow-hidden">
 
     <!-- 
@@ -156,10 +299,14 @@
       APP LOADER
       ================================================================
     -->
-    <div id="app-loader" class="fixed inset-0 flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-900 z-[100]">
-        <svg class="animate-spin h-12 w-12 text-sky-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+    <div id="app-loader"
+        class="fixed inset-0 flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-900 z-[100]">
+        <svg class="animate-spin h-12 w-12 text-sky-600" xmlns="http://www.w3.org/2000/svg" fill="none"
+            viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            <path class="opacity-75" fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+            </path>
         </svg>
         <p class="mt-4 text-lg font-medium text-slate-700 dark:text-slate-300">Loading StudyHelper...</p>
         <p class="text-sm text-slate-500 dark:text-slate-400">Initializing secure session...</p>
@@ -178,49 +325,66 @@
           SIDEBAR
           --------------------------------------
         -->
-        <nav id="sidebar" class="bg-white dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700 flex flex-col shrink-0 overflow-hidden fixed top-0 left-0 h-full">
+        <nav id="sidebar"
+            class="bg-white dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700 flex flex-col shrink-0 overflow-hidden fixed top-0 left-0 h-full">
             <!-- Sidebar Header -->
             <div class="h-16 flex items-center px-6 border-b border-slate-200 dark:border-slate-700 shrink-0">
                 <div class="bg-sky-600 p-2.5 rounded-lg text-white">
                     <i data-lucide="book-open" class="w-6 h-6"></i>
                 </div>
-                <span id="sidebar-logo-text" class="sidebar-logo-text text-xl font-bold ml-3 text-slate-900 dark:text-white">StudyHelper</span>
+                <span id="sidebar-logo-text"
+                    class="sidebar-logo-text text-xl font-bold ml-3 text-slate-900 dark:text-white">StudyHelper</span>
             </div>
 
             <!-- Navigation Links -->
             <div class="flex-grow overflow-y-auto py-6 px-4 space-y-2">
-                <a href="#" class="sidebar-link group relative flex items-center space-x-3 px-3 py-2.5 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700" data-page="page-home">
+                <a href="#"
+                    class="sidebar-link group relative flex items-center space-x-3 px-3 py-2.5 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700"
+                    data-page="page-home">
                     <i data-lucide="home" class="w-5 h-5"></i>
                     <span class="sidebar-text font-medium">Home</span>
-                    <span class="sidebar-tooltip absolute left-14 p-2 px-3 rounded-md shadow-lg bg-slate-900 text-white text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap hidden z-10">
+                    <span
+                        class="sidebar-tooltip absolute left-14 p-2 px-3 rounded-md shadow-lg bg-slate-900 text-white text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap hidden z-10">
                         Home
                     </span>
                 </a>
-                <a href="#" class="sidebar-link group relative flex items-center space-x-3 px-3 py-2.5 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700" data-page="page-manage-bank">
+                <a href="#"
+                    class="sidebar-link group relative flex items-center space-x-3 px-3 py-2.5 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700"
+                    data-page="page-manage-bank">
                     <i data-lucide="database" class="w-5 h-5"></i>
                     <span class="sidebar-text font-medium">Manage Bank</span>
-                    <span class="sidebar-tooltip absolute left-14 p-2 px-3 rounded-md shadow-lg bg-slate-900 text-white text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap hidden z-10">
+                    <span
+                        class="sidebar-tooltip absolute left-14 p-2 px-3 rounded-md shadow-lg bg-slate-900 text-white text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap hidden z-10">
                         Manage Bank
                     </span>
                 </a>
-                <a href="#" class="sidebar-link group relative flex items-center space-x-3 px-3 py-2.5 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700" data-page="page-take-quiz">
+                <a href="#"
+                    class="sidebar-link group relative flex items-center space-x-3 px-3 py-2.5 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700"
+                    data-page="page-take-quiz">
                     <i data-lucide="edit-3" class="w-5 h-5"></i>
                     <span class="sidebar-text font-medium">Take Quiz</span>
-                    <span class="sidebar-tooltip absolute left-14 p-2 px-3 rounded-md shadow-lg bg-slate-900 text-white text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap hidden z-10">
+                    <span
+                        class="sidebar-tooltip absolute left-14 p-2 px-3 rounded-md shadow-lg bg-slate-900 text-white text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap hidden z-10">
                         Take Quiz
                     </span>
                 </a>
-                <a href="#" class="sidebar-link group relative flex items-center space-x-3 px-3 py-2.5 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700" data-page="page-quiz-history">
+                <a href="#"
+                    class="sidebar-link group relative flex items-center space-x-3 px-3 py-2.5 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700"
+                    data-page="page-quiz-history">
                     <i data-lucide="history" class="w-5 h-5"></i>
                     <span class="sidebar-text font-medium">Quiz History</span>
-                    <span class="sidebar-tooltip absolute left-14 p-2 px-3 rounded-md shadow-lg bg-slate-900 text-white text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap hidden z-10">
+                    <span
+                        class="sidebar-tooltip absolute left-14 p-2 px-3 rounded-md shadow-lg bg-slate-900 text-white text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap hidden z-10">
                         Quiz History
                     </span>
                 </a>
-                <a href="#" class="sidebar-link group relative flex items-center space-x-3 px-3 py-2.5 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700" data-page="page-settings">
+                <a href="#"
+                    class="sidebar-link group relative flex items-center space-x-3 px-3 py-2.5 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700"
+                    data-page="page-settings">
                     <i data-lucide="settings" class="w-5 h-5"></i>
                     <span class="sidebar-text font-medium">Settings & Data</span>
-                    <span class="sidebar-tooltip absolute left-14 p-2 px-3 rounded-md shadow-lg bg-slate-900 text-white text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap hidden z-10">
+                    <span
+                        class="sidebar-tooltip absolute left-14 p-2 px-3 rounded-md shadow-lg bg-slate-900 text-white text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap hidden z-10">
                         Settings & Data
                     </span>
                 </a>
@@ -229,7 +393,8 @@
             <!-- Sidebar Footer -->
             <div class="p-4 border-t border-slate-200 dark:border-slate-700 shrink-0">
                 <!-- Dark Mode Toggle -->
-                <button id="dark-mode-toggle" class="w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700">
+                <button id="dark-mode-toggle"
+                    class="w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700">
                     <span class="font-medium flex items-center space-x-3">
                         <i data-lucide="moon" class="w-5 h-5 hidden dark:inline"></i>
                         <i data-lucide="sun" class="w-5 h-5 inline dark:hidden"></i>
@@ -238,7 +403,8 @@
                     <!-- Toggle Switch -->
                     <div class="relative inline-flex items-center cursor-pointer sidebar-text">
                         <span class="w-11 h-6 bg-slate-200 dark:bg-slate-600 rounded-full"></span>
-                        <span id="dark-mode-switch" class="absolute left-1 top-1 w-4 h-4 bg-white dark:bg-slate-300 rounded-full transition-transform dark:translate-x-5"></span>
+                        <span id="dark-mode-switch"
+                            class="absolute left-1 top-1 w-4 h-4 bg-white dark:bg-slate-300 rounded-full transition-transform dark:translate-x-5"></span>
                     </div>
                 </button>
             </div>
@@ -251,36 +417,46 @@
         -->
         <main id="main-content" class="flex-1 flex flex-col overflow-hidden">
             <!-- Main Content Header -->
-            <header class="h-16 bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between px-6 shrink-0">
+            <header
+                class="h-16 bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between px-6 shrink-0 z-10">
                 <div class="flex items-center space-x-3">
-                    <button id="sidebar-toggle-btn" class="p-2 rounded-md text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700">
+                    <button id="sidebar-toggle-btn"
+                        class="p-2 rounded-md text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700">
                         <i data-lucide="panel-left-close" class="w-6 h-6"></i>
                     </button>
                     <h1 id="page-title" class="text-2xl font-bold text-slate-900 dark:text-white">Home</h1>
                 </div>
-                
+
                 <!-- Header Auth Area -->
-                <div class="relative my-nav">
+                <div class="flex items-center space-x-4">
                     <ul class="my-nav-ul">
                         <li><a href="smart-study-calendar-firestore.html" class="my-study-btn">Study Callender</a></li>
                     </ul>
-                    <button id="login-button-header" class="bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center space-x-2 transition duration-150 ease-in-out">
+                    <button id="login-button-header"
+                        class="bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center space-x-2 transition duration-150 ease-in-out">
                         <i data-lucide="log-in" class="w-5 h-5"></i>
                         <span>Login</span>
                     </button>
-                    
-                    <button id="account-button-header" class="hidden w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center hover:ring-2 hover:ring-sky-500 hover:ring-offset-2 dark:hover:ring-offset-slate-800">
-                        <img id="user-avatar" class="w-full h-full rounded-full object-cover" src="https://placehold.co/40x40/e2e8f0/64748b?text=U" alt="User Avatar">
-                    </button>
 
-                    <!-- Account Details Dropdown/Modal -->
-                    <div id="account-modal" class="modal-content hidden absolute top-14 right-0 w-64 bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 z-50 p-4">
-                        <p class="text-sm font-medium text-slate-900 dark:text-white truncate">Welcome!</p>
-                        <p id="account-modal-email" class="text-sm text-slate-500 dark:text-slate-400 truncate mb-4">...</p>
-                        <button id="logout-button" class="w-full flex items-center justify-center space-x-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-semibold py-2.5 px-4 rounded-lg">
-                            <i data-lucide="log-out" class="w-5 h-5"></i>
-                            <span>Sign Out</span>
+                    <div id="account-area" class="relative hidden">
+                        <button id="account-button-header"
+                            class="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center hover:ring-2 hover:ring-sky-500 hover:ring-offset-2 dark:hover:ring-offset-slate-800">
+                            <img id="user-avatar" class="w-full h-full rounded-full object-cover"
+                                src="https://placehold.co/40x40/e2e8f0/64748b?text=U" alt="User Avatar">
                         </button>
+
+                        <!-- Account Details Dropdown/Modal -->
+                        <div id="account-modal"
+                            class="modal-content hidden absolute top-14 right-0 w-64 bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 z-50 p-4">
+                            <p class="text-sm font-medium text-slate-900 dark:text-white truncate">Welcome!</p>
+                            <p id="account-modal-email"
+                                class="text-sm text-slate-500 dark:text-slate-400 truncate mb-4">...</p>
+                            <button id="logout-button"
+                                class="w-full flex items-center justify-center space-x-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-semibold py-2.5 px-4 rounded-lg">
+                                <i data-lucide="log-out" class="w-5 h-5"></i>
+                                <span>Sign Out</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </header>
@@ -299,12 +475,13 @@
                     <!-- Welcome Message -->
                     <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow">
                         <h2 class="text-2xl font-bold">Welcome back, <span id="welcome-user-name">User</span>!</h2>
-                        <p class="text-slate-500 dark:text-slate-400 mt-1">You're doing great! Keep up the momentum.</p>
+                        <p id="welcome-message" class="text-slate-500 dark:text-slate-400 mt-1">Ready to start studying?
+                            Log in to see your stats.</p>
                     </div>
 
                     <!-- Main Dashboard Cards -->
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        
+
                         <!-- Card: Quick Start -->
                         <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow flex flex-col">
                             <div class="flex items-center space-x-3">
@@ -313,8 +490,10 @@
                                 </div>
                                 <h3 class="text-xl font-semibold">Quick Start</h3>
                             </div>
-                            <p class="text-slate-500 dark:text-slate-400 mt-4 mb-5 flex-grow">Jump right into your next quiz. Pick a subject and get started.</p>
-                            <button data-page="page-take-quiz" class="nav-button w-full bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2.5 px-4 rounded-lg">
+                            <p class="text-slate-500 dark:text-slate-400 mt-4 mb-5 flex-grow">Jump right into your next
+                                quiz. Pick a subject and get started.</p>
+                            <button data-page="page-take-quiz"
+                                class="nav-button w-full bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2.5 px-4 rounded-lg">
                                 Take a Quiz
                             </button>
                         </div>
@@ -323,20 +502,27 @@
                         <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow flex flex-col">
                             <div class="flex items-center space-x-3">
                                 <div class="p-3 rounded-lg bg-emerald-100 dark:bg-emerald-900">
-                                    <i data-lucide="database" class="w-6 h-6 text-emerald-600 dark:text-emerald-300"></i>
+                                    <i data-lucide="database"
+                                        class="w-6 h-6 text-emerald-600 dark:text-emerald-300"></i>
                                 </div>
                                 <h3 class="text-xl font-semibold">Question Bank</h3>
                             </div>
-                            <p class="text-slate-500 dark:text-slate-400 mt-4 mb-5 flex-grow">Manage your subjects and questions. Add new topics or edit existing ones.</p>
+                            <p class="text-slate-500 dark:text-slate-400 mt-4 mb-5 flex-grow">Manage your subjects,
+                                lessons, and questions.</p>
                             <div class="flex items-baseline space-x-2">
-                                <span id="db-question-count" class="text-4xl font-bold">0</span>
-                                <span class="text-slate-500 dark:text-slate-400">Questions</span>
-                            </div>
-                            <div class="flex items-baseline space-x-2 mt-1">
                                 <span id="db-subject-count" class="text-4xl font-bold">0</span>
                                 <span class="text-slate-500 dark:text-slate-400">Subjects</span>
                             </div>
-                            <button data-page="page-manage-bank" class="nav-button w-full mt-5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 px-4 rounded-lg">
+                            <div class="flex items-baseline space-x-2 mt-1">
+                                <span id="db-lesson-count" class="text-4xl font-bold">0</span>
+                                <span class="text-slate-500 dark:text-slate-400">Lessons</span>
+                            </div>
+                            <div class="flex items-baseline space-x-2 mt-1">
+                                <span id="db-question-count" class="text-4xl font-bold">0</span>
+                                <span class="text-slate-500 dark:text-slate-400">Questions</span>
+                            </div>
+                            <button data-page="page-manage-bank"
+                                class="nav-button w-full mt-5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 px-4 rounded-lg">
                                 Manage Bank
                             </button>
                         </div>
@@ -345,11 +531,13 @@
                         <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow flex flex-col">
                             <div class="flex items-center space-x-3">
                                 <div class="p-3 rounded-lg bg-indigo-100 dark:bg-indigo-900">
-                                    <i data-lucide="trending-up" class="w-6 h-6 text-indigo-600 dark:text-indigo-300"></i>
+                                    <i data-lucide="trending-up"
+                                        class="w-6 h-6 text-indigo-600 dark:text-indigo-300"></i>
                                 </div>
                                 <h3 class="text-xl font-semibold">Your Progress</h3>
                             </div>
-                            <p class="text-slate-500 dark:text-slate-400 mt-4 mb-5 flex-grow">Review your quiz history and track your improvement over time.</p>
+                            <p class="text-slate-500 dark:text-slate-400 mt-4 mb-5 flex-grow">Review your quiz history
+                                and track your improvement.</p>
                             <div class="space-y-3">
                                 <div>
                                     <p class="text-sm font-medium text-slate-500 dark:text-slate-400">Average Score</p>
@@ -360,7 +548,8 @@
                                     <p id="db-quizzes-taken" class="text-2xl font-bold">0</p>
                                 </div>
                             </div>
-                            <button data-page="page-quiz-history" class="nav-button w-full mt-5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 px-4 rounded-lg">
+                            <button data-page="page-quiz-history"
+                                class="nav-button w-full mt-5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 px-4 rounded-lg">
                                 View History
                             </button>
                         </div>
@@ -374,18 +563,20 @@
                 <div id="page-manage-bank" class="page-content hidden space-y-6">
                     <div class="flex justify-between items-center">
                         <h2 class="text-2xl font-bold">Manage Question Bank</h2>
-                        <button id="add-new-subject-btn" class="bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center space-x-2">
+                        <button id="add-new-subject-btn"
+                            class="bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center space-x-2">
                             <i data-lucide="plus" class="w-5 h-5"></i>
                             <span>New Subject</span>
                         </button>
                     </div>
 
                     <!-- Subject Cards Grid -->
-                    <div id="subject-card-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                        <!-- Subject cards will be dynamically inserted here -->
+                    <div id="subject-card-grid"
+                        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                         <p id="no-subjects-msg" class="text-slate-500 dark:text-slate-400 md:col-span-2 lg:col-span-3">
                             You haven't added any subjects yet. Click "New Subject" to get started.
                         </p>
+                        <!-- Subject cards will be dynamically inserted here -->
                     </div>
                 </div>
 
@@ -393,47 +584,83 @@
                   ================ PAGE: TAKE QUIZ (NEW UI) ================
                 -->
                 <div id="page-take-quiz" class="page-content hidden">
-                    <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow max-w-lg mx-auto">
+                    <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow max-w-2xl mx-auto">
                         <h2 class="text-2xl font-bold mb-6">Quiz Setup</h2>
-                        
-                        <form id="quiz-setup-form" class="space-y-4">
+
+                        <form id="quiz-setup-form" class="space-y-5">
+                            <!-- Step 1: Select Subject -->
                             <div>
-                                <label for="quiz-setup-subject" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Select Subject</label>
-                                <select id="quiz-setup-subject" required class="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500">
+                                <label for="quiz-setup-subject"
+                                    class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">1.
+                                    Select Subject</label>
+                                <select id="quiz-setup-subject" required
+                                    class="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500">
                                     <option value="">Select a subject...</option>
                                     <!-- Subject options -->
                                 </select>
                             </div>
 
-                            <div>
-                                <label for="quiz-setup-num-questions" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-                                    Number of Questions <span id="quiz-setup-max-questions" class="text-xs text-slate-500">(Max: 0)</span>
-                                </label>
-                                <input type="number" id="quiz-setup-num-questions" min="1" max="0" required class="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500">
-                            </div>
-                            
-                            <div>
-                                <label for="quiz-setup-time-per-question" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-                                    Time per Question (seconds)
-                                    <span class="text-xs text-slate-500">(0 for no limit)</span>
-                                </label>
-                                <input type="number" id="quiz-setup-time-per-question" min="0" value="0" required class="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500">
+                            <!-- Step 2: Select Lessons (Dynamically shown) -->
+                            <div id="quiz-setup-lessons-container" class="hidden space-y-3">
+                                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">2. Select
+                                    Lessons</label>
+                                <div id="quiz-setup-lessons-list"
+                                    class="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-48 overflow-y-auto pr-2">
+                                    <!-- Lesson checkboxes will be inserted here -->
+                                </div>
+                                <p id="quiz-setup-no-lessons-msg"
+                                    class="text-sm text-slate-500 dark:text-slate-400 hidden">This subject has no
+                                    lessons. Please add lessons in the 'Manage Bank' page.</p>
                             </div>
 
-                            <div class="flex items-center justify-between">
-                                <label for="quiz-setup-show-timer" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Show Timer during Quiz?</label>
-                                <label class="relative inline-flex items-center cursor-pointer">
-                                    <input type="checkbox" id="quiz-setup-show-timer" class="sr-only peer">
-                                    <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-sky-300 dark:peer-focus:ring-sky-800 rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-slate-600 peer-checked:bg-sky-600"></div>
-                                </label>
+                            <!-- Step 3: Quiz Settings -->
+                            <div id="quiz-setup-settings-container" class="hidden space-y-5">
+                                <div>
+                                    <label for="quiz-setup-num-questions"
+                                        class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+                                        3. Number of Questions <span id="quiz-setup-max-questions"
+                                            class="text-xs text-slate-500">(Max: 0)</span>
+                                    </label>
+                                    <input type="number" id="quiz-setup-num-questions" min="1" max="0" required
+                                        class="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500">
+                                </div>
+
+                                <div>
+                                    <label for="quiz-setup-time-per-question"
+                                        class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+                                        4. Time per Question (seconds)
+                                        <span class="text-xs text-slate-500">(0 for no limit)</span>
+                                    </label>
+                                    <input type="number" id="quiz-setup-time-per-question" min="0" value="0" required
+                                        class="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500">
+                                </div>
+
+                                <div class="flex items-center justify-between">
+                                    <label for="quiz-setup-show-timer"
+                                        class="block text-sm font-medium text-slate-700 dark:text-slate-300">5. Show
+                                        Timer during Quiz?</label>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" id="quiz-setup-show-timer" class="sr-only peer">
+                                        <div
+                                            class="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-sky-300 dark:peer-focus:ring-sky-800 rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-slate-600 peer-checked:bg-sky-600">
+                                        </div>
+                                    </label>
+                                </div>
+
+                                <p id="quiz-setup-error" class="text-sm text-red-500 !mt-4 hidden"></p>
+
+                                <button type="submit" id="quiz-setup-start-button"
+                                    class="w-full bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2.5 px-4 rounded-lg flex items-center justify-center space-x-2">
+                                    <i data-lucide="play" class="w-5 h-5"></i>
+                                    <span>Start Quiz</span>
+                                </button>
                             </div>
 
-                            <p id="quiz-setup-error" class="text-sm text-red-500 hidden"></p>
+                            <p id="quiz-setup-login-msg" class="text-slate-500 dark:text-slate-400">Please <button
+                                    type="button" id="quiz-setup-login-btn"
+                                    class="text-sky-600 dark:text-sky-400 hover:underline font-medium">log in</button>
+                                to take a quiz.</p>
 
-                            <button type="submit" id="quiz-setup-start-button" class="w-full bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2.5 px-4 rounded-lg flex items-center justify-center space-x-2">
-                                <i data-lucide="play" class="w-5 h-5"></i>
-                                <span>Start Quiz</span>
-                            </button>
                         </form>
                     </div>
                 </div>
@@ -444,12 +671,14 @@
                 <div id="page-quiz-active" class="page-content hidden">
                     <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow max-w-3xl mx-auto relative">
                         <!-- Quit Button -->
-                        <button id="quiz-exit-button-icon" class="absolute top-4 right-4 text-slate-400 hover:text-red-500 dark:hover:text-red-400">
+                        <button id="quiz-exit-button-icon"
+                            class="absolute top-4 right-4 text-slate-400 hover:text-red-500 dark:hover:text-red-400">
                             <i data-lucide="x-circle" class="w-6 h-6"></i>
                         </button>
-                        
+
                         <!-- Timer Display -->
-                        <div id="quiz-timer-display" class="hidden absolute top-4 left-6 text-lg font-semibold text-slate-700 dark:text-slate-300">
+                        <div id="quiz-timer-display"
+                            class="hidden absolute top-4 left-6 text-lg font-semibold text-slate-700 dark:text-slate-300">
                             <i data-lucide="clock" class="w-5 h-5 inline-block -mt-1 mr-1"></i>
                             <span id="quiz-timer-time">00:00</span>
                         </div>
@@ -457,9 +686,10 @@
                         <!-- Quiz Header -->
                         <div class="flex justify-between items-center mb-4 pt-8">
                             <h2 id="quiz-active-title" class="text-2xl font-bold">HTML Quiz</h2>
-                            <span id="quiz-progress-text" class="text-lg font-semibold text-sky-600 dark:text-sky-300">Question 1 / 10</span>
+                            <span id="quiz-progress-text"
+                                class="text-lg font-semibold text-sky-600 dark:text-sky-300">Question 1 / 10</span>
                         </div>
-                        
+
                         <!-- Progress Bar -->
                         <div class="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2.5 mb-6">
                             <div id="quiz-progress-bar" class="bg-sky-600 h-2.5 rounded-full" style="width: 10%"></div>
@@ -467,7 +697,8 @@
 
                         <!-- Question -->
                         <div class="mb-6">
-                            <p id="quiz-active-question" class="text-xl font-medium mb-6 min-h-[50px]">What does HTML stand for?</p>
+                            <p id="quiz-active-question" class="text-xl font-medium mb-6 min-h-[50px]">What does HTML
+                                stand for?</p>
                             <div id="quiz-options-container" class="space-y-3">
                                 <!-- Options will be dynamically inserted here -->
                             </div>
@@ -475,10 +706,12 @@
 
                         <!-- Navigation -->
                         <div class="flex justify-end items-center min-h-[44px]">
-                            <button id="quiz-next-button" class="hidden bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2.5 px-5 rounded-lg">
+                            <button id="quiz-next-button"
+                                class="hidden bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2.5 px-5 rounded-lg">
                                 Next
                             </button>
-                            <button id="quiz-submit-button" class="hidden bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 px-5 rounded-lg">
+                            <button id="quiz-submit-button"
+                                class="hidden bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 px-5 rounded-lg">
                                 Submit Quiz
                             </button>
                         </div>
@@ -490,28 +723,34 @@
                 -->
                 <div id="page-quiz-results" class="page-content hidden">
                     <div class="bg-white dark:bg-slate-800 p-8 rounded-2xl shadow max-w-2xl mx-auto text-center">
-                        <i data-lucide="check-circle" class="w-20 h-20 text-emerald-500 mx-auto"></i>
+                        <i id="results-icon" data-lucide="check-circle" class="w-20 h-20 text-emerald-500 mx-auto"></i>
                         <h2 class="text-4xl font-bold mt-4">Quiz Complete!</h2>
-                        <p id="results-subject-name" class="text-lg text-slate-500 dark:text-slate-400 mt-1">HTML Quiz</p>
+                        <p id="results-subject-name" class="text-lg text-slate-500 dark:text-slate-400 mt-1">HTML Quiz
+                        </p>
 
                         <div class="my-8">
                             <p class="text-lg text-slate-600 dark:text-slate-300">Your Score:</p>
-                            <p id="results-score-text" class="text-7xl font-bold text-sky-600 dark:text-sky-300 my-2">80%</p>
-                            <p id="results-score-details" class="text-lg text-slate-600 dark:text-slate-300">You answered 8 out of 10 questions correctly.</p>
+                            <p id="results-score-text" class="text-7xl font-bold text-sky-600 dark:text-sky-300 my-2">
+                                80%</p>
+                            <p id="results-score-details" class="text-lg text-slate-600 dark:text-slate-300">You
+                                answered 8 out of 10 questions correctly.</p>
                         </div>
 
                         <div class="flex items-center justify-center space-x-4">
-                            <button data-page="page-home" class="nav-button bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-semibold py-2.5 px-6 rounded-lg">
+                            <button data-page="page-home"
+                                class="nav-button bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-semibold py-2.5 px-6 rounded-lg">
                                 Go to Home
                             </button>
-                            <button id="quiz-review-button" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 px-6 rounded-lg">
+                            <button id="quiz-review-button"
+                                class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 px-6 rounded-lg">
                                 Review Answers
                             </button>
                         </div>
                     </div>
-                    
+
                     <!-- Answer Review Section -->
-                    <div id="quiz-review-section" class="hidden bg-white dark:bg-slate-800 p-8 rounded-2xl shadow max-w-3xl mx-auto mt-6">
+                    <div id="quiz-review-section"
+                        class="hidden bg-white dark:bg-slate-800 p-8 rounded-2xl shadow max-w-3xl mx-auto mt-6">
                         <h3 class="text-2xl font-bold mb-6 text-center">Answer Review</h3>
                         <div id="quiz-review-container" class="space-y-6">
                             <!-- Review content will be dynamically inserted here -->
@@ -529,18 +768,24 @@
                             <table class="w-full min-w-[600px] text-left">
                                 <thead class="border-b border-slate-200 dark:border-slate-700">
                                     <tr>
-                                        <th class="p-3 text-sm font-semibold text-slate-500 dark:text-slate-400">Subject</th>
-                                        <th class="p-3 text-sm font-semibold text-slate-500 dark:text-slate-400">Date</th>
-                                        <th class="p-3 text-sm font-semibold text-slate-500 dark:text-slate-400">Score</th>
-                                        <th class="p-3 text-sm font-semibold text-slate-500 dark:text-slate-400">Correct</th>
-                                        <th class="p-3 text-sm font-semibold text-slate-500 dark:text-slate-400">Total</th>
+                                        <th class="p-3 text-sm font-semibold text-slate-500 dark:text-slate-400">Subject
+                                        </th>
+                                        <th class="p-3 text-sm font-semibold text-slate-500 dark:text-slate-400">Date
+                                        </th>
+                                        <th class="p-3 text-sm font-semibold text-slate-500 dark:text-slate-400">Score
+                                        </th>
+                                        <th class="p-3 text-sm font-semibold text-slate-500 dark:text-slate-400">Correct
+                                        </th>
+                                        <th class="p-3 text-sm font-semibold text-slate-500 dark:text-slate-400">Total
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody id="quiz-history-table-body">
-                                    <!-- History rows will be inserted here -->
                                     <tr id="no-history-msg">
-                                        <td colspan="5" class="p-4 text-center text-slate-500 dark:text-slate-400">You haven't completed any quizzes yet.</td>
+                                        <td colspan="5" class="p-4 text-center text-slate-500 dark:text-slate-400">You
+                                            haven't completed any quizzes yet.</td>
                                     </tr>
+                                    <!-- History rows will be inserted here -->
                                 </tbody>
                             </table>
                         </div>
@@ -552,19 +797,19 @@
                 -->
                 <div id="page-settings" class="page-content hidden space-y-6">
                     <h2 class="text-2xl font-bold">Settings & Data</h2>
-                    
+
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <!-- Import Card -->
                         <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow space-y-6">
                             <h3 class="text-xl font-bold">Import Data</h3>
-                            
+
                             <!-- Import Subject -->
                             <form id="import-subject-form" class="space-y-3">
-                                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Import Subject (.json)</label>
-                                <select id="import-subject-select" required class="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500">
-                                    <option value="">Select subject to import into...</option>
-                                    <!-- Subject options -->
-                                </select>
+                                <label for="import-subject-file"
+                                    class="block text-sm font-medium text-slate-700 dark:text-slate-300">Import Subject
+                                    (.json)</label>
+                                <p class="text-xs text-slate-500 dark:text-slate-400">This will create a new subject,
+                                    with all its lessons and questions, from a previously exported subject file.</p>
                                 <input type="file" id="import-subject-file" accept=".json" required class="block w-full text-sm text-slate-500 dark:text-slate-400
                                     file:mr-4 file:py-2 file:px-4
                                     file:rounded-lg file:border-0
@@ -572,7 +817,8 @@
                                     file:bg-sky-50 dark:file:bg-sky-900
                                     file:text-sky-700 dark:file:text-sky-300
                                     hover:file:bg-sky-100 dark:hover:file:bg-sky-800">
-                                <button type="submit" class="w-full bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2.5 px-4 rounded-lg">
+                                <button type="submit"
+                                    class="w-full bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2.5 px-4 rounded-lg">
                                     Import Subject
                                 </button>
                             </form>
@@ -581,7 +827,11 @@
 
                             <!-- Import Full Backup -->
                             <form id="import-full-form" class="space-y-3">
-                                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Import Full Backup (.json)</label>
+                                <label for="import-full-file"
+                                    class="block text-sm font-medium text-slate-700 dark:text-slate-300">Import Full
+                                    Backup (.json)</label>
+                                <p class="text-xs text-slate-500 dark:text-slate-400">This will add all subjects,
+                                    lessons, questions, and history from a backup file. It may create duplicates.</p>
                                 <input type="file" id="import-full-file" accept=".json" required class="block w-full text-sm text-slate-500 dark:text-slate-400
                                     file:mr-4 file:py-2 file:px-4
                                     file:rounded-lg file:border-0
@@ -589,35 +839,42 @@
                                     file:bg-sky-50 dark:file:bg-sky-900
                                     file:text-sky-700 dark:file:text-sky-300
                                     hover:file:bg-sky-100 dark:hover:file:bg-sky-800">
-                                <button type="submit" class="w-full bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2.5 px-4 rounded-lg">
+                                <button type="submit"
+                                    class="w-full bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2.5 px-4 rounded-lg">
                                     Import Full Backup
                                 </button>
                             </form>
-                            <p id="import-status" class="text-sm text-slate-500 text-center"></p>
+                            <p id="import-status" class="text-sm text-center"></p>
                         </div>
-                        
+
                         <!-- Export Card -->
                         <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow space-y-6">
                             <h3 class="text-xl font-bold">Export Data</h3>
 
                             <!-- Export Subject -->
                             <div class="space-y-3">
-                                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Export Subject as .json</label>
-                                <select id="export-subject-select" class="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500">
+                                <label for="export-subject-select"
+                                    class="block text-sm font-medium text-slate-700 dark:text-slate-300">Export Subject
+                                    as .json</label>
+                                <select id="export-subject-select"
+                                    class="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500">
                                     <option value="">Select subject to export...</option>
                                     <!-- Subject options -->
                                 </select>
-                                <button id="export-subject-button" class="w-full bg-slate-600 hover:bg-slate-700 text-white font-semibold py-2.5 px-4 rounded-lg">
+                                <button id="export-subject-button"
+                                    class="w-full bg-slate-600 hover:bg-slate-700 text-white font-semibold py-2.5 px-4 rounded-lg">
                                     Export Subject
                                 </button>
                             </div>
-                            
+
                             <div class="border-t border-slate-200 dark:border-slate-700"></div>
-                            
+
                             <!-- Export Full Backup -->
                             <div class="space-y-3">
-                                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Export Full Backup</label>
-                                <button id="export-full-button" class="w-full bg-slate-600 hover:bg-slate-700 text-white font-semibold py-2.5 px-4 rounded-lg">
+                                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Export Full
+                                    Backup</label>
+                                <button id="export-full-button"
+                                    class="w-full bg-slate-600 hover:bg-slate-700 text-white font-semibold py-2.5 px-4 rounded-lg">
                                     Export All Data as .json
                                 </button>
                             </div>
@@ -625,11 +882,14 @@
                     </div>
 
                     <!-- Danger Zone -->
-                    <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow border-2 border-red-300 dark:border-red-700">
+                    <div
+                        class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow border-2 border-red-300 dark:border-red-700">
                         <h2 class="text-xl font-bold mb-2 text-red-700 dark:text-red-300">Danger Zone</h2>
-                        <p class="text-slate-500 dark:text-slate-400 mb-4">These actions are permanent and cannot be undone. Be careful!</p>
-                        
-                        <button id="delete-all-data-button" class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2.5 px-5 rounded-lg flex items-center space-x-2">
+                        <p class="text-slate-500 dark:text-slate-400 mb-4">These actions are permanent and cannot be
+                            undone. Be careful!</p>
+
+                        <button id="delete-all-data-button"
+                            class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2.5 px-5 rounded-lg flex items-center space-x-2">
                             <i data-lucide="trash-2" class="w-5 h-5"></i>
                             <span>Delete All My Data</span>
                         </button>
@@ -640,7 +900,7 @@
         </main> <!-- /End Main Content Area -->
     </div> <!-- /End App Shell -->
 
-    
+
     <!-- 
       ================================================================
       MODALS & TOAST (Moved outside app-shell to ensure centering)
@@ -648,10 +908,12 @@
     -->
 
     <!-- --- Universal Modal Backdrop --- -->
-    <div id="modal-backdrop" class="modal-backdrop fixed inset-0 bg-black/60 z-40 hidden opacity-0 items-center justify-center p-4" data-closable="true">
-        
+    <div id="modal-backdrop"
+        class="modal-backdrop fixed inset-0 bg-black/60 z-40 hidden opacity-0 items-center justify-center p-4"
+        data-closable="true">
+
         <!-- AUTH MODAL -->
-        <div id="auth-modal" class="modal-content hidden bg-white dark:bg-slate-800 rounded-2xl shadow-xl w-full max-w-md p-8">
+        <div id="auth-modal" class="modal-content bg-white dark:bg-slate-800 rounded-2xl shadow-xl w-full max-w-md p-8">
             <div class="flex flex-col items-center mb-6">
                 <div class="bg-sky-600 p-3 rounded-full text-white">
                     <i data-lucide="book-open" class="w-8 h-8"></i>
@@ -659,135 +921,248 @@
                 <h1 class="text-3xl font-bold text-slate-900 dark:text-white mt-4">StudyHelper</h1>
                 <p id="auth-form-title" class="text-slate-500 dark:text-slate-400 mt-1">Sign in to your account</p>
             </div>
-            <div id="auth-error" class="hidden bg-red-100 dark:bg-red-900 border border-red-300 dark:border-red-700 text-red-700 dark:text-red-200 px-4 py-3 rounded-lg relative mb-4 text-sm" role="alert"></div>
+            <div id="auth-error"
+                class="hidden bg-red-100 dark:bg-red-900 border border-red-300 dark:border-red-700 text-red-700 dark:text-red-200 px-4 py-3 rounded-lg relative mb-4 text-sm"
+                role="alert"></div>
             <form id="auth-form" class="space-y-4">
                 <div class="space-y-2">
-                    <label for="email" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Email address</label>
-                    <input type="email" id="email" name="email" required autocomplete="email" class="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent">
+                    <label for="email" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Email
+                        address</label>
+                    <input type="email" id="email" name="email" required autocomplete="email"
+                        class="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent">
                 </div>
                 <div class="space-y-2">
-                    <label for="password" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Password</label>
-                    <input type="password" id="password" name="password" required autocomplete="current-password" class="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent">
+                    <label for="password"
+                        class="block text-sm font-medium text-slate-700 dark:text-slate-300">Password</label>
+                    <input type="password" id="password" name="password" required autocomplete="current-password"
+                        class="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent">
                 </div>
                 <div id="login-buttons" class="pt-2 space-y-3">
-                    <button type="submit" id="login-button" class="w-full bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2.5 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 dark:focus:ring-offset-slate-800 transition duration-150 ease-in-out">
+                    <button type="submit" id="login-button"
+                        class="w-full bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2.5 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 dark:focus:ring-offset-slate-800 transition duration-150 ease-in-out">
                         Sign In
                     </button>
-                    <button type="button" id="toggle-to-signup" class="w-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-semibold py-2.5 px-4 rounded-lg">
+                    <button type="button" id="toggle-to-signup"
+                        class="w-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-semibold py-2.5 px-4 rounded-lg">
                         Don't have an account? Sign Up
                     </button>
                 </div>
                 <div id="signup-buttons" class="pt-2 space-y-3 hidden">
-                    <button type="submit" id="signup-button" class="w-full bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2.5 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 dark:focus:ring-offset-slate-800 transition duration-150 ease-in-out">
+                    <button type="submit" id="signup-button"
+                        class="w-full bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2.5 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 dark:focus:ring-offset-slate-800 transition duration-150 ease-in-out">
                         Create Account
                     </button>
-                    <button type="button" id="toggle-to-login" class="w-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-semibold py-2.5 px-4 rounded-lg">
+                    <button type="button" id="toggle-to-login"
+                        class="w-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-semibold py-2.5 px-4 rounded-lg">
                         Already have an account? Sign In
                     </button>
                 </div>
             </form>
             <div class="flex items-center justify-center my-6">
-                <div class="flex-grow border-t border-slate-300 dark:border-slate-600"></div><span class="mx-4 text-sm font-medium text-slate-500 dark:text-slate-400">OR</span><div class="flex-grow border-t border-slate-300 dark:border-slate-600"></div>
+                <div class="flex-grow border-t border-slate-300 dark:border-slate-600"></div><span
+                    class="mx-4 text-sm font-medium text-slate-500 dark:text-slate-400">OR</span>
+                <div class="flex-grow border-t border-slate-300 dark:border-slate-600"></div>
             </div>
-            <button id="google-signin-button" class="w-full bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-semibold py-2.5 px-4 rounded-lg flex items-center justify-center space-x-2">
-                <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8c-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4C12.955 4 4 12.955 4 24s8.955 20 20 20s20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z"/><path fill="#FF3D00" d="m6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4C16.318 4 9.656 8.337 6.306 14.691z"/><path fill="#4CAF50" d="m24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238C29.211 35.091 26.715 36 24 36c-5.202 0-9.619-3.317-11.283-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z"/><path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303c-0.792 2.237-2.231 4.166-4.087 5.571l6.19 5.238C42.012 34.569 44 29.865 44 24c0-1.341-.138-2.65-.389-3.917z"/></svg>
+            <button id="google-signin-button"
+                class="w-full bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-semibold py-2.5 px-4 rounded-lg flex items-center justify-center space-x-2">
+                <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+                    <path fill="#FFC107"
+                        d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8c-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4C12.955 4 4 12.955 4 24s8.955 20 20 20s20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z" />
+                    <path fill="#FF3D00"
+                        d="m6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4C16.318 4 9.656 8.337 6.306 14.691z" />
+                    <path fill="#4CAF50"
+                        d="m24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238C29.211 35.091 26.715 36 24 36c-5.202 0-9.619-3.317-11.283-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z" />
+                    <path fill="#1976D2"
+                        d="M43.611 20.083H42V20H24v8h11.303c-0.792 2.237-2.231 4.166-4.087 5.571l6.19 5.238C42.012 34.569 44 29.865 44 24c0-1.341-.138-2.65-.389-3.917z" />
+                </svg>
                 <span>Sign in with Google</span>
             </button>
         </div>
 
         <!-- CONFIRM MODAL -->
-        <div id="confirm-modal" class="modal-content hidden bg-white dark:bg-slate-800 rounded-2xl shadow-xl w-full max-w-md p-6">
+        <div id="confirm-modal"
+            class="modal-content bg-white dark:bg-slate-800 rounded-2xl shadow-xl w-full max-w-md p-6">
             <h3 id="confirm-modal-title" class="text-xl font-bold mb-2">Are you sure?</h3>
-            <p id="confirm-modal-message" class="text-slate-600 dark:text-slate-300 mb-6">This action cannot be undone.</p>
+            <p id="confirm-modal-message" class="text-slate-600 dark:text-slate-300 mb-6">This action cannot be undone.
+            </p>
             <div class="flex justify-end space-x-3">
-                <button id="modal-cancel-button" class="bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-semibold py-2 px-4 rounded-lg">
+                <button id="modal-cancel-button"
+                    class="bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-semibold py-2 px-4 rounded-lg">
                     Cancel
                 </button>
-                <button id="modal-confirm-button" class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg">
+                <button id="modal-confirm-button"
+                    class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg">
                     Confirm
                 </button>
             </div>
         </div>
 
         <!-- SUBJECT MODAL -->
-        <div id="subject-modal" class="modal-content hidden bg-white dark:bg-slate-800 rounded-2xl shadow-xl w-full max-w-md p-6">
+        <div id="subject-modal"
+            class="modal-content bg-white dark:bg-slate-800 rounded-2xl shadow-xl w-full max-w-md p-6">
             <form id="subject-form">
                 <h3 id="subject-modal-title" class="text-xl font-bold mb-4">Add New Subject</h3>
                 <input type="hidden" id="subject-id-input">
                 <div class="space-y-2">
-                    <label for="subject-name-input" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Subject Name</label>
-                    <input type="text" id="subject-name-input" placeholder="e.g., Mathematics" required class="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500">
+                    <label for="subject-name-input"
+                        class="block text-sm font-medium text-slate-700 dark:text-slate-300">Subject Name</label>
+                    <input type="text" id="subject-name-input" placeholder="e.g., Mathematics" required
+                        class="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500">
                 </div>
                 <p id="subject-form-error" class="text-sm text-red-500 mt-2 hidden"></p>
                 <div class="flex justify-end space-x-3 mt-6">
-                    <button type="button" class="modal-close-button bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-semibold py-2 px-4 rounded-lg">
+                    <button type="button"
+                        class="modal-close-button bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-semibold py-2 px-4 rounded-lg">
                         Cancel
                     </button>
-                    <button type="submit" class="bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2 px-4 rounded-lg">
+                    <button type="submit"
+                        class="bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2 px-4 rounded-lg">
                         Save Subject
                     </button>
                 </div>
             </form>
         </div>
 
-        <!-- MANAGE QUESTIONS MODAL -->
-        <div id="manage-questions-modal" class="modal-content hidden bg-white dark:bg-slate-800 rounded-2xl shadow-xl w-full max-w-2xl p-6 flex flex-col max-h-[90vh]">
+        <!-- LESSON MODAL (NEW) -->
+        <div id="lesson-modal"
+            class="modal-content bg-white dark:bg-slate-800 rounded-2xl shadow-xl w-full max-w-md p-6">
+            <form id="lesson-form">
+                <h3 id="lesson-modal-title" class="text-xl font-bold mb-4">Add New Lesson</h3>
+                <input type="hidden" id="lesson-id-input">
+                <input type="hidden" id="lesson-subject-id-input">
+                <div class="space-y-2">
+                    <label for="lesson-name-input"
+                        class="block text-sm font-medium text-slate-700 dark:text-slate-300">Lesson Name</label>
+                    <input type="text" id="lesson-name-input" placeholder="e.g., Lesson 1: Algebra" required
+                        class="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500">
+                </div>
+                <p id="lesson-form-error" class="text-sm text-red-500 mt-2 hidden"></p>
+                <div class="flex justify-end space-x-3 mt-6">
+                    <button type="button"
+                        class="modal-close-button bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-semibold py-2 px-4 rounded-lg">
+                        Cancel
+                    </button>
+                    <button type="submit"
+                        class="bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2 px-4 rounded-lg">
+                        Save Lesson
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- MANAGE LESSONS MODAL (NEW) -->
+        <div id="manage-lessons-modal"
+            class="modal-content bg-white dark:bg-slate-800 rounded-2xl shadow-xl w-full max-w-2xl p-6 flex flex-col max-h-[90vh]">
             <div class="flex justify-between items-center mb-4 shrink-0">
-                <h3 id="manage-q-modal-title" class="text-xl font-bold">Manage Questions</h3>
-                <button type="button" class="modal-close-button text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+                <h3 id="manage-l-modal-title" class="text-xl font-bold">Manage Lessons</h3>
+                <button type="button"
+                    class="modal-close-button text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
                     <i data-lucide="x" class="w-6 h-6"></i>
                 </button>
             </div>
             <div class="flex justify-between items-center mb-4 shrink-0">
-                <button id="edit-subject-name-btn" class="bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-semibold py-2 px-4 rounded-lg flex items-center space-x-2">
+                <button id="edit-subject-name-btn"
+                    class="bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-semibold py-2 px-4 rounded-lg flex items-center space-x-2">
                     <i data-lucide="edit-2" class="w-4 h-4"></i>
                     <span>Edit Subject</span>
                 </button>
-                <button id="add-new-question-btn" class="bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center space-x-2">
+                <button id="add-new-lesson-btn"
+                    class="bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center space-x-2">
+                    <i data-lucide="plus" class="w-5 h-5"></i>
+                    <span>Add New Lesson</span>
+                </button>
+            </div>
+            <div id="lesson-list-container" class="flex-grow overflow-y-auto space-y-3 pr-2">
+                <p id="no-lessons-msg" class="text-slate-500 dark:text-slate-400">No lessons added yet for this subject.
+                </p>
+                <!-- Lesson items will be dynamically inserted here -->
+            </div>
+        </div>
+
+        <!-- MANAGE QUESTIONS MODAL (UPDATED) -->
+        <div id="manage-questions-modal"
+            class="modal-content bg-white dark:bg-slate-800 rounded-2xl shadow-xl w-full max-w-2xl p-6 flex flex-col max-h-[90vh]">
+            <div class="flex justify-between items-center mb-4 shrink-0">
+                <h3 id="manage-q-modal-title" class="text-xl font-bold">Manage Questions</h3>
+                <button type="button"
+                    class="modal-close-button text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+            <div class="flex justify-between items-center mb-4 shrink-0">
+                <button id="edit-lesson-name-btn"
+                    class="bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-semibold py-2 px-4 rounded-lg flex items-center space-x-2">
+                    <i data-lucide="edit-2" class="w-4 h-4"></i>
+                    <span>Edit Lesson</span>
+                </button>
+                <button id="add-new-question-btn"
+                    class="bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center space-x-2">
                     <i data-lucide="plus" class="w-5 h-5"></i>
                     <span>Add New Question</span>
                 </button>
             </div>
             <div id="question-list-container" class="flex-grow overflow-y-auto space-y-3 pr-2">
-                <p id="no-questions-msg" class="text-slate-500 dark:text-slate-400">No questions added yet for this subject.</p>
+                <p id="no-questions-msg" class="text-slate-500 dark:text-slate-400">No questions added yet for this
+                    lesson.</p>
+                <!-- Question items will be dynamically inserted here -->
             </div>
         </div>
-        
-        <!-- QUESTION MODAL -->
-        <div id="question-modal" class="modal-content hidden bg-white dark:bg-slate-800 rounded-2xl shadow-xl w-full max-w-2xl p-6">
+
+        <!-- QUESTION MODAL (UPDATED) -->
+        <div id="question-modal"
+            class="modal-content bg-white dark:bg-slate-800 rounded-2xl shadow-xl w-full max-w-2xl p-6">
             <form id="question-form" class="space-y-4">
                 <h3 id="question-modal-title" class="text-xl font-bold mb-4">Add New Question</h3>
                 <input type="hidden" id="question-id-input">
                 <input type="hidden" id="question-subject-id-input">
-                
+                <input type="hidden" id="question-lesson-id-input"> <!-- NEW -->
+
                 <div>
-                    <label for="question-text" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Question</label>
-                    <textarea id="question-text" rows="2" required class="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500" placeholder="What does HTML stand for?"></textarea>
+                    <label for="question-text"
+                        class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Question</label>
+                    <textarea id="question-text" rows="2" required
+                        class="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                        placeholder="What does HTML stand for?"></textarea>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label for="option-0" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Option 1 (Correct Answer)</label>
-                        <input type="text" id="option-0" required class="question-option w-full px-4 py-2 border border-emerald-400 dark:border-emerald-600 rounded-lg bg-emerald-50 dark:bg-emerald-900 focus:outline-none focus:ring-2 focus:ring-emerald-500" placeholder="Correct Answer">
+                        <label for="option-0"
+                            class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Option 1 (Correct
+                            Answer)</label>
+                        <input type="text" id="option-0" required
+                            class="question-option w-full px-4 py-2 border border-emerald-400 dark:border-emerald-600 rounded-lg bg-emerald-50 dark:bg-emerald-900 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                            placeholder="Correct Answer">
                     </div>
                     <div>
-                        <label for="option-1" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Option 2</label>
-                        <input type="text" id="option-1" required class="question-option w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500" placeholder="Wrong Answer 1">
+                        <label for="option-1"
+                            class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Option 2</label>
+                        <input type="text" id="option-1" required
+                            class="question-option w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                            placeholder="Wrong Answer 1">
                     </div>
                     <div>
-                        <label for="option-2" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Option 3</label>
-                        <input type="text" id="option-2" required class="question-option w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500" placeholder="Wrong Answer 2">
+                        <label for="option-2"
+                            class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Option 3</label>
+                        <input type="text" id="option-2" required
+                            class="question-option w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                            placeholder="Wrong Answer 2">
                     </div>
                     <div>
-                        <label for="option-3" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Option 4</label>
-                        <input type="text" id="option-3" required class="question-option w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500" placeholder="Wrong Answer 3">
+                        <label for="option-3"
+                            class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Option 4</label>
+                        <input type="text" id="option-3" required
+                            class="question-option w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                            placeholder="Wrong Answer 3">
                     </div>
                 </div>
                 <p id="question-form-error" class="text-sm text-red-500 hidden"></p>
                 <div class="flex justify-end space-x-3 pt-4">
-                    <button type="button" class="modal-close-button bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-semibold py-2 px-4 rounded-lg">
+                    <button type="button"
+                        class="modal-close-button bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-semibold py-2 px-4 rounded-lg">
                         Cancel
                     </button>
-                    <button type="submit" class="bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2 px-4 rounded-lg">
+                    <button type="submit"
+                        class="bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2 px-4 rounded-lg">
                         Save Question
                     </button>
                 </div>
@@ -816,10 +1191,10 @@
         // === FIREBASE & APP INITIALIZATION ===============================
         // =================================================================
         // 
-        
+
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { 
-            getAuth, 
+        import {
+            getAuth,
             onAuthStateChanged,
             signInWithEmailAndPassword,
             createUserWithEmailAndPassword,
@@ -830,38 +1205,41 @@
             signInAnonymously,
             signInWithCustomToken
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { 
-            getFirestore, 
-            doc, 
-            getDoc, 
-            setDoc, 
+        import {
+            getFirestore,
+            doc,
+            getDoc,
+            setDoc,
             addDoc,
-            updateDoc, 
-            deleteDoc, 
-            onSnapshot, 
-            collection, 
+            updateDoc,
+            deleteDoc,
+            onSnapshot,
+            collection,
             query,
             writeBatch,
             getDocs,
-            Timestamp
+            Timestamp,
+            where // Added for cascade deletes
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // --- USER'S FIREBASE CONFIG ---
+        // This is a placeholder. In a real environment, this config would be provided.
         const firebaseConfig = {
-          apiKey: "AIzaSyDXZZVwU6Q8l5GtK8ngxfIkQLEVkbihNhM",
-          authDomain: "studyhelper-quizzes.firebaseapp.com",
-          projectId: "studyhelper-quizzes",
-          storageBucket: "studyhelper-quizzes.firebasestorage.app",
-          messagingSenderId: "217416839389",
-          appId: "1:217416839389:web:060ca955eaa8befce12b34",
-          measurementId: "G-4XVEYVNL7L"
+            apiKey: "AIzaSyDXZZVwU6Q8l5GtK8ngxfIkQLEVkbihNhM",
+            authDomain: "studyhelper-quizzes.firebaseapp.com",
+            projectId: "studyhelper-quizzes",
+            storageBucket: "studyhelper-quizzes.firebasestorage.app",
+            messagingSenderId: "217416839389",
+            appId: "1:217416839389:web:060ca955eaa8befce12b34",
+            measurementId: "G-4XVEYVNL7L"
         };
         // -----------------------------
-        
+
         let app, auth, db;
         try {
-            const config = typeof __firebase_config !== 'undefined' 
-                ? JSON.parse(__firebase_config) 
+            // Use provided config if available, else fallback to placeholder
+            const config = typeof __firebase_config !== 'undefined'
+                ? JSON.parse(__firebase_config)
                 : firebaseConfig;
 
             app = initializeApp(config);
@@ -870,19 +1248,26 @@
             console.log("Firebase initialized successfully.");
         } catch (error) {
             console.error("Error initializing Firebase:", error);
-            document.getElementById('app-loader').innerHTML = '<p class="text-red-500 p-4">Error: Firebase config is missing or invalid. Please check `index.html`.</p>';
+            document.getElementById('app-loader').innerHTML = '<p class="text-red-500 p-4">Error: Firebase config is missing or invalid. Please check console.</p>';
             throw new Error("Firebase initialization failed.");
         }
-        
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'studyhelper-quizzes'; 
+
+        // Use provided app ID if available, else fallback to project ID
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'studyhelper-quizzes';
         let currentUserId = null;
         let currentAuthUser = null;
-        let currentEditingSubject = null; 
+
+        // Globals for modal context
+        let currentEditingSubject = null; // { id, name }
+        let currentEditingLesson = null; // { id, name, subjectId }
+
         let toastTimeout;
         let quizTimerInterval;
 
+        // Global application state
         const appState = {
             subjects: [],
+            lessons: [], // NEW
             questions: [],
             quizHistory: [],
             activeQuiz: null, // { subjectId, subjectName, questions, currentIndex, userAnswers, score, timePerQuestion, showTimer, currentQuestionStartTime, savedQuizData }
@@ -890,9 +1275,11 @@
             isSidebarOpen: true
         };
 
-        let unsubSubjects = () => {};
-        let unsubQuestions = () => {};
-        let unsubHistory = () => {};
+        // Firestore listener unsubscribe functions
+        let unsubSubjects = () => { };
+        let unsubLessons = () => { }; // NEW
+        let unsubQuestions = () => { };
+        let unsubHistory = () => { };
 
         // 
         // =================================================================
@@ -902,6 +1289,7 @@
         const $ = (selector) => document.querySelector(selector);
         const $$ = (selector) => document.querySelectorAll(selector);
 
+        // --- App Shell ---
         const appLoader = $('#app-loader');
         const appShell = $('#app-shell');
         const sidebar = $('#sidebar');
@@ -910,15 +1298,16 @@
         const pageTitle = $('#page-title');
         const contentPages = $$('.page-content');
 
-        // Header Auth
+        // --- Header Auth ---
         const loginButtonHeader = $('#login-button-header');
+        const accountArea = $('#account-area'); // NEW
         const accountButtonHeader = $('#account-button-header');
         const userAvatar = $('#user-avatar');
         const accountModal = $('#account-modal');
         const accountModalEmail = $('#account-modal-email');
         const logoutButton = $('#logout-button');
 
-        // Auth Modal
+        // --- Auth Modal ---
         const authModal = $('#auth-modal');
         const authForm = $('#auth-form');
         const authFormTitle = $('#auth-form-title');
@@ -929,7 +1318,7 @@
         const signupButtons = $('#signup-buttons');
         const googleSigninButton = $('#google-signin-button');
 
-        // Modals
+        // --- Universal Modals ---
         const modalBackdrop = $('#modal-backdrop');
         const allModals = $$('.modal-content');
         const confirmModal = $('#confirm-modal');
@@ -939,7 +1328,7 @@
         const modalConfirmBtn = $('#modal-confirm-button');
         let modalConfirmCallback = null;
 
-        // Subject Modal
+        // --- Subject Modal ---
         const subjectModal = $('#subject-modal');
         const subjectForm = $('#subject-form');
         const subjectModalTitle = $('#subject-modal-title');
@@ -947,46 +1336,72 @@
         const subjectNameInput = $('#subject-name-input');
         const subjectFormError = $('#subject-form-error');
 
-        // Manage Questions Modal
+        // --- Lesson Modal (NEW) ---
+        const lessonModal = $('#lesson-modal');
+        const lessonForm = $('#lesson-form');
+        const lessonModalTitle = $('#lesson-modal-title');
+        const lessonIdInput = $('#lesson-id-input');
+        const lessonSubjectIdInput = $('#lesson-subject-id-input');
+        const lessonNameInput = $('#lesson-name-input');
+        const lessonFormError = $('#lesson-form-error');
+
+        // --- Manage Lessons Modal (NEW) ---
+        const manageLessonsModal = $('#manage-lessons-modal');
+        const manageLModalTitle = $('#manage-l-modal-title');
+        const editSubjectNameBtn = $('#edit-subject-name-btn');
+        const addNewLessonBtn = $('#add-new-lesson-btn');
+        const lessonListContainer = $('#lesson-list-container');
+        const noLessonsMsg = $('#no-lessons-msg');
+
+        // --- Manage Questions Modal (UPDATED) ---
         const manageQuestionsModal = $('#manage-questions-modal');
         const manageQModalTitle = $('#manage-q-modal-title');
-        const editSubjectNameBtn = $('#edit-subject-name-btn');
+        const editLessonNameBtn = $('#edit-lesson-name-btn'); // NEW
         const addNewQuestionBtn = $('#add-new-question-btn');
         const questionListContainer = $('#question-list-container');
         const noQuestionsMsg = $('#no-questions-msg');
-        
-        // Question Modal
+
+        // --- Question Modal (UPDATED) ---
         const questionModal = $('#question-modal');
         const questionForm = $('#question-form');
         const questionModalTitle = $('#question-modal-title');
         const questionIdInput = $('#question-id-input');
         const questionSubjectIdInput = $('#question-subject-id-input');
+        const questionLessonIdInput = $('#question-lesson-id-input'); // NEW
         const questionTextInput = $('#question-text');
         const questionOptions = $$('.question-option');
         const questionFormError = $('#question-form-error');
 
-        // Manage Bank Page
+        // --- Manage Bank Page ---
         const subjectCardGrid = $('#subject-card-grid');
         const noSubjectsMsg = $('#no-subjects-msg');
 
-        // Dashboard
+        // --- Dashboard Page ---
         const welcomeUserName = $('#welcome-user-name');
+        const welcomeMessage = $('#welcome-message'); // NEW
         const dbQuestionCount = $('#db-question-count');
         const dbSubjectCount = $('#db-subject-count');
+        const dbLessonCount = $('#db-lesson-count'); // NEW
         const dbAvgScore = $('#db-avg-score');
         const dbQuizzesTaken = $('#db-quizzes-taken');
 
-        // Take Quiz Page
+        // --- Take Quiz Page (UPDATED) ---
         const quizSetupForm = $('#quiz-setup-form');
         const quizSetupSubject = $('#quiz-setup-subject');
+        const quizSetupLessonsContainer = $('#quiz-setup-lessons-container'); // NEW
+        const quizSetupLessonsList = $('#quiz-setup-lessons-list'); // NEW
+        const quizSetupNoLessonsMsg = $('#quiz-setup-no-lessons-msg'); // NEW
+        const quizSetupSettingsContainer = $('#quiz-setup-settings-container'); // NEW
         const quizSetupMaxQuestions = $('#quiz-setup-max-questions');
         const quizSetupNumQuestions = $('#quiz-setup-num-questions');
         const quizSetupTimePerQuestion = $('#quiz-setup-time-per-question');
         const quizSetupShowTimer = $('#quiz-setup-show-timer');
         const quizSetupError = $('#quiz-setup-error');
         const quizSetupStartButton = $('#quiz-setup-start-button');
+        const quizSetupLoginMsg = $('#quiz-setup-login-msg'); // NEW
+        const quizSetupLoginBtn = $('#quiz-setup-login-btn'); // NEW
 
-        // Active Quiz Page
+        // --- Active Quiz Page ---
         const quizExitButtonIcon = $('#quiz-exit-button-icon');
         const quizTimerDisplay = $('#quiz-timer-display');
         const quizTimerTime = $('#quiz-timer-time');
@@ -998,7 +1413,8 @@
         const quizNextButton = $('#quiz-next-button');
         const quizSubmitButton = $('#quiz-submit-button');
 
-        // Results Page
+        // --- Results Page ---
+        const resultsIcon = $('#results-icon'); // NEW
         const resultsSubjectName = $('#results-subject-name');
         const resultsScoreText = $('#results-score-text');
         const resultsScoreDetails = $('#results-score-details');
@@ -1006,21 +1422,22 @@
         const quizReviewSection = $('#quiz-review-section');
         const quizReviewContainer = $('#quiz-review-container');
 
-        // History Page
+        // --- History Page ---
         const quizHistoryTableBody = $('#quiz-history-table-body');
         const noHistoryMsg = $('#no-history-msg');
 
-        // Settings Page
-        const importSubjectSelect = $('#import-subject-select');
-        const importSubjectForm = $('#import-subject-form');
+        // --- Settings Page (UPDATED) ---
+        const importSubjectForm = $('#import-subject-form'); // No select
+        const importSubjectFile = $('#import-subject-file');
         const importFullForm = $('#import-full-form');
+        const importFullFile = $('#import-full-file');
         const importStatus = $('#import-status');
-        const exportSubjectSelect = $('#export-subject-select');
+        const exportSubjectSelect = $('#export-subject-select'); // Still here
         const exportSubjectButton = $('#export-subject-button');
         const exportFullButton = $('#export-full-button');
         const deleteAllDataButton = $('#delete-all-data-button');
 
-        // Toast
+        // --- Toast ---
         const toast = $('#toast-notification');
         const toastIcon = $('#toast-icon');
         const toastMessage = $('#toast-message');
@@ -1031,10 +1448,15 @@
         // =================================================================
         // 
 
+        /**
+         * Shows a toast notification.
+         * @param {string} message - The message to display.
+         * @param {'success' | 'error'} type - The type of toast.
+         */
         function showToast(message, type = 'success') {
             clearTimeout(toastTimeout);
             toastMessage.textContent = message;
-            
+
             if (type === 'success') {
                 toast.className = "w-full max-w-xs p-4 rounded-lg shadow-lg bg-emerald-500 text-white";
                 toastIcon.setAttribute('data-lucide', 'check-circle');
@@ -1044,21 +1466,29 @@
             }
             lucide.createIcons();
             toast.classList.add('show');
-            
+
             toastTimeout = setTimeout(() => {
                 toast.classList.remove('show');
             }, 3000);
         }
 
+        /**
+         * Detaches all active Firestore listeners.
+         */
         function detachFirestoreListeners() {
             unsubSubjects();
+            unsubLessons(); // NEW
             unsubQuestions();
             unsubHistory();
             console.log("Firestore listeners detached.");
         }
 
+        /**
+         * Resets the global app state.
+         */
         function resetAppState() {
             appState.subjects = [];
+            appState.lessons = []; // NEW
             appState.questions = [];
             appState.quizHistory = [];
             appState.activeQuiz = null;
@@ -1066,78 +1496,103 @@
             console.log("App state reset.");
         }
 
+        /**
+         * Clears all dynamically generated UI content.
+         */
         function clearDynamicUI() {
             subjectCardGrid.innerHTML = '';
             subjectCardGrid.append(noSubjectsMsg);
-            
+
             quizSetupSubject.innerHTML = '<option value="">Select a subject...</option>';
-            
+            quizSetupLessonsList.innerHTML = ''; // NEW
+            quizSetupLessonsContainer.classList.add('hidden'); // NEW
+            quizSetupSettingsContainer.classList.add('hidden'); // NEW
+
             quizHistoryTableBody.innerHTML = '';
             quizHistoryTableBody.append(noHistoryMsg);
 
-            importSubjectSelect.innerHTML = '<option value="">Select subject...</option>';
             exportSubjectSelect.innerHTML = '<option value="">Select subject...</option>';
-            
+
             welcomeUserName.textContent = 'User';
+            welcomeMessage.textContent = 'Ready to start studying? Log in to see your stats.';
             dbQuestionCount.textContent = '0';
+            dbLessonCount.textContent = '0'; // NEW
             dbSubjectCount.textContent = '0';
             dbAvgScore.textContent = 'N/A';
             dbQuizzesTaken.textContent = '0';
         }
 
+        /**
+         * Shows or hides a modal.
+         * @param {string | null} modalId - The ID of the modal to show, or null to hide all.
+         * @param {boolean} [isClosable=true] - Whether the modal can be closed by clicking the backdrop.
+         */
         function showModal(modalId, isClosable = true) {
+            allModals.forEach(m => m.classList.remove('open')); // Remove open from all first
+
             if (!modalId) {
-                modalBackdrop.classList.add('opacity-0');
-                allModals.forEach(m => m.classList.remove('open', 'opacity-100', 'scale-100'));
+                // Hide backdrop
+                modalBackdrop.classList.remove('open');
                 setTimeout(() => {
                     modalBackdrop.classList.add('hidden');
                     allModals.forEach(m => m.classList.add('hidden'));
-                }, 200); 
+                }, 200); // Wait for transition
                 return;
             }
 
+            // Show backdrop
             modalBackdrop.dataset.closable = isClosable;
             modalBackdrop.classList.remove('hidden');
-            allModals.forEach(m => m.classList.add('hidden')); 
-            
+
+            // Hide all modals, then show the target one
+            allModals.forEach(m => m.classList.add('hidden'));
             const modalToShow = $(`#${modalId}`);
-            if(modalToShow) {
+
+            if (modalToShow) {
                 modalToShow.classList.remove('hidden');
                 setTimeout(() => {
-                    modalBackdrop.classList.add('open', 'opacity-100');
-                    modalToShow.classList.add('open', 'opacity-100', 'scale-100');
-                    lucide.createIcons(); 
-                }, 10); 
+                    modalBackdrop.classList.add('open');
+                    modalToShow.classList.add('open');
+                    lucide.createIcons();
+                }, 10); // Short delay to allow display:flex to apply
             }
         }
-        
+
+        // Backdrop click listener to close modal
         modalBackdrop.addEventListener('click', (e) => {
             if (e.target === modalBackdrop && modalBackdrop.dataset.closable === 'true') {
                 showModal(null);
             }
         });
-        
+
+        // Universal close button listener
         $$('.modal-close-button').forEach(btn => {
             btn.addEventListener('click', () => {
-                const parentModal = btn.closest('.modal-content');
-                if (parentModal.id) {
-                    showModal(null);
-                }
+                showModal(null);
             });
         });
 
+        /**
+         * Shows a confirmation modal.
+         * @param {string} title - The modal title.
+         * @param {string} message - The confirmation message.
+         * @param {function} onConfirm - The callback function to run on confirmation.
+         * @param {string} [confirmText='Confirm'] - The text for the confirm button.
+         * @param {string} [confirmClass='bg-red-600'] - The Tailwind class for the confirm button.
+         */
         function showConfirmModal(title, message, onConfirm, confirmText = 'Confirm', confirmClass = 'bg-red-600') {
             confirmModalTitle.textContent = title;
             confirmModalMessage.textContent = message;
             modalConfirmBtn.textContent = confirmText;
-            
-            modalConfirmBtn.className = 'text-white font-semibold py-2 px-4 rounded-lg';
-            modalConfirmBtn.classList.add(confirmClass); 
+
+            // Reset classes and apply new one
+            modalConfirmBtn.className = `text-white font-semibold py-2 px-4 rounded-lg ${confirmClass}`;
 
             modalConfirmCallback = onConfirm;
             showModal('confirm-modal', false);
         }
 
+        // Confirmation modal button listeners
         modalCancelBtn.addEventListener('click', () => showModal(null));
         modalConfirmBtn.addEventListener('click', () => {
             if (typeof modalConfirmCallback === 'function') {
@@ -1146,9 +1601,13 @@
             showModal(null);
         });
 
+        /**
+         * Navigates to a new page, handling quiz abandonment.
+         * @param {string} pageId - The ID of the page to show.
+         */
         function showPage(pageId) {
-            // New safety check: if a quiz is active, confirm before navigating away
-            if (appState.activeQuiz && pageId !== 'page-quiz-active') {
+            // Safety check: if a quiz is active, confirm before navigating away
+            if (appState.activeQuiz && pageId !== 'page-quiz-active' && pageId !== 'page-quiz-results') {
                 showConfirmModal(
                     'Exit Quiz?',
                     'Are you sure you want to exit? Your progress for this attempt will be lost.',
@@ -1160,16 +1619,18 @@
                 );
                 return; // Stop navigation until user confirms
             }
-            
+
             _navigateToPage(pageId);
         }
 
+        /**
+         * Internal function to switch page visibility and update sidebar.
+         * @param {string} pageId - The ID of the page to show.
+         */
         function _navigateToPage(pageId) {
-             if (!appState.isAuthReady && pageId !== 'page-home') {
-                 if(currentAuthUser == null) {
-                    showModal('auth-modal');
-                    return;
-                 }
+            if (!currentAuthUser && pageId !== 'page-home') {
+                showModal('auth-modal');
+                return;
             }
 
             contentPages.forEach(page => page.classList.add('hidden'));
@@ -1187,20 +1648,36 @@
                 } else if (pageId === 'page-home') {
                     pageTitle.textContent = 'Home';
                     $('[data-page="page-home"]').setAttribute('data-active', 'true');
+                } else if (pageId === 'page-quiz-active') {
+                    pageTitle.textContent = 'Quiz in Progress';
+                } else if (pageId === 'page-quiz-results') {
+                    pageTitle.textContent = 'Quiz Results';
                 }
             }
         }
 
+        /**
+         * Shows an error message on the auth modal.
+         * @param {string} message - The error message.
+         */
         function showAuthError(message) {
             authError.textContent = message;
             authError.classList.remove('hidden');
         }
 
+        /**
+         * Hides the auth modal error message.
+         */
         function hideAuthError() {
             authError.classList.add('hidden');
             authError.textContent = '';
         }
 
+        /**
+         * Formats a Firebase Timestamp into a readable date string.
+         * @param {Timestamp} timestamp - The Firebase Timestamp object.
+         * @returns {string} - Formatted date string.
+         */
         function formatFirebaseDate(timestamp) {
             if (!timestamp) return 'N/A';
             const date = timestamp.toDate();
@@ -1211,6 +1688,10 @@
             });
         }
 
+        /**
+         * Shuffles an array in place.
+         * @param {Array<any>} array - The array to shuffle.
+         */
         function shuffleArray(array) {
             for (let i = array.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
@@ -1218,58 +1699,73 @@
             }
         }
 
+        /**
+         * Formats seconds into a mm:ss time string.
+         * @param {number} seconds - The number of seconds.
+         * @returns {string} - Formatted time string.
+         */
         function formatTime(seconds) {
             const mins = Math.floor(seconds / 60);
             const secs = seconds % 60;
             return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
         }
-        
+
         // 
         // =================================================================
         // === AUTHENTICATION LOGIC ========================================
         // =================================================================
         // 
 
+        /**
+         * Auth state change listener. Handles user sign-in and sign-out.
+         */
         onAuthStateChanged(auth, async (user) => {
             if (user) {
+                // --- User is signed in ---
                 console.log("Auth state changed: User is signed in.", user.uid);
                 currentAuthUser = user;
                 currentUserId = user.uid;
                 appState.isAuthReady = true;
 
                 updateUserInfoUI(user);
-                attachFirestoreListeners();
-                
+                attachFirestoreListeners(); // This is where data loading starts
+
                 loginButtonHeader.classList.add('hidden');
-                accountButtonHeader.classList.remove('hidden');
-                
+                accountArea.classList.remove('hidden');
+
                 appLoader.classList.add('hidden');
                 appShell.classList.remove('hidden');
-                showPage('page-home'); 
-                showModal(null); 
+                showPage('page-home');
+                showModal(null);
+                updateQuizSetupUI(true); // Show quiz setup
 
             } else {
+                // --- User is signed out ---
                 console.log("Auth state changed: User is signed out.");
                 if (appState.activeQuiz) {
                     abandonQuiz();
                 }
                 currentAuthUser = null;
                 currentUserId = null;
-                appState.isAuthReady = true; 
+                appState.isAuthReady = true; // Auth check is complete
 
                 detachFirestoreListeners();
                 resetAppState();
                 clearDynamicUI();
-                
+
                 loginButtonHeader.classList.remove('hidden');
-                accountButtonHeader.classList.add('hidden');
-                
-                appShell.classList.remove('hidden'); 
+                accountArea.classList.add('hidden');
+
+                appShell.classList.remove('hidden');
                 appLoader.classList.add('hidden');
-                showPage('page-home'); 
+                showPage('page-home');
+                updateQuizSetupUI(false); // Hide quiz setup, show login message
             }
         });
 
+        /**
+         * Initializes authentication, trying custom token first, then checking current user.
+         */
         async function initializeAuth() {
             try {
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
@@ -1278,31 +1774,38 @@
                     console.log("Custom token sign in successful.");
                 } else if (auth.currentUser) {
                     console.log("User already signed in:", auth.currentUser.uid);
+                    // onAuthStateChanged will handle the rest
                 } else {
                     console.log("No user or token found. App is ready for login.");
+                    // No user, but auth is "ready" (we know they're logged out)
                     appState.isAuthReady = true;
                     appShell.classList.remove('hidden');
                     appLoader.classList.add('hidden');
                     showPage('page-home');
+                    updateQuizSetupUI(false);
                 }
             } catch (error) {
-                 console.error("Auth initialization error:", error);
-                 if (typeof __initial_auth_token !== 'undefined') {
-                    await signInAnonymously(auth);
-                 } else {
+                console.error("Auth initialization error:", error);
+                // Fallback for environment issues
+                if (!auth.currentUser) {
                     appState.isAuthReady = true;
                     appShell.classList.remove('hidden');
                     appLoader.classList.add('hidden');
                     showPage('page-home');
-                 }
+                    updateQuizSetupUI(false);
+                }
             }
         }
 
+        /**
+         * Updates the user avatar and name in the UI.
+         * @param {User} user - The Firebase User object.
+         */
         function updateUserInfoUI(user) {
             if (user) {
                 const displayName = user.displayName || user.email.split('@')[0] || 'User';
                 const email = user.email || 'No email provided';
-                
+
                 accountModalEmail.textContent = email;
                 if (user.photoURL) {
                     userAvatar.src = user.photoURL;
@@ -1310,33 +1813,39 @@
                     const initial = (displayName[0] || 'U').toUpperCase();
                     userAvatar.src = `https://placehold.co/40x40/e2e8f0/64748b?text=${initial}`;
                 }
-                welcomeUserName.textContent = displayName.split(' ')[0];
+                const firstName = displayName.split(' ')[0];
+                welcomeUserName.textContent = firstName;
+                welcomeMessage.textContent = "You're doing great! Keep up the momentum.";
             } else {
+                // Reset to default
                 accountModalEmail.textContent = '...';
                 userAvatar.src = 'https://placehold.co/40x40/e2e8f0/64748b?text=U';
                 welcomeUserName.textContent = 'User';
+                welcomeMessage.textContent = 'Ready to start studying? Log in to see your stats.';
             }
         }
 
+        // --- Auth UI Event Listeners ---
         loginButtonHeader.addEventListener('click', () => {
             setAuthFormMode('login');
             showModal('auth-modal');
         });
 
         accountButtonHeader.addEventListener('click', (e) => {
-            e.stopPropagation(); 
+            e.stopPropagation();
             accountModal.classList.toggle('hidden');
-            if(!accountModal.classList.contains('hidden')) {
-                accountModal.classList.add('open', 'opacity-100', 'scale-100');
+            if (!accountModal.classList.contains('hidden')) {
+                accountModal.classList.add('open');
             } else {
-                accountModal.classList.remove('open', 'opacity-100', 'scale-100');
+                accountModal.classList.remove('open');
             }
         });
-        
+
+        // Close account dropdown when clicking outside
         document.addEventListener('click', (e) => {
-            if (!accountButtonHeader.contains(e.target) && !accountModal.contains(e.target)) {
+            if (!accountArea.contains(e.target)) {
                 accountModal.classList.add('hidden');
-                accountModal.classList.remove('open', 'opacity-100', 'scale-100');
+                accountModal.classList.remove('open');
             }
         });
 
@@ -1344,10 +1853,14 @@
             console.log('Attempting sign out...');
             signOut(auth);
             accountModal.classList.add('hidden');
-            accountModal.classList.remove('open', 'opacity-100', 'scale-100');
+            accountModal.classList.remove('open');
             showToast('You have been logged out.', 'success');
         });
 
+        /**
+         * Toggles the auth modal between 'login' and 'signup' modes.
+         * @param {'login' | 'signup'} mode - The mode to set.
+         */
         function setAuthFormMode(mode) {
             hideAuthError();
             if (mode === 'signup') {
@@ -1361,10 +1874,11 @@
             }
         }
 
+        // Auth form submission (Login / Signup)
         authForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             hideAuthError();
-            
+
             const email = emailInput.value;
             const password = passwordInput.value;
             const isSignUp = !signupButtons.classList.contains('hidden');
@@ -1379,6 +1893,7 @@
                     await signInWithEmailAndPassword(auth, email, password);
                     showToast('Welcome back!', 'success');
                 }
+                // onAuthStateChanged will handle UI updates
             } catch (error) {
                 console.error("Auth error:", error.message);
                 showAuthError(error.message);
@@ -1389,12 +1904,14 @@
         $('#toggle-to-signup').addEventListener('click', () => setAuthFormMode('signup'));
         $('#toggle-to-login').addEventListener('click', () => setAuthFormMode('login'));
 
+        // Google Sign-In
         googleSigninButton.addEventListener('click', async () => {
             hideAuthError();
             const provider = new GoogleAuthProvider();
             try {
                 await signInWithPopup(auth, provider);
                 showToast('Signed in with Google!', 'success');
+                // onAuthStateChanged will handle UI updates
             } catch (error) {
                 console.error("Google Sign-In error:", error.message);
                 showAuthError(error.message);
@@ -1408,38 +1925,68 @@
         // =================================================================
         // 
 
+        // --- Collection Path Getters ---
         const getSubjectsCol = () => collection(db, `artifacts/${appId}/users/${currentUserId}/subjects`);
+        const getLessonsCol = () => collection(db, `artifacts/${appId}/users/${currentUserId}/lessons`); // NEW
         const getQuestionsCol = () => collection(db, `artifacts/${appId}/users/${currentUserId}/questions`);
         const getHistoryCol = () => collection(db, `artifacts/${appId}/users/${currentUserId}/quizHistory`);
 
+        /**
+         * Attaches all Firestore listeners for the logged-in user.
+         */
         function attachFirestoreListeners() {
             if (!currentUserId) return;
             console.log(`Attaching Firestore listeners for user ${currentUserId}`);
-            
-            detachFirestoreListeners();
 
+            detachFirestoreListeners(); // Clear old listeners first
+
+            // --- Subjects Listener ---
             const subjectsQuery = query(getSubjectsCol());
             unsubSubjects = onSnapshot(subjectsQuery, (snapshot) => {
                 appState.subjects = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 console.log('Firestore update: Subjects', appState.subjects);
                 renderSubjectCards();
-                renderQuizSetupDropdown();
+                renderQuizSetupSubjectDropdown();
                 renderDashboardStats();
                 renderSettingsDropdowns();
             }, (error) => console.error("Error listening to subjects:", error));
 
+            // --- Lessons Listener (NEW) ---
+            const lessonsQuery = query(getLessonsCol());
+            unsubLessons = onSnapshot(lessonsQuery, (snapshot) => {
+                appState.lessons = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                console.log('Firestore update: Lessons', appState.lessons);
+                renderSubjectCards(); // Re-render to update lesson counts
+                renderDashboardStats();
+                // If manage lessons modal is open, re-render it
+                if (!manageLessonsModal.classList.contains('hidden') && currentEditingSubject) {
+                    renderManageLessonsModal(currentEditingSubject.id, currentEditingSubject.name);
+                }
+                // If quiz setup is visible, re-render lessons
+                if (!quizSetupLessonsContainer.classList.add('hidden') && quizSetupSubject.value) {
+                    renderQuizSetupLessonCheckboxes(quizSetupSubject.value);
+                }
+            }, (error) => console.error("Error listening to lessons:", error));
+
+            // --- Questions Listener ---
             const questionsQuery = query(getQuestionsCol());
             unsubQuestions = onSnapshot(questionsQuery, (snapshot) => {
                 appState.questions = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 console.log('Firestore update: Questions', appState.questions);
-                renderQuizSetupDropdown();
+                renderSubjectCards(); // Re-render to update question counts
+                renderQuizSetupSubjectDropdown(); // Re-render to update counts
                 renderDashboardStats();
-                if (!manageQuestionsModal.classList.contains('hidden') && currentEditingSubject) {
-                    renderQuestionListModal(currentEditingSubject.id);
+                // If manage questions modal is open, re-render it
+                if (!manageQuestionsModal.classList.contains('hidden') && currentEditingLesson) {
+                    renderQuestionListModal(currentEditingLesson.id);
                 }
-                renderSubjectCards();
+                // If quiz setup is visible, update max questions
+                if (!quizSetupLessonsContainer.classList.add('hidden')) {
+                    updateQuizSetupMaxQuestions();
+                }
             }, (error) => console.error("Error listening to questions:", error));
 
+            // --- Quiz History Listener ---
             const historyQuery = query(getHistoryCol());
             unsubHistory = onSnapshot(historyQuery, (snapshot) => {
                 appState.quizHistory = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -1455,7 +2002,10 @@
         // === UI RENDERING FUNCTIONS ======================================
         // =================================================================
         // 
-        
+
+        /**
+         * Renders the subject cards on the "Manage Bank" page.
+         */
         function renderSubjectCards() {
             if (!currentUserId) {
                 subjectCardGrid.innerHTML = '<p class="text-slate-500 dark:text-slate-400 md:col-span-2 lg:col-span-3">Please log in to manage your question bank.</p>';
@@ -1467,20 +2017,29 @@
                 return;
             }
 
+            // Pre-calculate lesson and question counts for each subject
+            const lessonCounts = appState.lessons.reduce((acc, l) => {
+                acc[l.subjectId] = (acc[l.subjectId] || 0) + 1;
+                return acc;
+            }, {});
+
             const questionCounts = appState.questions.reduce((acc, q) => {
                 acc[q.subjectId] = (acc[q.subjectId] || 0) + 1;
                 return acc;
             }, {});
 
             subjectCardGrid.innerHTML = appState.subjects.map(subject => {
-                const count = questionCounts[subject.id] || 0;
+                const lCount = lessonCounts[subject.id] || 0;
+                const qCount = questionCounts[subject.id] || 0;
+
                 return `
                 <div class="bg-white dark:bg-slate-800 rounded-2xl shadow p-5 flex flex-col border border-slate-200 dark:border-slate-700">
                     <h3 class="text-xl font-semibold mb-2">${subject.name}</h3>
-                    <p class="text-sm text-slate-500 dark:text-slate-400 mb-4">${count} question(s)</p>
+                    <p class="text-sm text-slate-500 dark:text-slate-400">${lCount} lesson(s)</p>
+                    <p class="text-sm text-slate-500 dark:text-slate-400 mb-4">${qCount} question(s)</p>
                     
                     <button class="start-quiz-btn w-full bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2.5 px-4 rounded-lg flex items-center justify-center space-x-2"
-                            data-subject-id="${subject.id}" data-subject-name="${subject.name}" ${count === 0 ? 'disabled' : ''}>
+                            data-subject-id="${subject.id}" data-subject-name="${subject.name}" ${lCount === 0 || qCount === 0 ? 'disabled' : ''}>
                         <i data-lucide="play" class="w-5 h-5"></i>
                         <span>Start Quiz</span>
                     </button>
@@ -1504,47 +2063,154 @@
         /**
          * Renders the subject dropdown on the "Take Quiz" page.
          */
-        function renderQuizSetupDropdown() {
+        function renderQuizSetupSubjectDropdown() {
             if (!currentUserId) {
                 quizSetupSubject.innerHTML = '<option value="">Log in to see subjects</option>';
                 return;
             }
-            
+
+            // Get counts of lessons and questions per subject
+            const lessonCounts = appState.lessons.reduce((acc, l) => {
+                acc[l.subjectId] = (acc[l.subjectId] || 0) + 1;
+                return acc;
+            }, {});
             const questionCounts = appState.questions.reduce((acc, q) => {
                 acc[q.subjectId] = (acc[q.subjectId] || 0) + 1;
                 return acc;
             }, {});
 
-            const availableQuizzes = appState.subjects
+            // Only show subjects that have at least one lesson AND one question
+            const availableSubjects = appState.subjects
                 .map(subject => ({
                     ...subject,
+                    lessonCount: lessonCounts[subject.id] || 0,
                     questionCount: questionCounts[subject.id] || 0
                 }))
-                .filter(subject => subject.questionCount > 0); 
+                .filter(subject => subject.lessonCount > 0 && subject.questionCount > 0);
 
-            if (availableQuizzes.length === 0) {
-                quizSetupSubject.innerHTML = '<option value="">No subjects with questions</option>';
+            if (availableSubjects.length === 0) {
+                quizSetupSubject.innerHTML = '<option value="">No subjects with quizzes available</option>';
                 return;
             }
 
-            quizSetupSubject.innerHTML = '<option value="">Select a subject...</option>' + 
-                availableQuizzes.map(subject => `
-                    <option value="${subject.id}" data-name="${subject.name}" data-max="${subject.questionCount}">
-                        ${subject.name} (${subject.questionCount} questions)
+            quizSetupSubject.innerHTML = '<option value="">Select a subject...</option>' +
+                availableSubjects.map(subject => `
+                    <option value="${subject.id}" data-name="${subject.name}">
+                        ${subject.name} (${subject.lessonCount} lessons, ${subject.questionCount} questions)
                     </option>
                 `).join('');
         }
-        
-        function renderQuestionListModal(subjectId) {
-             const questionsForSubject = appState.questions.filter(q => q.subjectId === subjectId);
-             
-             if (questionsForSubject.length === 0) {
+
+        /**
+         * Renders the lesson checkboxes for a selected subject. (NEW)
+         * @param {string} subjectId - The ID of the selected subject.
+         */
+        function renderQuizSetupLessonCheckboxes(subjectId) {
+            const lessonsForSubject = appState.lessons.filter(l => l.subjectId === subjectId);
+
+            if (lessonsForSubject.length === 0) {
+                quizSetupLessonsList.innerHTML = '';
+                quizSetupNoLessonsMsg.classList.remove('hidden');
+                quizSetupLessonsContainer.classList.remove('hidden');
+                quizSetupSettingsContainer.classList.add('hidden'); // Hide settings if no lessons
+                return;
+            }
+
+            quizSetupNoLessonsMsg.classList.add('hidden');
+
+            // Get question counts for each lesson
+            const questionCounts = appState.questions.reduce((acc, q) => {
+                if (q.subjectId === subjectId) {
+                    acc[q.lessonId] = (acc[q.lessonId] || 0) + 1;
+                }
+                return acc;
+            }, {});
+
+            quizSetupLessonsList.innerHTML = lessonsForSubject.map(lesson => {
+                const count = questionCounts[lesson.id] || 0;
+                const isDisabled = count === 0;
+
+                return `
+                <label class="lesson-checkbox-label ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}">
+                    <input type="checkbox" name="quiz-lesson" value="${lesson.id}" data-q-count="${count}" class="sr-only" ${isDisabled ? 'disabled' : ''}>
+                    <div class="lesson-checkbox-content flex-1 flex items-center justify-between p-3 border border-slate-300 dark:border-slate-600 rounded-md transition-colors">
+                        <span class="font-medium text-slate-800 dark:text-slate-100">${lesson.name}</span>
+                        <span class="text-sm text-slate-500 dark:text-slate-400">${count} q's</span>
+                    </div>
+                </label>
+                `;
+                // Simple checkbox version:
+                // `<label class="flex items-center space-x-2 p-2 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700">
+                //     <input type="checkbox" name="quiz-lesson" value="${lesson.id}" data-q-count="${count}" class="rounded text-sky-600 focus:ring-sky-500" ${count === 0 ? 'disabled' : ''}>
+                //     <span>${lesson.name} (${count} questions)</span>
+                // </label>`
+            }).join('');
+
+            quizSetupLessonsContainer.classList.remove('hidden');
+            quizSetupSettingsContainer.classList.remove('hidden'); // Show settings
+            updateQuizSetupMaxQuestions(); // Update max questions based on 0 selected
+        }
+
+        /**
+         * Renders the list of lessons in the "Manage Lessons" modal. (NEW)
+         * @param {string} subjectId - The ID of the subject.
+         */
+        function renderManageLessonsModal(subjectId) {
+            const lessonsForSubject = appState.lessons.filter(l => l.subjectId === subjectId);
+
+            // Get question counts for each lesson
+            const questionCounts = appState.questions.reduce((acc, q) => {
+                if (q.subjectId === subjectId) {
+                    acc[q.lessonId] = (acc[q.lessonId] || 0) + 1;
+                }
+                return acc;
+            }, {});
+
+            if (lessonsForSubject.length === 0) {
+                lessonListContainer.innerHTML = '';
+                lessonListContainer.append(noLessonsMsg);
+                return;
+            }
+
+            lessonListContainer.innerHTML = lessonsForSubject.map(l => `
+                <div class="p-3 bg-slate-50 dark:bg-slate-700 rounded-lg flex items-center justify-between">
+                    <div>
+                        <p class="font-medium text-slate-800 dark:text-slate-100">${l.name}</p>
+                        <p class="text-sm text-slate-500 dark:text-slate-400">${questionCounts[l.id] || 0} question(s)</p>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button class="manage-questions-btn bg-sky-600 hover:bg-sky-700 text-white text-sm font-medium py-1.5 px-3 rounded-md" 
+                                data-lesson-id="${l.id}" data-lesson-name="${l.name}">
+                            Manage Questions
+                        </button>
+                        <button class="edit-lesson-btn bg-slate-200 hover:bg-slate-300 dark:bg-slate-600 dark:hover:bg-slate-500 text-sm font-medium p-1.5 rounded-md" 
+                                data-lesson-id="${l.id}" data-lesson-name="${l.name}">
+                            <i data-lucide="edit-2" class="w-4 h-4"></i>
+                        </button>
+                        <button class="delete-lesson-btn bg-red-100 hover:bg-red-200 dark:bg-red-900 dark:hover:bg-red-800 text-red-700 dark:text-red-300 text-sm font-medium p-1.5 rounded-md" 
+                                data-lesson-id="${l.id}" data-lesson-name="${l.name}">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+             `).join('');
+            lucide.createIcons();
+        }
+
+        /**
+         * Renders the list of questions for a specific lesson. (UPDATED)
+         * @param {string} lessonId - The ID of the lesson.
+         */
+        function renderQuestionListModal(lessonId) {
+            const questionsForLesson = appState.questions.filter(q => q.lessonId === lessonId);
+
+            if (questionsForLesson.length === 0) {
                 questionListContainer.innerHTML = '';
                 questionListContainer.append(noQuestionsMsg);
                 return;
-             }
-             
-             questionListContainer.innerHTML = questionsForSubject.map(q => `
+            }
+
+            questionListContainer.innerHTML = questionsForLesson.map(q => `
                 <div class="p-3 bg-slate-50 dark:bg-slate-700 rounded-lg">
                     <p class="font-medium text-slate-800 dark:text-slate-100">${q.question}</p>
                     <ul class="mt-2 space-y-1 text-sm list-disc list-inside">
@@ -1564,9 +2230,12 @@
                     </div>
                 </div>
              `).join('');
-             lucide.createIcons();
+            lucide.createIcons();
         }
 
+        /**
+         * Renders the quiz history table.
+         */
         function renderQuizHistoryTable() {
             if (!currentUserId) {
                 quizHistoryTableBody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-slate-500 dark:text-slate-400">Please log in to view your history.</td></tr>';
@@ -1589,10 +2258,14 @@
             `).join('');
         }
 
+        /**
+         * Renders the main dashboard statistics.
+         */
         function renderDashboardStats() {
-            if (!currentUserId) return; 
+            if (!currentUserId) return; // Don't render if logged out
 
             dbSubjectCount.textContent = appState.subjects.length;
+            dbLessonCount.textContent = appState.lessons.length; // NEW
             dbQuestionCount.textContent = appState.questions.length;
 
             const history = appState.quizHistory;
@@ -1606,33 +2279,55 @@
                 dbAvgScore.textContent = 'N/A';
             }
         }
-        
-         function renderSettingsDropdowns() {
+
+        /**
+         * Renders the dropdowns on the Settings page (UPDATED)
+         */
+        function renderSettingsDropdowns() {
             if (!currentUserId) {
-                importSubjectSelect.innerHTML = '<option value="">Log in to import</option>';
                 exportSubjectSelect.innerHTML = '<option value="">Log in to export</option>';
                 return;
             }
             if (appState.subjects.length === 0) {
-                importSubjectSelect.innerHTML = '<option value="">Add a subject first</option>';
                 exportSubjectSelect.innerHTML = '<option value="">Add a subject first</option>';
                 return;
             }
-            
-            const optionsHtml = appState.subjects.map(subject => 
+
+            const optionsHtml = appState.subjects.map(subject =>
                 `<option value="${subject.id}">${subject.name}</option>`
             ).join('');
-            
-            importSubjectSelect.innerHTML = `<option value="">Select subject to import into...</option>${optionsHtml}`;
+
             exportSubjectSelect.innerHTML = `<option value="">Select subject to export...</option>${optionsHtml}`;
-         }
+        }
+
+        /**
+         * Updates the quiz setup UI based on login state (NEW)
+         * @param {boolean} isLoggedIn - Whether the user is logged in.
+         */
+        function updateQuizSetupUI(isLoggedIn) {
+            if (isLoggedIn) {
+                quizSetupLoginMsg.classList.add('hidden');
+                quizSetupSubject.classList.remove('hidden');
+                // Other containers (lessons, settings) are shown/hidden by subject selection
+            } else {
+                quizSetupLoginMsg.classList.remove('hidden');
+                quizSetupSubject.classList.add('hidden');
+                quizSetupLessonsContainer.classList.add('hidden');
+                quizSetupSettingsContainer.classList.add('hidden');
+            }
+        }
 
         // 
         // =================================================================
         // === "MANAGE BANK" LOGIC =========================================
         // =================================================================
         // 
-        
+
+        /**
+         * Opens the modal to add or edit a subject.
+         * @param {string | null} [subjectId=null] - The ID of the subject to edit.
+         * @param {string} [subjectName=''] - The current name of the subject.
+         */
         function openSubjectModal(subjectId = null, subjectName = '') {
             subjectForm.reset();
             subjectFormError.classList.add('hidden');
@@ -1647,43 +2342,50 @@
             }
             showModal('subject-modal');
         }
-        
+
+        // --- "Add New Subject" button ---
         $('#add-new-subject-btn').addEventListener('click', () => {
-             if (!currentUserId) {
+            if (!currentUserId) {
                 showModal('auth-modal');
                 return;
             }
             openSubjectModal();
         });
 
+        // --- Subject Form submission (Add/Edit) ---
         subjectForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const subjectName = subjectNameInput.value.trim();
             const subjectId = subjectIdInput.value;
             if (!subjectName) return;
 
+            // Check for duplicate name
             if (appState.subjects.some(s => s.name.toLowerCase() === subjectName.toLowerCase() && s.id !== subjectId)) {
                 subjectFormError.textContent = 'This subject already exists.';
                 subjectFormError.classList.remove('hidden');
                 return;
             }
-            
+
             subjectFormError.classList.add('hidden');
-            
+
             try {
                 if (subjectId) {
+                    // --- Update Subject ---
                     const docRef = doc(getSubjectsCol(), subjectId);
                     await updateDoc(docRef, { name: subjectName });
                     showToast('Subject updated successfully!', 'success');
+
+                    // If editing from lessons modal, update title
+                    if (!manageLessonsModal.classList.contains('hidden') && currentEditingSubject) {
+                        currentEditingSubject.name = subjectName;
+                        manageLModalTitle.textContent = `Manage Lessons for "${subjectName}"`;
+                    }
                 } else {
+                    // --- Add New Subject ---
                     const docRef = await addDoc(getSubjectsCol(), { name: subjectName });
                     showToast('Subject added successfully!', 'success');
                 }
-                showModal(null); 
-                if (!manageQuestionsModal.classList.contains('hidden') && currentEditingSubject) {
-                    currentEditingSubject.name = subjectName;
-                    manageQModalTitle.textContent = `Manage Questions for "${subjectName}"`;
-                }
+                showModal(null); // Close subject modal
             } catch (error) {
                 console.error("Error saving subject:", error);
                 subjectFormError.textContent = 'Error saving subject. Please try again.';
@@ -1692,30 +2394,44 @@
             }
         });
 
+        // --- Subject Card Grid event delegation ---
         subjectCardGrid.addEventListener('click', (e) => {
             const subjectCard = e.target.closest('[data-subject-id]');
             if (!subjectCard) return;
-            
+
             const { subjectId, subjectName } = subjectCard.dataset;
 
+            // --- Delete Subject Button ---
             const deleteButton = e.target.closest('.delete-subject-btn');
             if (deleteButton) {
                 showConfirmModal(
                     'Delete Subject?',
-                    `Are you sure you want to delete "${subjectName}"? This will also delete all associated questions. This cannot be undone.`,
+                    `Are you sure you want to delete "${subjectName}"? This will also delete ALL its lessons and questions. This cannot be undone.`,
                     async () => {
                         try {
                             const batch = writeBatch(db);
+
+                            // 1. Delete Subject doc
                             const subjectDocRef = doc(getSubjectsCol(), subjectId);
                             batch.delete(subjectDocRef);
 
+                            // 2. Delete all Lessons for this Subject
+                            const lessonsToDelete = appState.lessons.filter(l => l.subjectId === subjectId);
+                            lessonsToDelete.forEach(l => {
+                                const lessonDocRef = doc(getLessonsCol(), l.id);
+                                batch.delete(lessonDocRef);
+                            });
+
+                            // 3. Delete all Questions for this Subject
+                            // Note: This relies on appState.questions. This is faster than a query.
                             const questionsToDelete = appState.questions.filter(q => q.subjectId === subjectId);
                             questionsToDelete.forEach(q => {
                                 const questionDocRef = doc(getQuestionsCol(), q.id);
                                 batch.delete(questionDocRef);
                             });
+
                             await batch.commit();
-                            showToast('Subject and questions deleted.', 'success');
+                            showToast('Subject, lessons, and questions deleted.', 'success');
                         } catch (error) {
                             console.error("Error deleting subject:", error);
                             showToast('Error deleting subject.', 'error');
@@ -1724,83 +2440,261 @@
                 );
                 return;
             }
-            
+
+            // --- Manage Subject Button ---
             const manageButton = e.target.closest('.manage-subject-btn');
             if (manageButton) {
-                openManageQuestionsModal(subjectId, subjectName);
+                openManageLessonsModal(subjectId, subjectName);
                 return;
             }
-            
+
+            // --- Start Quiz Button ---
             const startButton = e.target.closest('.start-quiz-btn');
             if (startButton && !startButton.disabled) {
-                // Don't start quiz, just go to the page
                 showPage('page-take-quiz');
                 // Pre-select this subject in the dropdown
                 quizSetupSubject.value = subjectId;
-                // Manually trigger change event to update max questions
+                // Manually trigger change event to show lessons
                 quizSetupSubject.dispatchEvent(new Event('change'));
                 return;
             }
         });
-        
+
         // 
         // =================================================================
-        // === "MANAGE QUESTIONS" MODAL LOGIC ==============================
+        // === "MANAGE LESSONS" MODAL LOGIC (NEW) ==========================
         // =================================================================
         // 
-        
-        function openManageQuestionsModal(subjectId, subjectName) {
+
+        /**
+         * Opens the modal to manage lessons for a subject.
+         * @param {string} subjectId - The ID of the subject.
+         * @param {string} subjectName - The name of the subject.
+         */
+        function openManageLessonsModal(subjectId, subjectName) {
             currentEditingSubject = { id: subjectId, name: subjectName };
-            manageQModalTitle.textContent = `Manage Questions for "${subjectName}"`;
-            renderQuestionListModal(subjectId);
-            showModal('manage-questions-modal');
+            currentEditingLesson = null; // Clear lesson context
+            manageLModalTitle.textContent = `Manage Lessons for "${subjectName}"`;
+            renderManageLessonsModal(subjectId);
+            showModal('manage-lessons-modal');
         }
-        
+
+        /**
+         * Opens the modal to add or edit a lesson.
+         * @param {string} subjectId - The ID of the parent subject.
+         * @param {string | null} [lessonId=null] - The ID of the lesson to edit.
+         * @param {string} [lessonName=''] - The current name of the lesson.
+         */
+        function openLessonModal(subjectId, lessonId = null, lessonName = '') {
+            lessonForm.reset();
+            lessonFormError.classList.add('hidden');
+            lessonSubjectIdInput.value = subjectId;
+
+            if (lessonId) {
+                lessonModalTitle.textContent = 'Edit Lesson';
+                lessonIdInput.value = lessonId;
+                lessonNameInput.value = lessonName;
+            } else {
+                lessonModalTitle.textContent = 'Add New Lesson';
+                lessonIdInput.value = '';
+                lessonNameInput.value = '';
+            }
+            showModal('lesson-modal');
+        }
+
+        // --- "Edit Subject Name" button (from lessons modal) ---
         editSubjectNameBtn.addEventListener('click', () => {
             if (currentEditingSubject) {
                 openSubjectModal(currentEditingSubject.id, currentEditingSubject.name);
             }
         });
-        
-        addNewQuestionBtn.addEventListener('click', () => {
+
+        // --- "Add New Lesson" button ---
+        addNewLessonBtn.addEventListener('click', () => {
             if (currentEditingSubject) {
-                openQuestionModal(currentEditingSubject.id);
+                openLessonModal(currentEditingSubject.id);
             }
         });
-        
-        function openQuestionModal(subjectId, questionId = null) {
+
+        // --- Lesson Form submission (Add/Edit) ---
+        lessonForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const lessonName = lessonNameInput.value.trim();
+            const lessonId = lessonIdInput.value;
+            const subjectId = lessonSubjectIdInput.value;
+            if (!lessonName || !subjectId) return;
+
+            // Check for duplicate name *within the same subject*
+            if (appState.lessons.some(l => l.subjectId === subjectId && l.name.toLowerCase() === lessonName.toLowerCase() && l.id !== lessonId)) {
+                lessonFormError.textContent = 'This lesson already exists for this subject.';
+                lessonFormError.classList.remove('hidden');
+                return;
+            }
+
+            lessonFormError.classList.add('hidden');
+
+            try {
+                if (lessonId) {
+                    // --- Update Lesson ---
+                    const docRef = doc(getLessonsCol(), lessonId);
+                    await updateDoc(docRef, { name: lessonName });
+                    showToast('Lesson updated successfully!', 'success');
+
+                    // If editing from questions modal, update title
+                    if (!manageQuestionsModal.classList.contains('hidden') && currentEditingLesson) {
+                        currentEditingLesson.name = lessonName;
+                        manageQModalTitle.textContent = `Manage Questions for "${lessonName}"`;
+                    }
+                } else {
+                    // --- Add New Lesson ---
+                    const docRef = await addDoc(getLessonsCol(), {
+                        name: lessonName,
+                        subjectId: subjectId
+                    });
+                    showToast('Lesson added successfully!', 'success');
+                }
+                showModal('manage-lessons-modal'); // Go back to lessons list
+            } catch (error) {
+                console.error("Error saving lesson:", error);
+                lessonFormError.textContent = 'Error saving lesson. Please try again.';
+                lessonFormError.classList.remove('hidden');
+                showToast('Error saving lesson.', 'error');
+            }
+        });
+
+        // --- Lesson List event delegation ---
+        lessonListContainer.addEventListener('click', (e) => {
+            const lessonItem = e.target.closest('[data-lesson-id]');
+            if (!lessonItem) return;
+
+            const { lessonId, lessonName } = lessonItem.dataset;
+
+            // --- Delete Lesson Button ---
+            const deleteButton = e.target.closest('.delete-lesson-btn');
+            if (deleteButton) {
+                showConfirmModal(
+                    'Delete Lesson?',
+                    `Are you sure you want to delete "${lessonName}"? This will also delete ALL its questions. This cannot be undone.`,
+                    async () => {
+                        try {
+                            const batch = writeBatch(db);
+
+                            // 1. Delete Lesson doc
+                            const lessonDocRef = doc(getLessonsCol(), lessonId);
+                            batch.delete(lessonDocRef);
+
+                            // 2. Delete all Questions for this Lesson
+                            const questionsToDelete = appState.questions.filter(q => q.lessonId === lessonId);
+                            questionsToDelete.forEach(q => {
+                                const questionDocRef = doc(getQuestionsCol(), q.id);
+                                batch.delete(questionDocRef);
+                            });
+
+                            await batch.commit();
+                            showToast('Lesson and questions deleted.', 'success');
+                        } catch (error) {
+                            console.error("Error deleting lesson:", error);
+                            showToast('Error deleting lesson.', 'error');
+                        }
+                    }
+                );
+                return;
+            }
+
+            // --- Edit Lesson Button ---
+            const editButton = e.target.closest('.edit-lesson-btn');
+            if (editButton) {
+                openLessonModal(currentEditingSubject.id, lessonId, lessonName);
+                return;
+            }
+
+            // --- Manage Questions Button ---
+            const manageButton = e.target.closest('.manage-questions-btn');
+            if (manageButton) {
+                openManageQuestionsModal(lessonId, lessonName);
+                return;
+            }
+        });
+
+        // 
+        // =================================================================
+        // === "MANAGE QUESTIONS" MODAL LOGIC (UPDATED) ====================
+        // =================================================================
+        // 
+
+        /**
+         * Opens the modal to manage questions for a specific lesson.
+         * @param {string} lessonId - The ID of the lesson.
+         * @param {string} lessonName - The name of the lesson.
+         */
+        function openManageQuestionsModal(lessonId, lessonName) {
+            // currentEditingSubject is already set
+            currentEditingLesson = { id: lessonId, name: lessonName, subjectId: currentEditingSubject.id };
+            manageQModalTitle.textContent = `Manage Questions for "${lessonName}"`;
+            renderQuestionListModal(lessonId);
+            showModal('manage-questions-modal');
+        }
+
+        // --- "Edit Lesson Name" button (from questions modal) ---
+        editLessonNameBtn.addEventListener('click', () => {
+            if (currentEditingLesson) {
+                openLessonModal(currentEditingLesson.subjectId, currentEditingLesson.id, currentEditingLesson.name);
+            }
+        });
+
+        // --- "Add New Question" button (from questions modal) ---
+        addNewQuestionBtn.addEventListener('click', () => {
+            if (currentEditingLesson) {
+                openQuestionModal(currentEditingLesson.subjectId, currentEditingLesson.id);
+            }
+        });
+
+        /**
+         * Opens the modal to add or edit a question.
+         * @param {string} subjectId - The ID of the parent subject.
+         * @param {string} lessonId - The ID of the parent lesson.
+         * @param {string | null} [questionId=null] - The ID of the question to edit.
+         */
+        function openQuestionModal(subjectId, lessonId, questionId = null) {
             questionForm.reset();
             questionFormError.classList.add('hidden');
             questionSubjectIdInput.value = subjectId;
-            
+            questionLessonIdInput.value = lessonId; // NEW
+
             if (questionId) {
+                // --- Edit Mode ---
                 questionModalTitle.textContent = 'Edit Question';
                 questionIdInput.value = questionId;
                 const questionData = appState.questions.find(q => q.id === questionId);
                 if (questionData) {
                     questionTextInput.value = questionData.question;
+                    // Options are already ordered (correct is 0)
                     questionOptions.forEach((input, index) => {
                         input.value = questionData.options[index] || '';
                     });
                 }
             } else {
+                // --- Add Mode ---
                 questionModalTitle.textContent = 'Add New Question';
                 questionIdInput.value = '';
             }
-            showModal('question-modal', false); 
+            showModal('question-modal', false);
         }
 
+        // --- Question Form submission (Add/Edit) ---
         questionForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             questionFormError.classList.add('hidden');
 
             const subjectId = questionSubjectIdInput.value;
+            const lessonId = questionLessonIdInput.value; // NEW
             const questionId = questionIdInput.value;
             const question = questionTextInput.value.trim();
+            // Options are saved with correct answer at index 0
             const options = Array.from(questionOptions).map(input => input.value.trim());
-            const correctAnswerIndex = 0; 
+            const correctAnswerIndex = 0; // By definition of the form
 
-            if (!subjectId || !question || options.some(opt => !opt)) {
+            if (!subjectId || !lessonId || !question || options.some(opt => !opt)) {
                 questionFormError.textContent = 'Please fill out all fields.';
                 questionFormError.classList.remove('hidden');
                 return;
@@ -1808,6 +2702,7 @@
 
             const questionData = {
                 subjectId,
+                lessonId, // NEW
                 question,
                 options,
                 correctAnswerIndex
@@ -1815,14 +2710,16 @@
 
             try {
                 if (questionId) {
+                    // --- Update Question ---
                     const docRef = doc(getQuestionsCol(), questionId);
                     await updateDoc(docRef, questionData);
                     showToast('Question updated!', 'success');
                 } else {
+                    // --- Add New Question ---
                     const docRef = await addDoc(getQuestionsCol(), questionData);
                     showToast('Question added!', 'success');
                 }
-                showModal('manage-questions-modal'); 
+                showModal('manage-questions-modal'); // Go back to questions list
             } catch (error) {
                 console.error("Error saving question:", error);
                 questionFormError.textContent = 'Error saving question. Please try again.';
@@ -1830,15 +2727,18 @@
                 showToast('Error saving question.', 'error');
             }
         });
-        
+
+        // --- Question List event delegation (Edit/Delete) ---
         questionListContainer.addEventListener('click', (e) => {
+            // --- Edit Question Button ---
             const editButton = e.target.closest('.edit-question-btn');
             if (editButton) {
                 const questionId = editButton.dataset.questionId;
-                openQuestionModal(currentEditingSubject.id, questionId);
+                openQuestionModal(currentEditingLesson.subjectId, currentEditingLesson.id, questionId);
                 return;
             }
-            
+
+            // --- Delete Question Button ---
             const deleteButton = e.target.closest('.delete-question-btn');
             if (deleteButton) {
                 const questionId = deleteButton.dataset.questionId;
@@ -1862,41 +2762,76 @@
 
         // 
         // =================================================================
-        // === QUIZ LOGIC (NEW) ============================================
+        // === QUIZ LOGIC (UPDATED) ========================================
         // =================================================================
         // 
 
-        // --- Event Listener for "Take Quiz" form ---
+        // --- Event Listener for Subject Dropdown ---
         quizSetupSubject.addEventListener('change', () => {
-            const selectedOption = quizSetupSubject.options[quizSetupSubject.selectedIndex];
-            const max = selectedOption.dataset.max || 0;
-            
-            quizSetupMaxQuestions.textContent = `(Max: ${max})`;
-            quizSetupNumQuestions.max = max;
-            if (parseInt(quizSetupNumQuestions.value) > max) {
-                quizSetupNumQuestions.value = max;
-            }
-            if (max == 0) {
-                 quizSetupNumQuestions.value = 0;
+            const subjectId = quizSetupSubject.value;
+            if (subjectId) {
+                renderQuizSetupLessonCheckboxes(subjectId);
+            } else {
+                quizSetupLessonsContainer.classList.add('hidden');
+                quizSetupSettingsContainer.classList.add('hidden');
             }
         });
 
+        // --- Event Listener for Lesson Checkbox List (NEW) ---
+        quizSetupLessonsList.addEventListener('change', (e) => {
+            if (e.target.name === 'quiz-lesson') {
+                updateQuizSetupMaxQuestions();
+            }
+        });
+
+        /**
+         * Updates the max questions input based on selected lessons. (NEW)
+         */
+        function updateQuizSetupMaxQuestions() {
+            const selectedLessons = $$('input[name="quiz-lesson"]:checked');
+            let totalQuestions = 0;
+            selectedLessons.forEach(checkbox => {
+                totalQuestions += parseInt(checkbox.dataset.qCount) || 0;
+            });
+
+            quizSetupMaxQuestions.textContent = `(Max: ${totalQuestions})`;
+            quizSetupNumQuestions.max = totalQuestions;
+            if (parseInt(quizSetupNumQuestions.value) > totalQuestions || quizSetupNumQuestions.value === "0") {
+                quizSetupNumQuestions.value = totalQuestions;
+            }
+            if (totalQuestions === 0) {
+                quizSetupNumQuestions.value = 0;
+            }
+        }
+
+        // --- Event Listener for "Take Quiz" form ---
         quizSetupForm.addEventListener('submit', (e) => {
             e.preventDefault();
             quizSetupError.classList.add('hidden');
 
+            // --- 1. Get Subject ---
             const selectedOption = quizSetupSubject.options[quizSetupSubject.selectedIndex];
             const subjectId = quizSetupSubject.value;
             const subjectName = selectedOption.dataset.name;
-            const maxQuestions = parseInt(selectedOption.dataset.max || 0);
-            
+
+            // --- 2. Get Selected Lessons (NEW) ---
+            const selectedLessonCheckboxes = $$('input[name="quiz-lesson"]:checked');
+            const selectedLessonIds = Array.from(selectedLessonCheckboxes).map(cb => cb.value);
+
+            // --- 3. Get Settings ---
             const numQuestions = parseInt(quizSetupNumQuestions.value);
             const timePerQuestion = parseInt(quizSetupTimePerQuestion.value) || 0;
             const showTimer = quizSetupShowTimer.checked;
+            const maxQuestions = parseInt(quizSetupNumQuestions.max) || 0;
 
-            // --- Validation ---
+            // --- 4. Validation ---
             if (!subjectId) {
                 quizSetupError.textContent = 'Please select a subject.';
+                quizSetupError.classList.remove('hidden');
+                return;
+            }
+            if (selectedLessonIds.length === 0) {
+                quizSetupError.textContent = 'Please select at least one lesson.';
                 quizSetupError.classList.remove('hidden');
                 return;
             }
@@ -1906,29 +2841,32 @@
                 return;
             }
 
-            console.log(`Starting quiz: ${subjectName}, ${numQuestions} questions, ${timePerQuestion}s/q, timer: ${showTimer}`);
-            
-            // --- Quiz Setup ---
-            const allQuestions = appState.questions.filter(q => q.subjectId === subjectId);
+            console.log(`Starting quiz: ${subjectName}, Lessons: ${selectedLessonIds.join(', ')}, ${numQuestions} questions`);
+
+            // --- 5. Quiz Setup ---
+            // Get all questions *only* from the selected lessons
+            const allQuestions = appState.questions.filter(q => selectedLessonIds.includes(q.lessonId));
             shuffleArray(allQuestions);
-            
+
             let quizQuestions = allQuestions.slice(0, numQuestions);
-            
+
             // For each question, create a *deep copy* and shuffle its options
             quizQuestions = quizQuestions.map(q => {
                 const newQ = JSON.parse(JSON.stringify(q)); // Deep copy
-                
+
+                // Map options to objects, shuffle, then map back
                 const optionsWithState = newQ.options.map((optionText, index) => ({
                     text: optionText,
                     isCorrect: index === newQ.correctAnswerIndex
                 }));
                 shuffleArray(optionsWithState);
-                
+
+                // Re-assign options array and find new correct index
                 newQ.options = optionsWithState.map(opt => opt.text);
                 newQ.correctAnswerIndex = optionsWithState.findIndex(opt => opt.isCorrect);
                 return newQ;
             });
-            
+
             appState.activeQuiz = {
                 subjectId,
                 subjectName,
@@ -1941,27 +2879,35 @@
                 currentQuestionStartTime: Date.now(),
                 savedQuizData: null // To store data for review
             };
-            
+
             quizActiveTitle.textContent = `${subjectName} Quiz`;
             quizReviewSection.classList.add('hidden'); // Hide review from previous quiz
             renderActiveQuizQuestion();
             _navigateToPage('page-quiz-active'); // Use internal nav function
-            
+
             if (showTimer && timePerQuestion > 0) {
                 startQuizTimer(timePerQuestion);
             } else {
                 quizTimerDisplay.classList.add('hidden');
             }
         });
-        
+
+        quizSetupLoginBtn.addEventListener('click', () => {
+            showModal('auth-modal');
+        });
+
+        /**
+         * Starts the timer for a single question.
+         * @param {number} seconds - The time allowed for the question.
+         */
         function startQuizTimer(seconds) {
             clearInterval(quizTimerInterval);
             let remainingTime = seconds;
             quizTimerDisplay.classList.remove('hidden');
-            
+
             function tick() {
                 quizTimerTime.textContent = formatTime(remainingTime);
-                
+
                 if (remainingTime <= 0) {
                     clearInterval(quizTimerInterval);
                     showToast('Time is up!', 'error');
@@ -1974,18 +2920,23 @@
             quizTimerInterval = setInterval(tick, 1000);
         }
 
+        /**
+         * Renders the currently active quiz question and options.
+         */
         function renderActiveQuizQuestion() {
             if (!appState.activeQuiz) return;
-            
+
             const quiz = appState.activeQuiz;
             const q = quiz.questions[quiz.currentIndex];
 
             quizActiveQuestion.textContent = q.question;
-            
+
+            // Update progress
             const progress = ((quiz.currentIndex + 1) / quiz.questions.length) * 100;
             quizProgressText.textContent = `Question ${quiz.currentIndex + 1} / ${quiz.questions.length}`;
             quizProgressBar.style.width = `${progress}%`;
 
+            // Render options
             quizOptionsContainer.innerHTML = q.options.map((option, index) => `
                 <label class="quiz-option-label block w-full p-4 border border-slate-300 dark:border-slate-600 rounded-lg cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
                     <input type="radio" name="quiz-option" value="${index}" class="hidden">
@@ -1993,6 +2944,7 @@
                 </label>
             `).join('');
 
+            // Hide nav buttons
             quizNextButton.classList.add('hidden');
             quizSubmitButton.classList.add('hidden');
 
@@ -2001,8 +2953,8 @@
                 startQuizTimer(quiz.timePerQuestion);
             }
         }
-        
-        // --- New: Event Delegation for clicking a quiz option ---
+
+        // --- Event Delegation for clicking a quiz option ---
         quizOptionsContainer.addEventListener('change', (e) => {
             if (e.target.name === 'quiz-option' && appState.activeQuiz) {
                 const quiz = appState.activeQuiz;
@@ -2014,7 +2966,7 @@
 
                 // Show feedback
                 showQuestionFeedback(selectedIndex);
-                
+
                 // Show next/submit button
                 if (quiz.currentIndex === quiz.questions.length - 1) {
                     quizSubmitButton.classList.remove('hidden');
@@ -2023,16 +2975,20 @@
                 }
             }
         });
-        
+
+        /**
+         * Shows correct/incorrect feedback on options after an answer.
+         * @param {number} selectedIndex - The index of the answer the user selected.
+         */
         function showQuestionFeedback(selectedIndex) {
             const quiz = appState.activeQuiz;
             const correctIndex = quiz.questions[quiz.currentIndex].correctAnswerIndex;
-            
+
             $$('.quiz-option-label').forEach((label, index) => {
                 const input = label.querySelector('input');
                 input.disabled = true;
                 label.classList.add('disabled');
-                
+
                 if (index === correctIndex) {
                     label.classList.add('correct');
                 } else if (index === selectedIndex) {
@@ -2041,11 +2997,15 @@
             });
         }
 
+        /**
+         * Moves to the next question or finishes the quiz.
+         * @param {boolean} [isTimeout=false] - Whether this was triggered by a timeout.
+         */
         function handleQuizNext(isTimeout = false) {
             if (!appState.activeQuiz) return;
             const quiz = appState.activeQuiz;
-            
-            // If it was a timeout, and no answer was selected, mark it as null (or -1)
+
+            // If it was a timeout, and no answer was selected, mark it as -1
             if (isTimeout && quiz.userAnswers[quiz.currentIndex] === null) {
                 quiz.userAnswers[quiz.currentIndex] = -1; // -1 indicates timeout
             }
@@ -2058,12 +3018,16 @@
             }
         }
 
+        /**
+         * Finalizes the quiz, calculates score, saves to history, and shows results.
+         */
         async function finishQuiz() {
             if (!appState.activeQuiz) return;
             clearInterval(quizTimerInterval); // Stop any running timers
-            
+
             const quiz = appState.activeQuiz;
-            
+
+            // Calculate score
             let correctAnswers = 0;
             quiz.questions.forEach((q, index) => {
                 if (q.correctAnswerIndex === quiz.userAnswers[index]) {
@@ -2072,15 +3036,16 @@
             });
 
             const totalQuestions = quiz.questions.length;
-            const finalScore = Math.round((correctAnswers / totalQuestions) * 100);
+            const finalScore = totalQuestions > 0 ? Math.round((correctAnswers / totalQuestions) * 100) : 0;
             quiz.score = finalScore;
-            
+
             // Save full quiz data for review
             quiz.savedQuizData = {
                 questions: quiz.questions,
                 userAnswers: quiz.userAnswers
             };
 
+            // Save to Firestore
             try {
                 await addDoc(getHistoryCol(), {
                     subjectId: quiz.subjectId,
@@ -2100,27 +3065,49 @@
             resultsSubjectName.textContent = `${quiz.subjectName} Quiz`;
             resultsScoreText.textContent = `${finalScore}%`;
             resultsScoreDetails.textContent = `You answered ${correctAnswers} out of ${totalQuestions} questions correctly.`;
-            
+
+            // Update results icon based on score
+            if (finalScore >= 70) {
+                resultsIcon.setAttribute('data-lucide', 'check-circle');
+                resultsIcon.className = 'w-20 h-20 text-emerald-500 mx-auto';
+            } else if (finalScore >= 40) {
+                resultsIcon.setAttribute('data-lucide', 'alert-triangle');
+                resultsIcon.className = 'w-20 h-20 text-yellow-500 mx-auto';
+            } else {
+                resultsIcon.setAttribute('data-lucide', 'x-circle');
+                resultsIcon.className = 'w-20 h-20 text-red-500 mx-auto';
+            }
+            lucide.createIcons();
+
             // Attach data to review button
             quizReviewButton.dataset.quizData = JSON.stringify(quiz.savedQuizData);
 
             _navigateToPage('page-quiz-results');
-            appState.activeQuiz = null;
+            appState.activeQuiz = null; // Quiz is no longer active
         }
-        
-        // --- New: Review Answers Button ---
+
+        // --- "Review Answers" Button ---
         quizReviewButton.addEventListener('click', () => {
-            const data = JSON.parse(quizReviewButton.dataset.quizData);
-            renderQuizReview(data.questions, data.userAnswers);
-            quizReviewSection.classList.remove('hidden');
+            try {
+                const data = JSON.parse(quizReviewButton.dataset.quizData);
+                renderQuizReview(data.questions, data.userAnswers);
+                quizReviewSection.classList.remove('hidden');
+            } catch (error) {
+                console.error("Error parsing review data:", error);
+                showToast('Could not load review data.', 'error');
+            }
         });
-        
-        // --- New: Render Quiz Review ---
+
+        /**
+         * Renders the detailed answer review section.
+         * @param {Array<object>} questions - The array of question objects.
+         * @param {Array<number>} userAnswers - The array of user's answer indices.
+         */
         function renderQuizReview(questions, userAnswers) {
             quizReviewContainer.innerHTML = questions.map((q, index) => {
                 const userAnswerIndex = userAnswers[index];
                 const correctIndex = q.correctAnswerIndex;
-                
+
                 const optionsHtml = q.options.map((option, i) => {
                     let classes = 'p-3 rounded-md border';
                     if (i === correctIndex) {
@@ -2130,17 +3117,17 @@
                     } else {
                         classes += ' bg-slate-100 border-slate-200 dark:bg-slate-700 dark:border-slate-600';
                     }
-                    
+
                     return `<li class="${classes}">${option}</li>`;
                 }).join('');
-                
+
                 let answerFeedback = '';
                 if (userAnswerIndex === correctIndex) {
                     answerFeedback = '<p class="text-sm font-medium text-emerald-600 dark:text-emerald-400">You answered correctly.</p>';
-                } else if (userAnswerIndex === -1) {
-                    answerFeedback = '<p class="text-sm font-medium text-yellow-600 dark:text-yellow-400">You ran out of time.</p>';
+                } else if (userAnswerIndex === -1 || userAnswerIndex === null) {
+                    answerFeedback = '<p class="text-sm font-medium text-yellow-600 dark:text-yellow-400">You did not answer this question.</p>';
                 } else {
-                     answerFeedback = '<p class="text-sm font-medium text-red-600 dark:text-red-400">You answered incorrectly.</p>';
+                    answerFeedback = '<p class="text-sm font-medium text-red-600 dark:text-red-400">You answered incorrectly.</p>';
                 }
 
                 return `
@@ -2153,16 +3140,18 @@
             }).join('');
         }
 
+        /**
+         * Abandons the active quiz.
+         */
         function abandonQuiz() {
             clearInterval(quizTimerInterval);
             appState.activeQuiz = null;
             console.log("Quiz abandoned.");
         }
-        
-        // Event listeners for quiz navigation
+
+        // --- Event listeners for quiz navigation/exit ---
         quizNextButton.addEventListener('click', () => handleQuizNext(false));
         quizSubmitButton.addEventListener('click', () => handleQuizNext(false));
-
         quizExitButtonIcon.addEventListener('click', () => {
             showConfirmModal(
                 'Exit Quiz?',
@@ -2176,10 +3165,15 @@
 
         // 
         // =================================================================
-        // === "SETTINGS & DATA" LOGIC =====================================
+        // === "SETTINGS & DATA" LOGIC (UPDATED) ===========================
         // =================================================================
         // 
-        
+
+        /**
+         * Triggers a browser download for a JSON object.
+         * @param {object} data - The JSON object to download.
+         * @param {string} filename - The desired filename.
+         */
         function downloadJSON(data, filename) {
             const dataStr = JSON.stringify(data, null, 2);
             const dataBlob = new Blob([dataStr], { type: 'application/json' });
@@ -2193,19 +3187,24 @@
             URL.revokeObjectURL(url);
             showToast('Data exported successfully!', 'success');
         }
-        
+
+        /**
+         * Sets the status message on the import/export page.
+         * @param {string} message - The message to show.
+         * @param {boolean} [isError=false] - Whether to style as an error.
+         */
         function setImportStatus(message, isError = false) {
-             importStatus.textContent = message;
-             importStatus.classList.toggle('text-red-500', isError);
-             importStatus.classList.toggle('text-emerald-500', !isError);
-             if (isError) {
+            importStatus.textContent = message;
+            importStatus.className = `text-sm text-center ${isError ? 'text-red-500' : 'text-emerald-500'}`;
+            if (isError) {
                 showToast(message, 'error');
-             } else {
+            } else {
                 showToast(message, 'success');
-             }
-             setTimeout(() => importStatus.textContent = '', 4000);
+            }
+            setTimeout(() => importStatus.textContent = '', 5000);
         }
-        
+
+        // --- "Export Subject" Button (UPDATED) ---
         exportSubjectButton.addEventListener('click', () => {
             if (!currentUserId) { showModal('auth-modal'); return; }
             const subjectId = exportSubjectSelect.value;
@@ -2213,62 +3212,114 @@
                 showToast('Please select a subject to export.', 'error');
                 return;
             }
-            
+
             const subject = appState.subjects.find(s => s.id === subjectId);
-            const questions = appState.questions
-                .filter(q => q.subjectId === subjectId)
-                .map(({id, subjectId, ...q}) => q); 
-                
+            const lessons = appState.lessons.filter(l => l.subjectId === subjectId);
+            const questions = appState.questions.filter(q => q.subjectId === subjectId);
+
+            // Build nested structure
             const dataToExport = {
                 subjectName: subject.name,
-                questions: questions
+                lessons: lessons.map(lesson => ({
+                    name: lesson.name,
+                    questions: questions
+                        .filter(q => q.lessonId === lesson.id)
+                        // Strip firestore IDs from questions
+                        .map(({ id, subjectId, lessonId, ...q }) => q)
+                }))
             };
-            
+
             downloadJSON(dataToExport, `studyhelper_subject_${subject.name}.json`);
         });
 
+        // --- "Export Full Backup" Button (UPDATED) ---
         exportFullButton.addEventListener('click', () => {
             if (!currentUserId) { showModal('auth-modal'); return; }
+
+            // Create maps for easier lookup
+            const subjectMap = new Map(appState.subjects.map(s => [s.id, s.name]));
+            const lessonMap = new Map(appState.lessons.map(l => [l.id, l.name]));
+
             const dataToExport = {
-                subjects: appState.subjects.map(({id, ...s}) => s), 
-                questions: appState.questions.map(({id, ...q}) => q), 
-                quizHistory: appState.quizHistory.map(({id, ...h}) => ({ 
+                // Strip IDs, keep names
+                subjects: appState.subjects.map(({ id, ...s }) => s),
+                // Strip IDs, add subjectName
+                lessons: appState.lessons.map(({ id, subjectId, ...l }) => ({
+                    ...l,
+                    subjectName: subjectMap.get(subjectId) || 'Unknown Subject'
+                })),
+                // Strip IDs, add subjectName and lessonName
+                questions: appState.questions.map(({ id, subjectId, lessonId, ...q }) => ({
+                    ...q,
+                    subjectName: subjectMap.get(subjectId) || 'Unknown Subject',
+                    lessonName: lessonMap.get(lessonId) || 'Unknown Lesson'
+                })),
+                // Convert Timestamps to ISO strings
+                quizHistory: appState.quizHistory.map(({ id, ...h }) => ({
                     ...h,
-                    timestamp: h.timestamp.toDate().toISOString() 
+                    timestamp: h.timestamp.toDate().toISOString()
                 }))
             };
             downloadJSON(dataToExport, `studyhelper_full_backup_${new Date().toISOString().split('T')[0]}.json`);
         });
 
+        // --- "Import Subject" Form (UPDATED) ---
         importSubjectForm.addEventListener('submit', (e) => {
             e.preventDefault();
             if (!currentUserId) { showModal('auth-modal'); return; }
-            const subjectId = importSubjectSelect.value;
-            const file = $('#import-subject-file').files[0];
-            if (!subjectId || !file) {
-                showToast('Please select a subject and a file.', 'error');
+            const file = importSubjectFile.files[0];
+            if (!file) {
+                showToast('Please select a file.', 'error');
                 return;
             }
-            
+
             const reader = new FileReader();
             reader.onload = async (event) => {
                 try {
                     const importedData = JSON.parse(event.target.result);
-                    if (!importedData.questions || !importedData.subjectName) {
+                    if (!importedData.subjectName || !importedData.lessons) {
                         throw new Error('Invalid subject file format.');
                     }
-                    
+
+                    // Check if subject name already exists
+                    let subjectName = importedData.subjectName;
+                    if (appState.subjects.some(s => s.name.toLowerCase() === subjectName.toLowerCase())) {
+                        subjectName = `${subjectName} (Copy) ${Date.now() % 1000}`;
+                    }
+
                     const batch = writeBatch(db);
-                    importedData.questions.forEach(question => {
-                        const docRef = doc(getQuestionsCol()); 
-                        batch.set(docRef, {
-                            ...question,
-                            subjectId: subjectId 
+
+                    // 1. Create new subject
+                    const subjectDocRef = doc(getSubjectsCol());
+                    batch.set(subjectDocRef, { name: subjectName });
+                    const newSubjectId = subjectDocRef.id;
+
+                    let totalQuestions = 0;
+
+                    // 2. Create lessons and questions
+                    for (const lesson of importedData.lessons) {
+                        const lessonDocRef = doc(getLessonsCol());
+                        batch.set(lessonDocRef, {
+                            name: lesson.name,
+                            subjectId: newSubjectId
                         });
-                    });
-                    
+                        const newLessonId = lessonDocRef.id;
+
+                        if (lesson.questions && Array.isArray(lesson.questions)) {
+                            for (const question of lesson.questions) {
+                                const questionDocRef = doc(getQuestionsCol());
+                                batch.set(questionDocRef, {
+                                    ...question,
+                                    subjectId: newSubjectId,
+                                    lessonId: newLessonId
+                                });
+                                totalQuestions++;
+                            }
+                        }
+                    }
+
                     await batch.commit();
-                    setImportStatus(`Imported ${importedData.questions.length} questions to ${appState.subjects.find(s=>s.id === subjectId).name}.`);
+                    setImportStatus(`Imported new subject "${subjectName}" with ${importedData.lessons.length} lessons and ${totalQuestions} questions.`);
                     importSubjectForm.reset();
                 } catch (error) {
                     setImportStatus(`Error: ${error.message}`, true);
@@ -2276,42 +3327,90 @@
             };
             reader.readAsText(file);
         });
-        
+
+        // --- "Import Full Backup" Form (UPDATED) ---
         importFullForm.addEventListener('submit', (e) => {
             e.preventDefault();
             if (!currentUserId) { showModal('auth-modal'); return; }
-            const file = $('#import-full-file').files[0];
+            const file = importFullFile.files[0];
             if (!file) {
                 showToast('Please select a file.', 'error');
                 return;
             }
-            
+
             const reader = new FileReader();
             reader.onload = (event) => {
                 try {
                     const importedData = JSON.parse(event.target.result);
-                    if (!importedData.subjects || !importedData.questions || !importedData.quizHistory) {
+                    if (!importedData.subjects || !importedData.lessons || !importedData.questions) {
                         throw new Error('Invalid backup file format.');
                     }
-                    
+
                     showConfirmModal(
                         'Import Full Backup?',
                         'This will add all data from the file. It may create duplicates. Are you sure?',
                         async () => {
                             try {
                                 const batch = writeBatch(db);
-                                importedData.subjects.forEach(s => batch.set(doc(getSubjectsCol()), s));
-                                importedData.questions.forEach(q => batch.set(doc(getQuestionsCol()), q));
-                                importedData.quizHistory.forEach(h => {
-                                    batch.set(doc(getHistoryCol()), {
-                                        ...h,
-                                        timestamp: Timestamp.fromDate(new Date(h.timestamp))
+                                const subjectNameMap = new Map(); // Map<oldName, newId>
+                                const lessonNameMap = new Map(); // Map<oldSubjectName_oldLessonName, newId>
+
+                                // 1. Import Subjects
+                                for (const subject of importedData.subjects) {
+                                    let subjectName = subject.name;
+                                    if (appState.subjects.some(s => s.name.toLowerCase() === subjectName.toLowerCase())) {
+                                        subjectName = `${subjectName} (Import) ${Date.now() % 1000}`;
+                                    }
+                                    const subjectDocRef = doc(getSubjectsCol());
+                                    batch.set(subjectDocRef, { name: subjectName });
+                                    subjectNameMap.set(subject.name, subjectDocRef.id);
+                                }
+
+                                // 2. Import Lessons
+                                for (const lesson of importedData.lessons) {
+                                    const newSubjectId = subjectNameMap.get(lesson.subjectName);
+                                    if (!newSubjectId) continue; // Skip orphan lessons
+
+                                    const lessonDocRef = doc(getLessonsCol());
+                                    batch.set(lessonDocRef, {
+                                        name: lesson.name,
+                                        subjectId: newSubjectId
                                     });
-                                });
+                                    lessonNameMap.set(`${lesson.subjectName}_${lesson.name}`, lessonDocRef.id);
+                                }
+
+                                // 3. Import Questions
+                                for (const question of importedData.questions) {
+                                    const newSubjectId = subjectNameMap.get(question.subjectName);
+                                    const newLessonId = lessonNameMap.get(`${question.subjectName}_${question.lessonName}`);
+                                    if (!newSubjectId || !newLessonId) continue; // Skip orphan questions
+
+                                    const questionDocRef = doc(getQuestionsCol());
+                                    batch.set(questionDocRef, {
+                                        question: question.question,
+                                        options: question.options,
+                                        correctAnswerIndex: question.correctAnswerIndex,
+                                        subjectId: newSubjectId,
+                                        lessonId: newLessonId
+                                    });
+                                }
+
+                                // 4. Import History (if exists)
+                                if (importedData.quizHistory) {
+                                    importedData.quizHistory.forEach(h => {
+                                        const historyDocRef = doc(getHistoryCol());
+                                        batch.set(historyDocRef, {
+                                            ...h,
+                                            timestamp: Timestamp.fromDate(new Date(h.timestamp))
+                                        });
+                                    });
+                                }
+
                                 await batch.commit();
                                 setImportStatus('Full backup imported successfully!');
                                 importFullForm.reset();
                             } catch (error) {
+                                console.error("Import Error:", error);
                                 setImportStatus(`Error importing: ${error.message}`, true);
                             }
                         },
@@ -2319,26 +3418,30 @@
                         'bg-sky-600'
                     );
                 } catch (error) {
-                    setImportStatus(`Error: ${error.message}`, true);
+                    setImportStatus(`Error reading file: ${error.message}`, true);
                 }
             };
             reader.readAsText(file);
         });
 
-        
+        // --- "Delete All Data" Button ---
         deleteAllDataButton.addEventListener('click', () => {
             if (!currentUserId) { showModal('auth-modal'); return; }
             showConfirmModal(
                 'DELETE ALL DATA?',
-                'This is your final warning. All your subjects, questions, and quiz history will be permanently erased. This cannot be undone.',
+                'This is your final warning. All your subjects, lessons, questions, and quiz history will be permanently erased. This cannot be undone.',
                 async () => {
                     try {
+                        // This is a simple but slow way. A better way uses cloud functions.
+                        // For a client-side app, this is the most direct approach.
                         const batch = writeBatch(db);
-                        const collections = [getSubjectsCol(), getQuestionsCol(), getHistoryCol()];
+                        const collections = [getSubjectsCol(), getLessonsCol(), getQuestionsCol(), getHistoryCol()];
+
                         for (const colRef of collections) {
-                             const snapshot = await getDocs(colRef);
-                             snapshot.forEach(doc => batch.delete(doc.ref));
+                            const snapshot = await getDocs(colRef);
+                            snapshot.forEach(doc => batch.delete(doc.ref));
                         }
+
                         await batch.commit();
                         showToast('All your data has been deleted.', 'success');
                     } catch (error) {
@@ -2355,18 +3458,20 @@
         // =================================================================
         // 
 
+        // --- Sidebar Toggle ---
         sidebarToggleBtn.addEventListener('click', () => {
             appState.isSidebarOpen = !appState.isSidebarOpen;
             sidebar.classList.toggle('collapsed');
             mainContent.classList.toggle('sidebar-collapsed');
-            
+
             const icon = appState.isSidebarOpen ? 'panel-left-close' : 'panel-left-open';
             sidebarToggleBtn.innerHTML = `<i data-lucide="${icon}" class="w-6 h-6"></i>`;
             lucide.createIcons();
-            
+
             localStorage.setItem('studyhelper-sidebar', appState.isSidebarOpen);
         });
-        
+
+        // --- Restore Sidebar State ---
         if (localStorage.getItem('studyhelper-sidebar') === 'false') {
             appState.isSidebarOpen = false;
             sidebar.classList.add('collapsed');
@@ -2374,6 +3479,7 @@
             sidebarToggleBtn.innerHTML = `<i data-lucide="panel-left-open" class="w-6 h-6"></i>`;
         }
 
+        // --- Sidebar Link Navigation ---
         $$('.sidebar-link').forEach(link => {
             link.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -2382,6 +3488,7 @@
             });
         });
 
+        // --- Dashboard Button Navigation ---
         document.addEventListener('click', (e) => {
             const navButton = e.target.closest('.nav-button');
             if (navButton) {
@@ -2391,6 +3498,7 @@
             }
         });
 
+        // --- Dark Mode Toggle ---
         const darkModeSwitch = $('#dark-mode-switch');
         $('#dark-mode-toggle').addEventListener('click', () => {
             document.documentElement.classList.toggle('dark');
@@ -2402,18 +3510,24 @@
                 darkModeSwitch.classList.remove('dark:translate-x-5');
             }
         });
-        
-        if (localStorage.getItem('studyhelper-darkmode') === 'true' || 
-           (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches && !localStorage.getItem('studyhelper-darkmode'))) 
-        {
-             document.documentElement.classList.add('dark');
-             darkModeSwitch.classList.add('dark:translate-x-5');
+
+        // --- Restore Dark Mode State ---
+        if (localStorage.getItem('studyhelper-darkmode') === 'true' ||
+            (!localStorage.getItem('studyhelper-darkmode') && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+            darkModeSwitch.classList.add('dark:translate-x-5');
         }
 
-        // --- Final Initialization ---
-        lucide.createIcons(); 
-        initializeAuth(); 
-        
+        // 
+        // =================================================================
+        // === FINAL INITIALIZATION ========================================
+        // =================================================================
+        // 
+
+        lucide.createIcons(); // Initial icon render
+        initializeAuth(); // Start auth flow
+
     </script>
 </body>
+
 </html>

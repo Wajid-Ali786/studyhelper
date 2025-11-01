@@ -1,10 +1,10 @@
-.modal-backdrop.open .modal-content {
+/* .modal-backdrop.open .modal-content {
     translate: 50%;
-}
+} */
 #dark-mode-toggle svg {
     margin-left: 0;
 }
-header .relative.my-nav {
+header .my-nav {
     display: flex;
     flex-direction: row;
 }
@@ -12,10 +12,10 @@ header .relative.my-nav {
 header .my-nav-ul {
     display: flex;
     flex-direction: row;
+    gap: 10px;
 }
 header .my-nav-ul .my-study-btn {
     display: inline-block;
-    margin-right: 15px;
     background-color: #4CAF50; 
     color: white;
     padding: 10px 20px;
