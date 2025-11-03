@@ -1,39 +1,75 @@
 /* .modal-backdrop.open .modal-content {
     translate: 50%;
 } */
- .modal-content.open {
-    opacity: 1;
- }
+.modal-content.open {
+  opacity: 1;
+}
 #dark-mode-toggle svg {
-    margin-left: 0;
+  margin-left: 0;
 }
 header .my-nav {
-    display: flex;
-    flex-direction: row;
+  display: flex;
+  flex-direction: row;
 }
 
 header .my-nav-ul {
-    display: flex;
-    flex-direction: row;
-    gap: 10px;
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
 }
 header .my-nav-ul .my-study-btn {
-    display: inline-block;
-    background-color: #4CAF50; 
-    color: white;
-    padding: 10px 20px;
-    text-decoration: none;
-    border-radius: 6px;
-    font-weight: bold;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-}
-
-header .my-nav-ul .my-study-btn {
-    background-color: #45a049; 
-    transform: scale(1.05);
+  display: inline-block;
+  background-color: #4caf50;
+  color: white;
+  padding: 10px 20px;
+  text-decoration: none;
+  border-radius: 6px;
+  font-weight: bold;
+  transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 header .my-nav-ul .my-study-btn {
-    background-color: #3e8e41;
-    transform: scale(0.98);
+  background-color: #45a049;
+  transform: scale(1.05);
+}
+
+header .my-nav-ul .my-study-btn {
+  background-color: #3e8e41;
+  transform: scale(0.98);
+}
+
+@media (max-width: 768px) {
+
+  nav.collapsed {
+    width: 4em;
+  }
+
+  main.sidebar-collapsed {
+    margin-left: 4em;
+  }
+
+  #page-title {
+    display: none;
+  }
+
+  header {
+    overflow-x: scroll;
+    padding: 10px !important;
+  }
+
+  header .my-nav-ul .my-study-btn {
+    font-size: 14px;
+    padding: 8px 14px;
+    width: max-content;
+  }
+
+  #sidebar .h-16.flex.items-center.px-6 {
+    padding: 5px;
+    margin: 0 auto;
+  }
+
+  #sidebar .flex-grow.overflow-y-auto.py-6.px-4 {
+    padding: 10px 5px;
+  }
+
 }
